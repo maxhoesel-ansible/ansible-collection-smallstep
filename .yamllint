@@ -2,6 +2,9 @@
 # Based on ansible-lint config
 extends: default
 
+ignore: |
+  tests/testenv/
+
 rules:
   braces:
     max-spaces-inside: 1

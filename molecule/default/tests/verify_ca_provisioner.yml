@@ -20,7 +20,7 @@
 
 - name: Testing password file is present
   copy:
-    concent: molecule-test
+    content: molecule-test
     dest: '{{ stepca_home }}/molecule_passfile'
     owner: '{{ stepca_user }}'
     group: '{{ stepca_user }}'
@@ -29,7 +29,7 @@
   become_user: '{{ stepca_user }}'
 
 - name: Create test provisioners
-  ariosthephoenix.smallstep.ca_provisioner: '{{ item }}'
+  maxhoesel.smallstep.ca_provisioner: '{{ item }}'
   become: yes
   become_user: '{{ stepca_user }}'
   loop:

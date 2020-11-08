@@ -3,10 +3,11 @@
 
 # Copyright: (c) 2020, Max Hösel <ansible@maxhoesel.de>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-from __future__ import (absolute_import, division, print_function)
+from __future__ import absolute_import, division, print_function
+
 __metaclass__ = type
 
-DOCUMENTATION = r'''
+DOCUMENTATION = r"""
 ---
 module: ca_provisioner
 short_description: Manage provisioners for a Smallstep CA server
@@ -109,9 +110,9 @@ options:
         description: Root certificate (chain) file used to validate the signature on X5C provisioning tokens.
 author:
     - Max Hösel (@maxhoesel)
-'''
+"""
 
-EXAMPLES = r'''
+EXAMPLES = r"""
 - name: Add a single JWK provisioner
   maxhoesel.smallstep.ca_provisioner:
     name: max@smallstep.com
@@ -222,7 +223,7 @@ EXAMPLES = r'''
   maxhoesel.smallstep.ca_provisioner:
     name: Amazon
     type: AWS
-'''
+"""
 
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils._text import to_text
@@ -231,14 +232,14 @@ from ansible.module_utils.common.validation import check_type_list
 import json
 import os
 
+
 def get_provisioners(module, result):
-    with open(module.params['ca_config'], 'rb') as f:
+    with open(module.params["ca_config"], "rb") as f:
         try:
             config = json.load(f)
         except json.JSONDecodeError as e:
-            module.fail_json(msg='Error when loading ca.json config: {}'.format(e),
-                             **result)
-    return config['authority']['provisioners']
+            module.fail_json(msg="Error when loading ca.json config: {}".format(e), **result)
+    return config["authority"]["provisioners"]
 
 
 def add_provisioner(module, result):
@@ -248,38 +249,43 @@ def add_provisioner(module, result):
     Return: result dict
     """
     arg_map = {
-        'aws_account': '--aws-account',
-        'aws_iid_roots_file': '--iid-roots',
-        'azure_tenant': '--azure-tenant',
-        'azure_resource_group': '--azure-resource-group',
-        'disable_custom_sans': '--disable-custom-sans',
-        'disable_trust_on_first_use': '--disable-trust-on-first-use',
-        'gcp_service_account': '--gcp-service-account',
-        'gcp_project': '--gcp-project',
-        'instance_age': '--instance-age',
-        'k8s_pem_keys_file': '--pem-keys',
-        'jwk_create': '--create',
-        'jwk_password_file': '--password-file',
-        'oidc_client_id': '--client-id',
-        'oidc_client_secret': '--client-secret',
-        'oidc_admin_email': '--admin',
-        'oidc_domain': '--domain',
-        'ssh': '--ssh',
-        'x5c_root_file': '--x5c-root'
+        "aws_account": "--aws-account",
+        "aws_iid_roots_file": "--iid-roots",
+        "azure_tenant": "--azure-tenant",
+        "azure_resource_group": "--azure-resource-group",
+        "disable_custom_sans": "--disable-custom-sans",
+        "disable_trust_on_first_use": "--disable-trust-on-first-use",
+        "gcp_service_account": "--gcp-service-account",
+        "gcp_project": "--gcp-project",
+        "instance_age": "--instance-age",
+        "k8s_pem_keys_file": "--pem-keys",
+        "jwk_create": "--create",
+        "jwk_password_file": "--password-file",
+        "oidc_client_id": "--client-id",
+        "oidc_client_secret": "--client-secret",
+        "oidc_admin_email": "--admin",
+        "oidc_domain": "--domain",
+        "ssh": "--ssh",
+        "x5c_root_file": "--x5c-root",
     }
-    optional_list_args = ['aws_account', 'azure_resource_group', 'gcp_service_account',
-                          'gcp_project' 'oidc_admin_email', 'oidc_domain']
-    bool_args = ['disable_custom_sans', 'disable_trust_on_first_use', 'jwk_create', 'ssh']
+    optional_list_args = [
+        "aws_account",
+        "azure_resource_group",
+        "gcp_service_account",
+        "gcp_project" "oidc_admin_email",
+        "oidc_domain",
+    ]
+    bool_args = ["disable_custom_sans", "disable_trust_on_first_use", "jwk_create", "ssh"]
 
     # These args are always required
-    args = ['add', module.params['name'], '--type=' + module.params['type']]
+    args = ["add", module.params["name"], "--type=" + module.params["type"]]
     # step automatically truncates invalid parameters for us, so we can be
     # lazy and just pass through all user-supplied parameters for provisioners,
     # even if their type doesn't match (e.g. Azure params for a GCP provisioner).
     # We do however handle the jwk keys separately as they are positional parameters
     # instead of flags
-    if module.params['type'] == 'JWK' and module.params['jwk_key_files']:
-        args.extend(check_type_list(module.params['jwk_key_files']))
+    if module.params["type"] == "JWK" and module.params["jwk_key_files"]:
+        args.extend(check_type_list(module.params["jwk_key_files"]))
 
     for arg in arg_map:
         if module.params[arg]:
@@ -288,14 +294,15 @@ def add_provisioner(module, result):
                 # we first need to convert the user-supplied lists into steps format:
                 # --arg-name=val1 --arg-name=val2
                 list_args = check_type_list(module.params[arg])
-                args.extend([arg_map[arg] + '=' + arg for arg in list_args])
+                args.extend([arg_map[arg] + "=" + arg for arg in list_args])
             if arg in bool_args:
                 args.append(arg_map[arg])
             else:
-                args.append(arg_map[arg] + '=' + module.params[arg])
-    result = run_step_command(module, result, args, errmsg='Error when trying to add provisioner')
-    result['changed'] = True
+                args.append(arg_map[arg] + "=" + module.params[arg])
+    result = run_step_command(module, result, args, errmsg="Error when trying to add provisioner")
+    result["changed"] = True
     return result
+
 
 def remove_provisioner(module, result):
     """
@@ -303,25 +310,29 @@ def remove_provisioner(module, result):
 
     Return: result dict
     """
-    args = ['remove', module.params['name'], '--type=' + module.params['type']]
-    result = run_step_command(module,result,args, errmsg='Error when trying to remove provisioner')
-    result['changed'] = True
+    args = ["remove", module.params["name"], "--type=" + module.params["type"]]
+    result = run_step_command(
+        module, result, args, errmsg="Error when trying to remove provisioner"
+    )
+    result["changed"] = True
     return result
+
 
 def run_step_command(module, result, args, errmsg):
     """
     Run a step command with the parameters given in args,
     as well as the ca-config file defined in the module params
     """
-    base_args = [module.params['step_executable'], 'ca', 'provisioner']
+    base_args = [module.params["step_executable"], "ca", "provisioner"]
     args = base_args + args
-    if module.params['ca_config']:
-        args.append('--ca-config=' + module.params['ca_config'])
+    if module.params["ca_config"]:
+        args.append("--ca-config=" + module.params["ca_config"])
 
-    rc, result['stdout'], result['stderr'] = module.run_command(args)
+    rc, result["stdout"], result["stderr"] = module.run_command(args)
     if rc != 0:
         module.fail_json(msg=errmsg, **result)
     return result
+
 
 def run_module():
     module_args = dict(
@@ -329,14 +340,14 @@ def run_module():
         aws_iid_roots_file=dict(),
         azure_tenant=dict(),
         azure_resource_group=dict(),
-        ca_config=dict(default='{}/.step/config/ca.json'.format(os.path.expanduser('~'))),
-        disable_custom_sans=dict(type='bool', default=False),
-        disable_trust_on_first_use=dict(type='bool', default=False),
+        ca_config=dict(default="{}/.step/config/ca.json".format(os.path.expanduser("~"))),
+        disable_custom_sans=dict(type="bool", default=False),
+        disable_trust_on_first_use=dict(type="bool", default=False),
         gcp_service_account=dict(),
         gcp_project=dict(),
         instance_age=dict(),
         k8s_pem_keys_file=dict(),
-        jwk_create=dict(type='bool', default=False),
+        jwk_create=dict(type="bool", default=False),
         jwk_key_files=dict(),
         jwk_password_file=dict(no_log=False),
         name=dict(required=True),
@@ -344,69 +355,65 @@ def run_module():
         oidc_client_secret=dict(),
         oidc_admin_email=dict(),
         oidc_domain=dict(),
-        ssh=dict(type='bool', default=False),
-        state=dict(choices=['present', 'absent'], default='present'),
-        step_executable=dict(default='step'),
-        type=dict(choices=[
-            'JWK',
-            'OIDC',
-            'AWS',
-            'GCP',
-            'Azure',
-            'ACME',
-            'X5C',
-            'K8sSA',
-            'SSHPOP'
-        ], default='JWK'),
-        x5c_root_file=dict()
+        ssh=dict(type="bool", default=False),
+        state=dict(choices=["present", "absent"], default="present"),
+        step_executable=dict(default="step"),
+        type=dict(
+            choices=["JWK", "OIDC", "AWS", "GCP", "Azure", "ACME", "X5C", "K8sSA", "SSHPOP"],
+            default="JWK",
+        ),
+        x5c_root_file=dict(),
     )
-    result = dict(
-        changed=False,
-        stdout='',
-        stderr='',
-        msg=''
-    )
-    module = AnsibleModule(
-        argument_spec=module_args,
-        supports_check_mode=True
-    )
+    result = dict(changed=False, stdout="", stderr="", msg="")
+    module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
 
     # Shorthands for commonly used values
-    name = module.params['name']
-    state = module.params['state']
-    p_type = module.params['type']
+    name = module.params["name"]
+    state = module.params["state"]
+    p_type = module.params["type"]
 
-    rc, result['stdout'], result['stderr'] = module.run_command([module.params['step_executable']])
+    rc, result["stdout"], result["stderr"] = module.run_command([module.params["step_executable"]])
     if rc != 0:
-        result['msg'] = 'Could not run step binary on remote host. Please make sure that it is installed and in $PATH.'
+        result[
+            "msg"
+        ] = "Could not run step binary on remote host. Please make sure that it is installed and in $PATH."
         module.fail_json(**result)
 
     provisioners = get_provisioners(module, result)
+    # Edge case - no provisioner present
+    if not provisioners and state == "absent":
+        module.exit_json(**result)
+    elif not provisioners and state == "present":
+        add_provisioner(module, result)
+        result["changed"] = True
+        module.exit_json(**result)
+
     for p in provisioners:
-        if p['type'] == p_type and p['name'] == name:
+        if p["type"] == p_type and p["name"] == name:
             # Found a matching provisioner, now we need to decide what to do with it
-            if state == 'present':
-                result['msg'] = 'Provisioner found in CA config - not modified'
-            elif state == 'absent':
+            if state == "present":
+                result["msg"] = "Provisioner found in CA config - not modified"
+            elif state == "absent":
                 if module.check_mode:
-                    result['changed'] = True
+                    result["changed"] = True
                 if not module.check_mode:
                     remove_provisioner(module, result)
-                    result['changed'] = True
+                    result["changed"] = True
             module.exit_json(**result)
 
     # No matching provisioner found
-    if module.params['state'] == 'present':
+    if module.params["state"] == "present":
         if module.check_mode:
-            result['changed'] = True
+            result["changed"] = True
         else:
             add_provisioner(module, result)
-            result['changed'] = True
+            result["changed"] = True
     module.exit_json(**result)
+
 
 def main():
     run_module()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
