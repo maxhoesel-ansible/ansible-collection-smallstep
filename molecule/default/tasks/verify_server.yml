@@ -1,0 +1,91 @@
+- name: Include ca_server vars
+  include_vars: '{{ item }}'
+  loop:
+  - ../../../roles/ca_server/defaults/main.yml
+  - ../../../roles/ca_server/vars/main.yml
+  - '../../../roles/ca_server/vars/{{ ansible_os_family }}.yml'
+
+- name: Get current version [step-ca]
+  shell: "step-ca version | cut -d' ' -f 2 | cut -d'/' -f 2 | awk 'FNR == 1'"
+  environment:
+    PATH: /usr/local/bin:{{ ansible_env.PATH }}
+  changed_when: no
+  register: stepca_current_version
+- name: Get current version [step]
+  shell: "step version | cut -d' ' -f 2 | cut -d'/' -f 2 | awk 'FNR == 1'"
+  environment:
+    PATH: /usr/local/bin:{{ ansible_env.PATH }}
+  changed_when: no
+  register: step_current_version
+
+- block:
+  - name: Get latest release information [step-ca]
+    uri:
+      url: https://api.github.com/repos/smallstep/certificates/releases/latest
+      body_format: json
+      return_content: yes
+    register: stepca_latest_release
+    delegate_to: localhost
+    run_once: yes
+  - name: Set release tag [step-ca]
+    set_fact:
+      stepca_version: '{{ (stepca_latest_release.json.tag_name)[1:] }}'
+  when: stepca_version == "latest"
+- block:
+  - name: Get latest release information [step]
+    uri:
+      url: https://api.github.com/repos/smallstep/cli/releases/latest
+      body_format: json
+      return_content: yes
+    register: step_latest_release
+    delegate_to: localhost
+    run_once: yes
+  - name: Set release tag [step-ca]
+    set_fact:
+      step_version: '{{ (step_latest_release.json.tag_name)[1:] }}'
+  when: step_version == "latest"
+
+- name: Check installed version is correct [step-ca]
+  assert:
+    quiet: yes
+    that: stepca_current_version.stdout == stepca_version
+- name: Check installed version is correct [step]
+  assert:
+    quiet: yes
+    that: step_current_version.stdout == step_version
+
+- name: Check service status
+  systemd:
+    name: step-ca.service
+    state: started
+    enabled: yes
+  check_mode: yes
+  register: stepca_service_status
+- name: Assert that service is running
+  assert:
+    quiet: yes
+    that: not stepca_service_status.changed
+
+- name: Check server health
+  command: step ca health
+  environment:
+    PATH: /usr/local/bin:{{ ansible_env.PATH }}
+  become: yes
+  become_user: '{{ stepca_user }}'
+  changed_when: no
+
+- name: Look for sensitive password/key files
+  stat:
+    path: '{{ item }}'
+  register: stepca_password_files
+  loop:
+  - '{{ stepca_home }}/{{ stepca_root_passfile }}'
+  - '{{ stepca_home }}/{{ stepca_provisioner_passfile }}'
+  - '{{ stepca_root_key_file }}'
+  - '{{ stepca_root_cert_file }}'
+  become: yes
+- name: Assert that sensitive files are absent
+  assert:
+    quiet: yes
+    that: not item.stat.exists
+  loop: '{{ stepca_password_files.results }}'

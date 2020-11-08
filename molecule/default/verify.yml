@@ -1,0 +1,18 @@
+---
+# This is an example playbook to execute Ansible tests.
+
+- name: Verify server installation
+  hosts: server-*
+  tasks:
+  - include_tasks: 'tasks/verify_server.yml'
+
+- name: Verify ca_provisioner module
+  hosts: server-*
+  tasks:
+  - include_tasks: 'tasks/verify_ca_provisioner.yml'
+
+#- name: Verify client installation
+
+#- name: Create provisioners for clients
+
+#- name: Verify client provisioning and renewal

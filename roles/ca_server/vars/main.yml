@@ -1,0 +1,7 @@
+---
+# vars file for roles/step_certificates
+stepca_root_passfile: .step_root_pass
+stepca_intermediate_passfile: .step_intermediate_pass
+stepca_provisioner_passfile: .step_provisioner_pass
+stepca_root_cert_file: .step_root_cert
+stepca_root_key_file: .step_root_key

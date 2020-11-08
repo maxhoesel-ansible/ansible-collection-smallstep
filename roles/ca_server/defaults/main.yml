@@ -1,0 +1,37 @@
+---
+# Version of step/step-ca to install. Can be latest or a specific
+# github release (e.g. '0.15.3')
+stepca_version: latest
+step_version: latest
+
+# User as which the step-ca server will run
+stepca_user: step
+stepca_home: /opt/step
+# Directory under which step-ca logs will be saved
+stepca_logdir: /var/log/step-ca
+
+# CA Settings used for initial setup. Note that changing these values will
+# have no effect if the CA already exists.
+stepca_name: Example Inc.
+stepca_dns_names: '{{ ansible_fqdn }},{{ ansible_default_ipv4.address }}'
+# Address under which the step-ca server will listen for connections
+stepca_address: :443
+
+# The password used to encrypt the root key (and intermediate keys while installing)
+stepca_root_password:
+# The password used to encrypt the intermediate key with after installing
+stepca_intermediate_password:
+
+# Options for the initial JWT provisioner
+stepca_provisioner_name: ansible-init
+stepca_provisioner_password: '{{ stepca_intermediate_password }}'
+# Whether to remove the initial provisioner after creation
+stepca_provisioner_remove: yes
+
+# --- OPTIONAL ---
+# You can use an existing root certificate and key as the root CA for step-ca
+# instead of letting step-ca generate new ones.
+stepca_root_cert:
+stepca_root_key:
+# Whether to create SSH keys for SSH CA operations
+stepca_ssh: no

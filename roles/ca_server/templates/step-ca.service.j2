@@ -1,0 +1,17 @@
+[Unit]
+Description=step-ca
+After=syslog.target network.target
+
+[Service]
+User=step
+Group=step
+Enviroment=PATH={{ stepca_executable_path }}:$PATH
+ExecStart=/bin/sh -c '{{ stepca_executable_path }}/step-ca {{ stepca_home }}/.step/config/ca.json --password-file={{ stepca_home }}/{{ stepca_intermediate_passfile }} >> /var/log/step-ca/output.log 2>&1'
+Type=simple
+Restart=on-failure
+RestartSec=10
+# Needed to bind to lower ports like 443
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+
+[Install]
+WantedBy=multi-user.target

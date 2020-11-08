@@ -1,0 +1,94 @@
+# These shell calls return "" when the binary in question is not found.
+# This means that we don't need to actually check for the existence of the binary first.
+# Not the cleanest solution, but it's simple and works well.
+- name: Get current version [step-ca]
+  shell: "{{ stepca_executable_path }}/step-ca version | cut -d' ' -f 2 | cut -d'/' -f 2 | awk 'FNR == 1'" # noqa 306
+  changed_when: no
+  register: stepca_current_version
+- name: Get current version [step]
+  shell: "{{ stepca_executable_path }}/step version | cut -d' ' -f 2 | cut -d'/' -f 2 | awk 'FNR == 1'" # noqa 306
+  changed_when: no
+  register: step_current_version
+
+- block:
+  - name: Get latest release information [step-ca]
+    uri:
+      url: https://api.github.com/repos/smallstep/certificates/releases/latest
+      body_format: json
+      return_content: yes
+    register: stepca_latest_release
+    delegate_to: localhost
+    run_once: yes
+  - name: Set release tag [step-ca]
+    set_fact:
+      stepca_version: '{{ (stepca_latest_release.json.tag_name)[1:] }}'
+  when: stepca_version == 'latest'
+- block:
+  - name: Get latest release information [step]
+    uri:
+      url: https://api.github.com/repos/smallstep/cli/releases/latest
+      body_format: json
+      return_content: yes
+    register: step_latest_release
+    delegate_to: localhost
+    run_once: yes
+  - name: Set release tag [step]
+    set_fact:
+      step_version: '{{ (step_latest_release.json.tag_name)[1:] }}'
+  when: step_version == 'latest'
+
+- block:
+  - name: requirements are installed [Debian]
+    apt:
+      name:
+        - xz-utils
+        - 'python{% if ansible_python.version.major == 3 %}3{% endif %}-pexpect'
+      update_cache: yes
+
+  - name: step-ca is installed [Debian]
+    apt:
+      deb: 'https://github.com/smallstep/certificates/releases/download/v{{ stepca_version }}/step-certificates_{{ stepca_version }}_amd64.deb'
+    when: stepca_current_version.stdout != stepca_version
+  - name: step is installed [Debian]
+    apt:
+      deb: 'https://github.com/smallstep/cli/releases/download/v{{ step_version }}/step-cli_{{ step_version }}_amd64.deb'
+    when: step_current_version.stdout != step_version
+  become: yes
+  when: ansible_os_family == 'Debian'
+
+- block:
+  - name: Requirements are installed [EL8]
+    dnf:
+      name: python3-pexpect
+
+  - block:
+    - name: Download and extract step-ca release [EL]
+      unarchive:
+        src: 'https://github.com/smallstep/certificates/releases/download/v{{ stepca_version }}/step-certificates_linux_{{ stepca_version }}_amd64.tar.gz'
+        dest: /tmp
+        remote_src: yes
+    - name: Install step-ca binary [EL]
+      shell: 'cp /tmp/step-certificates_{{ stepca_version }}/bin/* {{ stepca_executable_path }}/'
+    always:
+    - name: Remove step-ca release archive [EL]
+      file:
+        path: '/tmp/step-certificates_{{ stepca_version }}'
+        state: absent
+    when: stepca_current_version.stdout != stepca_version
+
+  - block:
+    - name: Download and extract step release [EL]
+      unarchive:
+        src: 'https://github.com/smallstep/cli/releases/download/v{{ step_version }}/step_linux_{{ step_version }}_amd64.tar.gz'
+        dest: /tmp
+        remote_src: yes
+    - name: Install step binary [EL]
+      shell: 'cp /tmp/step_{{ step_version }}/bin/* {{ stepca_executable_path }}/'
+    always:
+    - name: Remove step release archive [EL]
+      file:
+        path: '/tmp/step_{{ step_version }}'
+        state: absent
+    when: step_current_version.stdout != step_version
+  become: yes
+  when: ansible_os_family == "RedHat"

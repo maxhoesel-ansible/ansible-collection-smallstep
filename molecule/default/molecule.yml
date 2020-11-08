@@ -1,0 +1,49 @@
+---
+lint: |
+  set -e
+  ansible-lint ./ ./roles/*
+  yamllint .
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  - name: server-ubuntu-20
+    image: "geerlingguy/docker-ubuntu2004-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+  - name: server-ubuntu-18
+    image: "geerlingguy/docker-ubuntu1804-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+  - name: server-debian-10
+    image: "geerlingguy/docker-debian10-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+  - name: server-debian-9
+    image: "geerlingguy/docker-debian9-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+  - name: server-centos-8
+    image: "geerlingguy/docker-centos8-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+provisioner:
+  name: ansible
+verifier:
+  name: ansible

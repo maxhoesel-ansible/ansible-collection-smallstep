@@ -1,0 +1,73 @@
+- block:
+  - name: Password files are generated
+    copy:
+      content: '{{ item.0 }}'
+      dest: '{{ stepca_home }}/{{ item.1 }}'
+      owner: '{{ stepca_user }}'
+      group: '{{ stepca_user }}'
+      mode: 0600
+    loop:
+      - ['{{ stepca_root_password }}', '{{ stepca_root_passfile }}']
+      - ['{{ stepca_intermediate_password }}', '{{ stepca_intermediate_passfile }}']
+      - ['{{ stepca_provisioner_password }}', '{{ stepca_provisioner_passfile }}']
+
+  - name: Existing root key and CA are present
+    copy:
+      content: '{{ item.0 }}'
+      dest: '{{ stepca_home }}/{{ item.1 }}'
+      owner: '{{ stepca_user }}'
+      group: '{{ stepca_user }}'
+      mode: 0600
+    loop:
+      - ['{{ stepca_root_cert }}', '{{ stepca_root_cert_file }}']
+      - ['{{ stepca_root_key }}', '{{ stepca_root_key_file }}']
+    when: stepca_root_cert and stepca_root_key
+
+  - name: Generate init arguments
+    set_fact:
+      stepca_initcmd_keys: >
+        {% if stepca_root_key %}--key={{ stepca_home }}/{{ stepca_root_key_file }}
+        --root={{ stepca_home }}/{{ stepca_root_cert_file }}{% endif %}
+      stepca_initcmd_ssh: >
+        {% if stepca_ssh %}--ssh{% endif %}
+      stepca_initcmd_names: >
+        --name={{ stepca_name }} --dns={{ stepca_dns_names }} --provisioner={{ stepca_provisioner_name }}
+      stepca_initcmd_passwords: >
+        --password-file={{ stepca_home }}/{{ stepca_root_passfile }}
+        --provisioner-password-file={{ stepca_home }}/{{ stepca_provisioner_passfile }}
+  - name: Initialize CA
+    command: >
+      {{ stepca_executable_path }}/step ca init --address={{ stepca_address }} {{ stepca_initcmd_keys }}
+      {{ stepca_initcmd_ssh }} {{ stepca_initcmd_names }} {{ stepca_initcmd_passwords }}
+
+  - name: Get root CA fingerprint
+    command: '{{ stepca_executable_path }}/step certificate fingerprint {{ stepca_home }}/.step/certs/root_ca.crt'
+    register: stepca_rootca_fingerprint
+    notify: print CA cert fingerprint
+
+  - name: Change password for intermediate key
+    expect:
+      command: '{{ stepca_executable_path }}/step crypto change-pass {{ stepca_home }}/.step/secrets/intermediate_ca_key -f'
+      responses:
+        '\bdecrypt\b': '{{ stepca_root_password }}'
+        '\bencrypt\b': '{{ stepca_intermediate_password }}'
+
+  - name: Remove initial provisioner
+    maxhoesel.smallstep.ca_provisioner:
+      name: '{{ stepca_provisioner_name }}'
+      type: JWK
+      state: absent
+      step_executable: '{{ stepca_executable_path }}/step'
+    when: stepca_provisioner_remove
+    notify: restart step-ca
+
+  always:
+  - name: Temporary password files and keys are absent
+    file:
+      path: '{{ stepca_home }}/{{ item }}'
+      state: absent
+    loop:
+      - '{{ stepca_root_passfile }}'
+      - '{{ stepca_provisioner_passfile }}'
+      - '{{ stepca_root_key_file }}'
+      - '{{ stepca_root_cert_file }}'
