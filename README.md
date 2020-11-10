@@ -1,5 +1,9 @@
 # maxhoesel.smallstep
 
+![Release](https://img.shields.io/github/v/release/maxhoesel/ansible-collection-smallstep)
+![Build Status](https://img.shields.io/github/workflow/status/maxhoesel/ansible-collection-smallstep/CI/devel)
+![License](https://img.shields.io/github/license/maxhoesel/ansible-collection-smallstep)
+
 An Ansible collection for managing Smallstep CLI and CA applications.
 
 This collection contains role and modules to help you install, configure, and maintain both the step client and the CA server from Ansible.
