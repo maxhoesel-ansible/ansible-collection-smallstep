@@ -1,6 +1,6 @@
 # maxhoesel.smallstep
 
-An Ansible acollection for managing Smallstep CLI and CA applications.
+An Ansible collection for managing Smallstep CLI and CA applications.
 
 This collection contains role and modules to help you install, configure, and maintain both the step client and the CA server from Ansible.
 
@@ -10,7 +10,7 @@ Currently, the following components are available:
 
 #### Modules
 
-- ca_proisioner: Add and remove provisioners on a step-ca server
+- ca_provisioner: Add and remove provisioners on a step-ca server
 
 #### Roles
 
@@ -19,10 +19,10 @@ Currently, the following components are available:
 
 ## Installation
 
-Before installing the collection, make sure that the following dependencies are met:
+Before installing the collection, make sure that the following dependencies are met on the controller:
 
 - Ansible 2.9 or newer
-- Python 3.5 or newer
+- Python 3.6 or newer
 
 NOTE: Individual roles/modules may have additional requirements. Please see the role/module documentation for more details.
 
@@ -34,12 +34,8 @@ Installation via the official ansible-galaxy repository is currently not possibl
 
 To install the collection directly from this repository, run:
 
-```ansible-galaxy install https://github.com/maxhoesel/ansible-collection-smallstep```#
+```ansible-galaxy install https://github.com/maxhoesel/ansible-collection-smallstep```
 
 #### Tarball install
 
 You can also install a specific version of this collection manually by downloading a tarball from the [releases](https://github.com/maxhoesel/ansible-collection-smallstep/releases).
-
-## Contributing
-
-tbd

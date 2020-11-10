@@ -1,0 +1,63 @@
+---
+name: CI
+on: [push, pull_request]
+
+defaults:
+  run:
+    working-directory: 'maxhoesel.smallstep'
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out codebase
+        uses: actions/checkout@v2
+        with:
+          path: maxhoesel.smallstep
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install test dependencies
+        run: pip3 install yamllint ansible-lint ansible-base
+      - name: Build collection
+        run: ansible-galaxy collection build
+      - name: Install collection
+        run: ansible-galaxy collection install maxhoesel-smallstep-*.tar.gz
+      - name: Lint code
+        run: |
+          yamllint .
+          ansible-lint ./ ./roles/*
+
+  molecule:
+    name: Molecule
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        python-version: [3.6, 3.7]
+        ansible-version: [">=2.9,<2.10", ">=2.10,<2.11"]
+    steps:
+      - name: Check out codebase
+        uses: actions/checkout@v2
+        with:
+          path: 'maxhoesel.smallstep'
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Set up pip
+        run: pip3 install --upgrade pip
+      - name: Install test dependencies
+        run: pip3 install "ansible${{ matrix.ansible-version }}" docker molecule molecule-docker
+      - name: Build collection
+        run: ansible-galaxy collection build
+      - name: Install collection
+        run: ansible-galaxy collection install maxhoesel-smallstep-*.tar.gz
+      - name: Run Molecule tests
+        run: molecule test
+        env:
+          PY_COLORS: '1'
+          ANSIBLE_FORCE_COLOR: '1'

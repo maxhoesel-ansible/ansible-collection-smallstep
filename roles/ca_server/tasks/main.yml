@@ -2,8 +2,8 @@
 - name: Check that passwords are set
   assert:
     that:
-      - stepca_root_password
-      - stepca_intermediate_password
+      - stepca_root_password | length > 0
+      - stepca_intermediate_password | length > 0
     fail_msg: "Please make sure that both stepca_root_password and stepca_intermediate_password are set!"
 
 - name: Load distribution-specific variables
