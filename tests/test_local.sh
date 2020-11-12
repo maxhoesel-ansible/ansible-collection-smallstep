@@ -26,6 +26,7 @@ run() {
     # Create venv and install requirements
     printf "Creating testing virtualenv...\n\n"
     python3 -m venv "$VENV_DIR"
+    # shellcheck disable=SC1090
     source "$VENV_DIR/bin/activate"
     pip3 install --upgrade pip
     pip3 install ansible docker molecule molecule-docker yamllint ansible-lint
@@ -39,7 +40,8 @@ run() {
     printf "\nRunning Linters...\n\n"
     export ANSIBLE_COLLECTIONS_PATH="$COLLECTIONS_DIR"
     yamllint .
-    ansible-lint . "$SCRIPT_DIR/../roles/"*
+    ansible-lint . "$SCRIPT_DIR/../roles/"* "$SCRIPT_DIR"/../molecule/default/tests/* \
+        "$SCRIPT_DIR"/../molecule/default/converge.yml "$SCRIPT_DIR"/../molecule/default/converge.yml
 
     printf "\nRunning molecule...\n\n"
     export TESTENV_COLLECTIONS="$COLLECTIONS_DIR"
