@@ -15,6 +15,7 @@ version_added: '2.10.0'
 description: Use this module to create and remove provisioners from a Smallstep CA server.
 requirements:
     - C(step) tool and C(step-ca) server installed on remote host
+    - C(pexpect) module on remote host
     - This module must be executed as a user with write permissions on the config file specified in I(ca_config) (or the default step-ca config in ~/.step)
 notes:
     - This module will B(not) modify existing provisioners - it can only add or remove them.
@@ -59,6 +60,9 @@ options:
         description: Create a new ECDSA key pair using curve P-256 and populate a new JWK provisioner with it.
         type: bool
         default: no
+    jwk_encrypt_password:
+        description: Password used to encrypt the JWK provisioner key. Required when creating a JWK provisioner
+        no_log: yes
     jwk_key_files:
         description: List of private (or public) keys in JWK or PEM format to be added to the provisioner.
     jwk_password_file:
@@ -94,8 +98,8 @@ options:
         description: Path or name of the step tool used to manage the step-ca server
         default: step
     type:
-        description: The type of provisioner to create (case-sensitive).
-        default: jwk
+        description: The type of provisioner to create or remove (case-sensitive).
+        required: True
         choices:
         - 'JWK'
         - 'OIDC'
@@ -120,6 +124,7 @@ EXAMPLES = r"""
     # Key and password files must already exist on the remote host
     jwk_key_files: /tmp/step-ca/max-laptop.jwk
     jwk_password_file: /tmp/step-ca/max-laptop.pass
+    jwk_encrypt_password: a-secret-password
     state: present
 
 - name: Add a single JWK provisioner using an auto-generated asymmetric key pair
@@ -128,6 +133,7 @@ EXAMPLES = r"""
     type: JWK
     # Password file must already exist on the remote host
     jwk_password_file: /tmp/step-ca/max-laptop.pass
+    jwk_encrypt_password: a-secret-password
     jwk_create: yes
     state: present
 
@@ -141,6 +147,7 @@ EXAMPLES = r"""
       - /tmp/max-phone.pem
       - /tmp/max-work.pem
     jwk_password_file: /tmp/step-ca/max-laptop.pass
+    jwk_encrypt_password: a-secret-password
     state: present
 
 - name: Add a single OIDC provisioner
@@ -221,8 +228,8 @@ EXAMPLES = r"""
 
 - name: Remove a JWK provisioner
   maxhoesel.smallstep.ca_provisioner:
-    name: Amazon
-    type: AWS
+    name: my-jwk-provisioner
+    type: JWK
 """
 
 from ansible.module_utils.basic import AnsibleModule
@@ -232,8 +239,51 @@ from ansible.module_utils.common.validation import check_type_list
 import json
 import os
 
+try:
+    import pexpect
+
+    HAS_PEXPECT = True
+except ImportError:
+    HAS_PEXPECT = False
+
+
+def validate_params(module, result):
+    """
+    Basic input parameter validation to ensure that the module will run properly.
+    Does not guarantee that the parameters for a given provisioners actually make sense.
+    Args:
+        module: Module object for accessing module params
+        result: result dict for returning results
+    """
+    if module.params["type"] == "JWK" and module.params["state"] == "present" and not HAS_PEXPECT:
+        result["msg"] = "Please make sure that pexpect is installed for creating JWK provisioners"
+        module.fail_json(**result)
+
+    if module.params["type"] == "SSHPOP" and module.params["state"] == "absent":
+        result["msg"] = "Cannot remove SSHPOP provisioners"
+        module.fail_json(**result)
+
+    rc, step_stdout, step_stderr = module.run_command([module.params["step_executable"]])
+    if rc != 0:
+        result["msg"] = (
+            "Could not run step binary on remote host. "
+            "Please make sure that it is installed and in $PATH."
+        )
+        result["stdout"] = step_stdout
+        result["stderr"] = step_stderr
+        module.fail_json(**result)
+    return result
+
 
 def get_provisioners(module, result):
+    """
+    Get a list of provisioners from step-ca.
+    Args:
+        module: Module object for accessing module params
+        result: result dict for returning results
+    Returns:
+        list of provisioner dicts
+    """
     with open(module.params["ca_config"], "rb") as f:
         try:
             config = json.load(f)
@@ -245,8 +295,9 @@ def get_provisioners(module, result):
 def add_provisioner(module, result):
     """
     Create a new provisioner of the type given in the module parameters.
-
-    Return: result dict
+    Args:
+        module: Module object for accessing module params
+        result: result dict for returning results
     """
     arg_map = {
         "aws_account": "--aws-account",
@@ -259,69 +310,101 @@ def add_provisioner(module, result):
         "gcp_project": "--gcp-project",
         "instance_age": "--instance-age",
         "k8s_pem_keys_file": "--pem-keys",
-        "jwk_create": "--create",
-        "jwk_password_file": "--password-file",
         "oidc_client_id": "--client-id",
         "oidc_client_secret": "--client-secret",
         "oidc_admin_email": "--admin",
         "oidc_domain": "--domain",
+        "oidc_configuration_endpoint": "--configuration-endpoint",
         "ssh": "--ssh",
         "x5c_root_file": "--x5c-root",
     }
-    optional_list_args = [
-        "aws_account",
-        "azure_resource_group",
-        "gcp_service_account",
-        "gcp_project" "oidc_admin_email",
-        "oidc_domain",
-    ]
     bool_args = ["disable_custom_sans", "disable_trust_on_first_use", "jwk_create", "ssh"]
 
     # These args are always required
     args = ["add", module.params["name"], "--type=" + module.params["type"]]
+
     # step automatically truncates invalid parameters for us, so we can be
     # lazy and just pass through all user-supplied parameters for provisioners,
     # even if their type doesn't match (e.g. Azure params for a GCP provisioner).
     # We do however handle the jwk keys separately as they are positional parameters
     # instead of flags
-    if module.params["type"] == "JWK" and module.params["jwk_key_files"]:
-        args.extend(check_type_list(module.params["jwk_key_files"]))
-
     for arg in arg_map:
         if module.params[arg]:
-            if arg in optional_list_args:
+            if isinstance(module.params[arg], list):
                 # Step can accept some parameters multiple times. To use this,
                 # we first need to convert the user-supplied lists into steps format:
                 # --arg-name=val1 --arg-name=val2
-                list_args = check_type_list(module.params[arg])
-                args.extend([arg_map[arg] + "=" + arg for arg in list_args])
-            if arg in bool_args:
+                args.extend([arg_map[arg] + "=" + a for a in module.params[arg]])
+            elif arg in bool_args:
                 args.append(arg_map[arg])
             else:
                 args.append(arg_map[arg] + "=" + module.params[arg])
-    result = run_step_command(module, result, args, errmsg="Error when trying to add provisioner")
+
+    else:
+        result = run_step_ca_command(
+            module, result, args, errmsg="Error when trying to add provisioner"
+        )
     result["changed"] = True
+    return result
+
+
+def add_jwk_provisioner(module, result):
+    """
+    Add a JWK provisioner using the options given in the module params.
+    JWK provisioners need special treatment because they require an
+    interactive password input and use positional parameters instead of
+    options.
+    Args:
+        module: Module object for accessing module params
+        result: result dict for returning results
+    """
+    if not module.params["jwk_encrypt_password"]:
+        result["msg"] = "jwk_encrypt_password is required when creating a JWK provisioner"
+        module.fail_json(**result)
+
+    args = ["ca", "provisioner", "add", module.params["name"]]
+    if module.params["jwk_create"]:
+        args.append("--create")
+    else:
+        args.extend(module.params["jwk_key_files"])
+        if module.params["jwk_password_file"]:
+            args.extend(["--password-file", module.params["jwk_password_file"]])
+
+    try:
+        child = pexpect.spawn(module.params["step_executable"], args)
+        child.expect("Please enter the password to encrypt the private JWK:")
+        child.sendline(module.params["jwk_encrypt_password"])
+        child.read()
+        child.close()
+    except (OSError, pexpect.ExceptionPexpect):
+        result["msg"] = "Could not create JWK provisioner"
+        module.fail_json(**result)
     return result
 
 
 def remove_provisioner(module, result):
     """
     Remove an existing provisioner of the type given in the module parameters.
-
-    Return: result dict
+    Args:
+        module: Module object for accessing module params
+        result: result dict for returning results
     """
-    args = ["remove", module.params["name"], "--type=" + module.params["type"]]
-    result = run_step_command(
+    args = ["remove", module.params["name"], "--type", module.params["type"]]
+    result = run_step_ca_command(
         module, result, args, errmsg="Error when trying to remove provisioner"
     )
     result["changed"] = True
     return result
 
 
-def run_step_command(module, result, args, errmsg):
+def run_step_ca_command(module, result, args, errmsg):
     """
-    Run a step command with the parameters given in args,
-    as well as the ca-config file defined in the module params
+    Run a step-ca command with args and the defaults passed to the module.
+    Args:
+        module: Module object for accessing module params
+        result: result dict for returning results
+        args: arguments of the command to run, as passed to module.run_command()
+        errmsg: Error message to return if execution fails
     """
     base_args = [module.params["step_executable"], "ca", "provisioner"]
     args = base_args + args
@@ -330,84 +413,74 @@ def run_step_command(module, result, args, errmsg):
 
     rc, result["stdout"], result["stderr"] = module.run_command(args)
     if rc != 0:
-        module.fail_json(msg=errmsg, **result)
+        result["msg"] = errmsg
+        module.fail_json(**result)
     return result
 
 
 def run_module():
     module_args = dict(
-        aws_account=dict(),
+        aws_account=dict(type="list"),
         aws_iid_roots_file=dict(),
         azure_tenant=dict(),
-        azure_resource_group=dict(),
+        azure_resource_group=dict(type="list"),
         ca_config=dict(default="{}/.step/config/ca.json".format(os.path.expanduser("~"))),
         disable_custom_sans=dict(type="bool", default=False),
         disable_trust_on_first_use=dict(type="bool", default=False),
-        gcp_service_account=dict(),
-        gcp_project=dict(),
+        gcp_service_account=dict(type="list"),
+        gcp_project=dict(type="list"),
         instance_age=dict(),
         k8s_pem_keys_file=dict(),
         jwk_create=dict(type="bool", default=False),
-        jwk_key_files=dict(),
+        jwk_key_files=dict(type="list"),
         jwk_password_file=dict(no_log=False),
+        jwk_encrypt_password=dict(no_log=True),
         name=dict(required=True),
         oidc_client_id=dict(),
-        oidc_client_secret=dict(),
-        oidc_admin_email=dict(),
-        oidc_domain=dict(),
+        oidc_client_secret=dict(no_log=True),
+        oidc_admin_email=dict(type="list"),
+        oidc_domain=dict(type="list"),
+        oidc_configuration_endpoint=dict(),
         ssh=dict(type="bool", default=False),
         state=dict(choices=["present", "absent"], default="present"),
         step_executable=dict(default="step"),
         type=dict(
             choices=["JWK", "OIDC", "AWS", "GCP", "Azure", "ACME", "X5C", "K8sSA", "SSHPOP"],
-            default="JWK",
+            required=True,
         ),
         x5c_root_file=dict(),
     )
     result = dict(changed=False, stdout="", stderr="", msg="")
     module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
 
-    # Shorthands for commonly used values
+    result = validate_params(module, result)
+
     name = module.params["name"]
     state = module.params["state"]
     p_type = module.params["type"]
 
-    rc, result["stdout"], result["stderr"] = module.run_command([module.params["step_executable"]])
-    if rc != 0:
-        result[
-            "msg"
-        ] = "Could not run step binary on remote host. Please make sure that it is installed and in $PATH."
-        module.fail_json(**result)
-
     provisioners = get_provisioners(module, result)
-    # Edge case - no provisioner present
-    if not provisioners and state == "absent":
-        module.exit_json(**result)
-    elif not provisioners and state == "present":
-        add_provisioner(module, result)
-        result["changed"] = True
-        module.exit_json(**result)
-
+    # Ensure that we can always iterate over something
+    if not provisioners:
+        provisioners = []
     for p in provisioners:
         if p["type"] == p_type and p["name"] == name:
             # Found a matching provisioner, now we need to decide what to do with it
             if state == "present":
                 result["msg"] = "Provisioner found in CA config - not modified"
-            elif state == "absent":
-                if module.check_mode:
-                    result["changed"] = True
+            else:
                 if not module.check_mode:
-                    remove_provisioner(module, result)
-                    result["changed"] = True
+                    result = remove_provisioner(module, result)
+                result["changed"] = True
             module.exit_json(**result)
 
     # No matching provisioner found
-    if module.params["state"] == "present":
-        if module.check_mode:
-            result["changed"] = True
-        else:
-            add_provisioner(module, result)
-            result["changed"] = True
+    if state == "present":
+        if not module.check_mode and p_type == "JWK":
+            result = add_jwk_provisioner(module, result)
+        elif not module.check_mode:
+            result = add_provisioner(module, result)
+        result["changed"] = True
     module.exit_json(**result)
 
 

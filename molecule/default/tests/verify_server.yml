@@ -6,15 +6,11 @@
   - '../../../roles/ca_server/vars/{{ ansible_os_family }}.yml'
 
 - name: Get current version [step-ca]
-  shell: "step-ca version | cut -d' ' -f 2 | cut -d'/' -f 2 | awk 'FNR == 1'"
-  environment:
-    PATH: /usr/local/bin:{{ ansible_env.PATH }}
+  shell: "{{ stepca_executable_path }}/step-ca version | cut -d' ' -f 2 | cut -d'/' -f 2 | awk 'FNR == 1'" # noqa 306
   changed_when: no
   register: stepca_current_version
 - name: Get current version [step]
-  shell: "step version | cut -d' ' -f 2 | cut -d'/' -f 2 | awk 'FNR == 1'"
-  environment:
-    PATH: /usr/local/bin:{{ ansible_env.PATH }}
+  shell: "{{ stepca_executable_path }}/step version | cut -d' ' -f 2 | cut -d'/' -f 2 | awk 'FNR == 1'" # noqa 306
   changed_when: no
   register: step_current_version
 
@@ -67,9 +63,7 @@
     that: not stepca_service_status.changed
 
 - name: Check server health
-  command: step ca health
-  environment:
-    PATH: /usr/local/bin:{{ ansible_env.PATH }}
+  command: '{{ stepca_executable_path }}/step ca health'
   become: yes
   become_user: '{{ stepca_user }}'
   changed_when: no
