@@ -28,7 +28,7 @@ jobs:
       - name: Lint code
         run: |
           yamllint .
-          ansible-lint ./ ./roles/*
+          ansible-lint ./ ./roles/* ./molecule/default/tests/* ./molecule/default/converge.yml ./molecule/default/verify.yml
 
   molecule:
     name: Ansible ${{ matrix.ansible-version }}, Python ${{ matrix.python-version }}
