@@ -6,7 +6,7 @@ After=syslog.target network.target
 User=step
 Group=step
 Enviroment=PATH={{ stepca_executable_path }}:$PATH
-ExecStart=/bin/sh -c '{{ stepca_executable_path }}/step-ca {{ stepca_home }}/.step/config/ca.json --password-file={{ stepca_home }}/{{ stepca_intermediate_passfile }} >> /var/log/step-ca/output.log 2>&1'
+ExecStart={{ stepca_executable_path }}/step-ca {{ stepca_home }}/.step/config/ca.json --password-file={{ stepca_home }}/{{ stepca_intermediate_passfile }}
 Type=simple
 Restart=on-failure
 RestartSec=10

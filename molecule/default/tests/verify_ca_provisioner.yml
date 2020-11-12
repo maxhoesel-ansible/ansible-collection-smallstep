@@ -15,12 +15,12 @@
   become: yes
   become_user: '{{ stepca_user }}'
   loop:
-  - files/molecule_jwk_key
-  - files/molecule_x5c_key
+  - files/molecule_tests_key
+  - files/molecule_tests_crt
 
 - name: Testing password file is present
   copy:
-    content: molecule-test
+    content: '{{ testing_password }}'
     dest: '{{ stepca_home }}/molecule_passfile'
     owner: '{{ stepca_user }}'
     group: '{{ stepca_user }}'
@@ -28,6 +28,9 @@
   become: yes
   become_user: '{{ stepca_user }}'
 
+# The values for these test provisioners are mostly identical to the ones in the dodumentation,
+# so many of the online provisioners do not actually work. Good enough to test our module
+# functionality still.
 - name: Create test provisioners
   maxhoesel.smallstep.ca_provisioner: '{{ item }}'
   become: yes
@@ -35,8 +38,9 @@
   loop:
   - name: molecule-JWK
     type: JWK
-    jwk_key_files: '{{ stepca_home }}/molecule_jwk_key'
+    jwk_key_files: '{{ stepca_home }}/molecule_tests_key'
     jwk_password_file: '{{ stepca_home }}/molecule_passfile'
+    jwk_encrypt_password: '{{ testing_password }}'
   - name: molecule-OIDC
     type: OIDC
     oidc_client_id: 1087160488420-8qt7bavg3qesdhs6it824mhnfgcfe8il.apps.googleusercontent.com
@@ -67,23 +71,48 @@
     type: ACME
   - name: molecule-x5c
     type: X5C
-    # Key file must already exist on the remote host
-    x5c_root_file: '{{ stepca_home }}/molecule_x5c_key'
+    x5c_root_file: '{{ stepca_home }}/molecule_tests_crt'
   - name: molecule-sshpop
     type: SSHPOP
+  - name: molecule-k8s
+    type: K8sSA
+    k8s_pem_keys_file: '{{ stepca_home }}/molecule_tests_crt'
 
-- name: Remove test provisioners
+# Remove the online provisioners before restarting as they could imapct server
+# functionality
+- name: Remove online provisioners
   maxhoesel.smallstep.ca_provisioner:
-    name: '{{ item }}'
+    name: '{{ item.0 }}'
+    type: '{{ item.1 }}'
     state: absent
   become: yes
   become_user: '{{ stepca_user }}'
   loop:
-  - molecule-JWK
-  - molecule-OIDC
-  - molecule-Amazon
-  - molecule-Google
-  - molecule-Azure
-  - molcule-ACME
-  - molecue-x5c
-  - molecule-sshpop
+  - ["molecule-OIDC", "OIDC"]
+  - ["molecule-Amazon", "AWS"]
+  - ["molecule-Google", "GCP"]
+  - ["molecule-Azure", "Azure"]
+
+- name: Restart Server
+  service:
+    name: step-ca
+    state: restarted
+  become: yes
+- name: Check server health
+  command: '{{ stepca_executable_path }}/step ca health'
+  become: yes
+  become_user: '{{ stepca_user }}'
+  changed_when: no
+
+- name: Remove test provisioners
+  maxhoesel.smallstep.ca_provisioner:
+    name: '{{ item.0 }}'
+    type: '{{ item.1 }}'
+    state: absent
+  become: yes
+  become_user: '{{ stepca_user }}'
+  loop:
+  - ["molecule-JWK", "JWK"]
+  - ["molecule-ACME", "ACME"]
+  - ["molecule-x5c", "X5C"]
+  - ["molecule-k8s", "K8sSA"]
