@@ -22,7 +22,7 @@ A host running one of the below distributions with become privileges:
 
 Other distributions based on Debian or RHEL may also work, but they are not officially supported.
 
-The host must have the `python(3)-pexpect` package installed. This package is installed form the OS repositories automatically when running this role.
+The host must have the `expect` package installed. This package is installed form the OS repositories automatically when running this role.
 
 Role Variables
 --------------

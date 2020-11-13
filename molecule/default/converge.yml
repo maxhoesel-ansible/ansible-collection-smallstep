@@ -1,4 +1,16 @@
 ---
+- name: Install requirements
+  hosts: server-*
+  become: yes
+  tasks:
+  - apt: # noqa 502
+      name: 'python{% if ansible_python.version.major == 3 %}3{% endif %}-pexpect'
+      update_cache: yes
+    when: ansible_os_family == "Debian"
+  - package: # noqa 502
+      name: python3-pexpect
+    when: ansible_os_family == "RedHat"
+
 - name: Create step-ca servers
   hosts: server-*
   roles:
