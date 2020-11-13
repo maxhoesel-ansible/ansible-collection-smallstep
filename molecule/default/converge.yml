@@ -19,3 +19,5 @@
     stepca_dns_name: localhost
     stepca_root_password: '{{ testing_password }}'
     stepca_intermediate_password: '{{ testing_password }}'
+    stepca_root_cert: '{{ lookup("file", "files/molecule_ca_crt") }}'
+    stepca_root_key: '{{ lookup("file", "files/molecule_ca_key") }}'

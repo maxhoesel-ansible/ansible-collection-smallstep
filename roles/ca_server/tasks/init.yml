@@ -46,6 +46,7 @@
     notify: print CA cert fingerprint
 
   - name: Change password for intermediate key
+<<<<<<< HEAD
     shell: |
       set timeout 300
       spawn {{ stepca_executable_path }}/step crypto change-pass {{ stepca_home }}/.step/secrets/intermediate_ca_key -f
@@ -56,6 +57,13 @@
       exit 0
     args:
       executable: expect
+=======
+    expect:
+      command: '{{ stepca_executable_path }}/step crypto change-pass {{ stepca_home }}/.step/secrets/intermediate_ca_key -f'
+      responses:
+        'decrypt': '{{ stepca_root_password }}'
+        'encrypt': '{{ stepca_intermediate_password }}'
+>>>>>>> afd29e6... Use preset root cert/key for step_ca tests
 
   - name: Remove initial provisioner
     maxhoesel.smallstep.ca_provisioner:
