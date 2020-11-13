@@ -42,9 +42,8 @@
     apt:
       name:
         - xz-utils
-        - 'python{% if ansible_python.version.major == 3 %}3{% endif %}-pexpect'
+        - expect
       update_cache: yes
-
   - name: step-ca is installed [Debian]
     apt:
       deb: 'https://github.com/smallstep/certificates/releases/download/v{{ stepca_version }}/step-certificates_{{ stepca_version }}_amd64.deb'
@@ -58,9 +57,8 @@
 
 - block:
   - name: Requirements are installed [EL8]
-    dnf:
-      name: python3-pexpect
-
+    package:
+      name: expect
   - block:
     - name: Download and extract step-ca release [EL]
       unarchive:

@@ -144,3 +144,6 @@ dmypy.json
 .prof
 
 maxhoesel-smallstep-*.tar.gz
+
+# Testing files
+tests/testenv

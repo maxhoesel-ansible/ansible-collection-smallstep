@@ -55,3 +55,5 @@ issues: https://github.com/maxhoesel/ansible-collection-smallstep/issues
 build_ignore:
     - '.vscode'
     - '*-smallstep-*.tar.gz'
+    - '.github'
+    - 'tests'

@@ -4,12 +4,12 @@
 - name: Verify server installation
   hosts: server-*
   tasks:
-  - include_tasks: 'tasks/verify_server.yml'
+  - include_tasks: 'tests/verify_server.yml'
 
 - name: Verify ca_provisioner module
   hosts: server-*
   tasks:
-  - include_tasks: 'tasks/verify_ca_provisioner.yml'
+  - include_tasks: 'tests/verify_ca_provisioner.yml'
 
 #- name: Verify client installation
 

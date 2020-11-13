@@ -1,8 +1,4 @@
 ---
-lint: |
-  set -e
-  ansible-lint ./ ./roles/*
-  yamllint .
 dependency:
   name: galaxy
 driver:
@@ -45,5 +41,14 @@ platforms:
     pre_build_image: true
 provisioner:
   name: ansible
+  options:
+    vvv: ${TESTENV_VERBOSE:-false}
+  env:
+    ANSIBLE_KEEP_REMOTE_FILES: ${TESTENV_KEEP_REMOTE:-false}
+    ANSIBLE_COLLECTIONS_PATH: ${TESTENV_COLLECTIONS:-~/.ansible/collections:/usr/share/ansible/collections}
+  inventory:
+    group_vars:
+      all:
+        testing_password: molecule-test
 verifier:
   name: ansible

@@ -1,9 +1,23 @@
 ---
+- name: Install requirements
+  hosts: server-*
+  become: yes
+  tasks:
+  - apt: # noqa 502
+      name: 'python{% if ansible_python.version.major == 3 %}3{% endif %}-pexpect'
+      update_cache: yes
+    when: ansible_os_family == "Debian"
+  - package: # noqa 502
+      name: python3-pexpect
+    when: ansible_os_family == "RedHat"
+
 - name: Create step-ca servers
   hosts: server-*
   roles:
   - role: maxhoesel.smallstep.ca_server
     stepca_name: Molecule-Test
     stepca_dns_name: localhost
-    stepca_root_password: molecule-test
-    stepca_intermediate_password: molecule-test
+    stepca_root_password: '{{ testing_password }}'
+    stepca_intermediate_password: '{{ testing_password }}'
+    stepca_root_cert: '{{ lookup("file", "files/molecule_ca_crt") }}'
+    stepca_root_key: '{{ lookup("file", "files/molecule_ca_key") }}'
