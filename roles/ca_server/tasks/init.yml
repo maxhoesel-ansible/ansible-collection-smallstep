@@ -46,11 +46,16 @@
     notify: print CA cert fingerprint
 
   - name: Change password for intermediate key
-    expect:
-      command: '{{ stepca_executable_path }}/step crypto change-pass {{ stepca_home }}/.step/secrets/intermediate_ca_key -f'
-      responses:
-        '\bdecrypt\b': '{{ stepca_root_password }}'
-        '\bencrypt\b': '{{ stepca_intermediate_password }}'
+    shell: |
+      set timeout 300
+      spawn {{ stepca_executable_path }}/step crypto change-pass {{ stepca_home }}/.step/secrets/intermediate_ca_key -f
+      expect "decrypt"
+      send "{{ stepca_root_password }}\n"
+      expect "encrypt"
+      send "{{ stepca_intermediate_password }}\n"
+      exit 0
+    args:
+      executable: expect
 
   - name: Remove initial provisioner
     maxhoesel.smallstep.ca_provisioner:
