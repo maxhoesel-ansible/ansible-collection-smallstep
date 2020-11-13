@@ -4,21 +4,29 @@ info:
   title: CHANGELOG
   repository_url: https://github.com/maxhoesel/ansible-collection-smallstep
 options:
+  # NOTE: Commented out commit types should be used when appropiate.
+  # They will not show up in the changelogs
   commits:
      filters:
        Type:
+         - docs
          - feat
          - fix
          - perf
          - refactor
-         - chore
+         #- style
+         #- test
+         #- chore
   commit_groups:
      title_maps:
+       docs: Documentation
        feat: Features
        fix: Bug Fixes
        perf: Performance Improvements
        refactor: Code Refactoring
-       chore: Non-Functional Changes (e.g. CI, gitignore)
+       #chore: Other Non-Functional Aspects (e.g. CI, gitignore)
+       #style: Code Style and Conventions
+       #test: Testing Framework
   header:
     pattern: "^(\\w*)(?:\\(([\\w\\$\\.\\-\\*\\s]*)\\))?\\:\\s(.*)$"
     pattern_maps:
