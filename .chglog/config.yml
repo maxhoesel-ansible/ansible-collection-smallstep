@@ -13,7 +13,7 @@ options:
          - feat
          - fix
          - perf
-         - refactor
+         #- refactor
          #- style
          #- test
          #- chore
@@ -23,7 +23,7 @@ options:
        feat: Features
        fix: Bug Fixes
        perf: Performance Improvements
-       refactor: Code Refactoring
+       #refactor: Code Refactoring
        #chore: Other Non-Functional Aspects (e.g. CI, gitignore)
        #style: Code Style and Conventions
        #test: Testing Framework
