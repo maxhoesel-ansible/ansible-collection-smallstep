@@ -1,0 +1,22 @@
+- name: requirements are installed [Debian]
+  apt:
+    name:
+      - xz-utils
+      - expect
+    update_cache: yes
+  retries: 3
+  delay: 3
+
+- name: step-ca is installed [Debian]
+  apt:
+    deb: 'https://github.com/smallstep/certificates/releases/download/v{{ stepca_version }}/step-certificates_{{ stepca_version }}_amd64.deb'
+  retries: 3
+  delay: 3
+  when: stepca_current_version.stdout != stepca_version
+
+- name: step is installed [Debian]
+  apt:
+    deb: 'https://github.com/smallstep/cli/releases/download/v{{ step_version }}/step-cli_{{ step_version }}_amd64.deb'
+  retries: 3
+  delay: 3
+  when: step_current_version.stdout != step_version

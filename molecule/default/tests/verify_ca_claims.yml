@@ -1,0 +1,163 @@
+- name: Include ca_server vars
+  include_vars: '{{ item }}'
+  loop:
+  - ../../roles/ca_server/defaults/main.yml
+  - ../../roles/ca_server/vars/main.yml
+  - '../../roles/ca_server/vars/{{ ansible_os_family }}.yml'
+
+# We set up 3 provisioners with custom claims to fully test the module:
+# claims-single (ACME): To test most parameters and single-provisioner updates
+# claims-double (ACME + AWS): To test updating multiple provisioners with the same name
+- name: Set claim facts
+  set_fact:
+    claims_single:
+      name: claims-single
+      type: ACME
+      min_tls_cert_duration: 1h
+      default_tls_cert_duration: 20h
+      enable_SSHCA: yes
+      min_host_ssh_duration: 1h
+      default_host_ssh_duration: 20h
+      max_host_ssh_duration: 24h
+      min_user_ssh_duration: 1h
+      default_user_ssh_duration: 20h
+      max_user_ssh_duration: 24h
+    claims_double_1:
+      name: claims-double
+      type: ACME
+      # Different to double_2 to test retention of existing claims with multiple provisioners
+      min_tls_cert_duration: 5m
+      default_tls_cert_duration: 20h
+    claims_double_2:
+      name: claims-double
+      type: AWS
+      min_tls_cert_duration: 1h
+      default_tls_cert_duration: 20h
+    claims_global:
+      scope: global
+      min_tls_cert_duration: 1h
+      default_tls_cert_duration: 20h
+
+- name: Testing provisioners are present
+  maxhoesel.smallstep.ca_provisioner:
+    name: '{{ item.0 }}'
+    type: '{{ item.1 }}'
+  become: yes
+  become_user: '{{ stepca_user }}'
+  loop:
+  - ['{{ claims_single.name }}', '{{ claims_single.type }}']
+  - ['{{ claims_double_1.name }}', '{{ claims_double_1.type }}']
+  - ['{{ claims_double_2.name }}', '{{ claims_double_2.type }}']
+
+# Using a loop isn't possible here - the parameters will get mashed up between
+# provisioners for some reason.
+- block:
+  - name: Testing claims are present [1/4]
+    maxhoesel.smallstep.ca_claims: '{{ claims_single }}'
+  - name: Testing claims are present [2/4]
+    maxhoesel.smallstep.ca_claims: '{{ claims_double_1 }}'
+  - name: Testing claims are present [3/4]
+    maxhoesel.smallstep.ca_claims: '{{ claims_double_2 }}'
+  - name: Testing claims are present [4/4]
+    maxhoesel.smallstep.ca_claims: '{{ claims_global }}'
+  become: yes
+  become_user: '{{ stepca_user }}'
+
+# Update the provisioners to test both adding and overwriting claims:
+# - max_tls_cert_duration is newly added
+# - default_tls_cert_duration is changed from 20h -> 24h
+- name: Test updating claims [provisioners]
+  maxhoesel.smallstep.ca_claims:
+    name: '{{ item }}'
+    max_tls_cert_duration: 33h
+    default_tls_cert_duration: 24h
+  become: yes
+  become_user: '{{ stepca_user }}'
+  loop:
+  - '{{ claims_single.name }}'
+  - '{{ claims_double_1.name }}'
+  register: stepca_current_claims
+- name: Test updating claims [global]
+  maxhoesel.smallstep.ca_claims:
+    scope: global
+    max_tls_cert_duration: 33h
+    default_tls_cert_duration: 24h
+  become: yes
+  become_user: '{{ stepca_user }}'
+  register: stepca_current_global_claims
+
+# Combine our initial claims with the updataed ones to verify that everything went well
+- name: Set expected claims
+  set_fact:
+    expected_single:
+      minTLSCertDuration: 1h
+      defaultTLSCertDuration: 24h
+      maxTLSCertDuration: 33h
+      enableSSHCA: yes
+      minHostSSHDuration: 1h
+      defaultHostSSHDuration: 20h
+      maxHostSSHDuration: 24h
+      minUserSSHDuration: 1h
+      defaultUserSSHDuration: 20h
+      maxUserSSHDuration: 24h
+    expected_double_1:
+      minTLSCertDuration: 5m
+      maxTLSCertDuration: 33h
+      defaultTLSCertDuration: 24h
+    expected_double_2:
+      minTLSCertDuration: 1h
+      maxTLSCertDuration: 33h
+      defaultTLSCertDuration: 24h
+    expected_global:
+      minTLSCertDuration: 1h
+      maxTLSCertDuration: 33h
+      defaultTLSCertDuration: 24h
+- name: Validate claims status
+  assert:
+    quiet: yes
+    that:
+    - stepca_current_global_claims.claims == expected_global
+    - stepca_current_claims.results.0.claims[claims_single.type] == expected_single
+    - stepca_current_claims.results.1.claims[claims_double_1.type] == expected_double_1
+    - stepca_current_claims.results.1.claims[claims_double_2.type] == expected_double_2
+
+- name: Test overwriting claims
+  maxhoesel.smallstep.ca_claims:
+    name: '{{ claims_single.name }}'
+    type: '{{ claims_single.type }}'
+    exclusive: yes
+    min_tls_cert_duration: 10m
+  become: yes
+  become_user: '{{ stepca_user }}'
+  register: stepca_current_claims
+- name: Set expected claim
+  set_fact:
+    expected_single:
+      minTLSCertDuration: 10m
+- name: Validate overwritten claims
+  assert:
+    quiet: yes
+    that: stepca_current_claims.claims == expected_single
+
+- name: Restart Server
+  service:
+    name: step-ca
+    state: restarted
+  become: yes
+- name: Check server health
+  command: '{{ stepca_executable_path }}/step ca health'
+  become: yes
+  become_user: '{{ stepca_user }}'
+  changed_when: no
+
+- name: Testing provisioners are absent
+  maxhoesel.smallstep.ca_provisioner:
+    name: '{{ item.0 }}'
+    type: '{{ item.1 }}'
+    state: absent
+  become: yes
+  become_user: '{{ stepca_user }}'
+  loop:
+  - ['{{ claims_single.name }}', '{{ claims_single.type }}']
+  - ['{{ claims_double_1.name }}', '{{ claims_double_1.type }}']
+  - ['{{ claims_double_2.name }}', '{{ claims_double_2.type }}']
