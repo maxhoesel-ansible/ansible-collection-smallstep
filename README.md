@@ -15,6 +15,7 @@ Currently, the following components are available:
 #### Modules
 
 - ca_provisioner: Add and remove provisioners on a step-ca server
+- ca_claims: Manage claims of providers on a step-ca server
 
 #### Roles
 
