@@ -41,6 +41,7 @@ jobs:
         ansible-version:
           - "ansible>=2.9,<2.10"
           - "ansible>=2.10,<2.11"
+          - "https://github.com/ansible/ansible/archive/devel.tar.gz"
     steps:
       - name: Check out codebase
         uses: actions/checkout@v2
@@ -52,11 +53,13 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Set up pip
         run: pip3 install --upgrade pip
-      - name: Install test dependencies
+      - name: Install molecule dependencies
         run: pip3 install "${{ matrix.ansible-version }}" docker molecule molecule-docker
-      - name: Build collection
+      - name: Install community.general collection
+        run: ansible-galaxy collection install community.general
+      - name: Build maxhoesel.smallstep collection
         run: ansible-galaxy collection build
-      - name: Install collection
+      - name: Install maxhoesel.smallstep collection
         run: ansible-galaxy collection install maxhoesel-smallstep-*.tar.gz
       - name: Run Molecule tests
         run: molecule test
