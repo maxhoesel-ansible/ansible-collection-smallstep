@@ -1,0 +1,34 @@
+- block:
+  - name: Check if root cert is installed
+    uri:
+      url: '{{ item.url }}'
+    ignore_errors: yes
+    register: stepclient_cert_test
+    loop: '{{ stepclient_ca_certs }}'
+
+  - name: Temporary certificate folder is present
+    file:
+      path: '{{ stepclient_tmpdir }}'
+      owner: root
+      group: root
+      mode: 0755
+      state: directory
+    become: yes
+
+  - name: Download ca root cert
+    command: 'step ca root {{ stepclient_tmpdir }}/{{ item.item.url.split("//").1 }} --ca-url {{ item.item.url }} --fingerprint {{ item.item.fp }}'
+    become: yes
+    when: '"CERTIFICATE_VERIFY_FAILED" in item.msg'
+    loop: '{{ stepclient_cert_test.results }}'
+  - name: Install ca root cert
+    command: 'step certificate install {{ stepclient_tmpdir }}/{{ item.item.url.split("//").1 }}'
+    become: yes
+    when: '"CERTIFICATE_VERIFY_FAILED" in item.msg'
+    loop: '{{ stepclient_cert_test.results }}'
+
+  #always:
+  #- name: Temporary certificate folder is absent
+  #  file:
+  #    path: '{{ stepclient_tmpdir }}'
+  #    state: absent
+  #  become: yes

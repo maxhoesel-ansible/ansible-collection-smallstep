@@ -42,7 +42,10 @@ Additionally, please make sure that the documentation ins `docs/` and the `READM
 
 ### Testing Locally
 
-You can test the changes you made locally with the testing scripts located in `tests/`. These will run the molecule tests on your local host using docker.
+You can test the changes you made locally with the testing scripts located in `tests/`. These will run a subset of the CI tests on your machine.
+
+The CI test matrix includes several Ansible and Python versions, but the sake of simplicity, only one instance of the tests is run locally, using
+the current Ansible release and your systems default Python 3 version.
 
 Steps to test locally:
 

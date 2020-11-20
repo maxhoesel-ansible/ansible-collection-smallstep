@@ -13,6 +13,7 @@ options:
          - feat
          - fix
          - perf
+         #- ci
          #- refactor
          #- style
          #- test
@@ -23,6 +24,7 @@ options:
        feat: Features
        fix: Bug Fixes
        perf: Performance Improvements
+       #ci: Changes to the CI pipeline
        #refactor: Code Refactoring
        #chore: Other Non-Functional Aspects (e.g. CI, gitignore)
        #style: Code Style and Conventions

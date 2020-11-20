@@ -1,7 +1,7 @@
 ---
 # This is an example playbook to execute Ansible tests.
 
-- hosts: server-*
+- hosts: servers
   tasks:
   - name: Include ca_server vars
     include_vars: '{{ item }}'
@@ -16,8 +16,11 @@
   - name: Verify ca_claims module
     include_tasks: 'tests/verify_ca_claims.yml'
 
-#- name: Verify client installation
-
+- hosts: clients
+  name: Verify step_client role
+  tasks:
+  - name: Verify step_client role
+    include_tasks: 'tests/verify_step_client.yml'
 #- name: Create provisioners for clients
 
 #- name: Verify client provisioning and renewal

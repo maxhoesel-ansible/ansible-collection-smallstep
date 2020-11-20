@@ -1,5 +1,5 @@
-# These shell calls return "" when the binary in question is not found.
-# This means that we don't need to actually check for the existence of the binary first.
+# These pipes squelch the "command not found" error message if the binary isn't installed yet.
+# Instead, they return "", which we simply use as our version string.
 # Not the cleanest solution, but it's simple and works well.
 - name: Get current version [step-ca]
   shell: "{{ stepca_executable_path }}/step-ca version | cut -d' ' -f 2 | cut -d'/' -f 2 | awk 'FNR == 1'" # noqa 306
