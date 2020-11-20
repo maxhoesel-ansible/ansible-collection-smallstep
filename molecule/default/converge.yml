@@ -1,6 +1,6 @@
 ---
 - name: Install requirements
-  hosts: server-*
+  hosts: servers
   become: yes
   tasks:
   - apt: # noqa 502
@@ -11,13 +11,12 @@
       name: python3-pexpect
     when: ansible_os_family == "RedHat"
 
-- name: Create step-ca servers
-  hosts: server-*
+- name: Install step-ca servers
+  hosts: servers
   roles:
   - role: maxhoesel.smallstep.ca_server
-    stepca_name: Molecule-Test
-    stepca_dns_name: localhost
-    stepca_root_password: '{{ testing_password }}'
-    stepca_intermediate_password: '{{ testing_password }}'
-    stepca_root_cert: '{{ lookup("file", "files/molecule_ca_crt") }}'
-    stepca_root_key: '{{ lookup("file", "files/molecule_ca_key") }}'
+
+- name: Install step clients
+  hosts: clients
+  roles:
+  - role: maxhoesel.smallstep.step_client
