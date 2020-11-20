@@ -1,0 +1,14 @@
+# Version of step to install. Can be latest or a specific
+# github release (e.g. '0.15.3')
+stepclient_version: latest
+
+# If you want to get certificates from a step-ca server, its
+# root CA cert needs to be installed in the system trust store.
+# To do this automatically for the ca servers defined below, set
+# this to `yes` and set the CA server URLs + cert fingerprints below
+stepclient_install_ca_cert: yes
+stepclient_ca_certs:
+- url: 'https://ca1.example.com:443'
+  fp: 93edf189e74fa44e9dfe74fc18d4cfd5d93b09cc210d2352171d5ea9dd70669c
+- url: 'https://ca2.example.com:443'
+  fp: 1c9a4bd958dc6f08fb6479f0a6c54f5de5c31eaec6b59c919dbbc46f27daa6af

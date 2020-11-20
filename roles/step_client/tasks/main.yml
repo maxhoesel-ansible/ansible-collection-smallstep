@@ -1,0 +1,4 @@
+- include: install.yml
+
+- include: root_cert.yml
+  when: stepclient_install_ca_cert

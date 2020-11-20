@@ -1,0 +1,16 @@
+- block:
+  - name: Download and extract step release [EL]
+    unarchive:
+      src: 'https://github.com/smallstep/cli/releases/download/v{{ stepclient_version }}/step_linux_{{ stepclient_version }}_amd64.tar.gz'
+      dest: /tmp
+      remote_src: yes
+    retries: 3
+    delay: 3
+  - name: Install step binary [EL]
+    shell: 'cp /tmp/step_{{ stepclient_version }}/bin/* {{ stepclient_executable_path }}/'
+  always:
+  - name: Remove step release archive [EL]
+    file:
+      path: '/tmp/step_{{ stepclient_version }}'
+      state: absent
+  when: stepclient_current_version.stdout != stepclient_version
