@@ -20,7 +20,7 @@ Currently, the following components are available:
 #### Roles
 
 - ca_server: Install and initialize a step-ca server
-- (TODO) ca_cli: Install and initialize the step-cli client
+- step_client: Install and initialize the step-cli client
 
 ## Installation
 
