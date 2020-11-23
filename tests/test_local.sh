@@ -29,8 +29,7 @@ run() {
     # shellcheck disable=SC1090
     source "$VENV_DIR/bin/activate"
     pip3 install --upgrade pip
-    pip3 install ansible docker molecule molecule-docker yamllint ansible-lint
-
+    pip3 install ansible docker molecule molecule-docker yamllint ansible-lint --upgrade
     # Build and install our collection
     printf "\nBuilding and installing collection...\n\n"
     mkdir -p "$COLLECTIONS_DIR"

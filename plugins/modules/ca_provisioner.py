@@ -33,6 +33,7 @@ options:
         description: The Microsoft Azure resource group name used to validate the identity tokens. Also accepts a list for passing multiple names.
     ca_config:
         description: The path to the certificate authority configuration file. Defaults to the C(step) default of C($STEPPATH/config/ca.json).
+        default: ~/.step/config/ca.json
     disable_custom_sans:
         description: On cloud provisioners, if enabled only the internal DNS and IP will be added as a SAN. By default it will accept any SAN in the CSR.
         type: bool
@@ -284,11 +285,11 @@ def get_provisioners(module, result):
     Returns:
         list of provisioner dicts
     """
-    with open(module.params["ca_config"], "rb") as f:
-        try:
+    try:
+        with open(module.params["ca_config"], "rb") as f:
             config = json.load(f)
-        except json.JSONDecodeError as e:
-            module.fail_json(msg="Error when loading ca.json config: {}".format(e), **result)
+    except Exception as e:
+        module.fail_json(msg="Error when loading ca.json config: {}".format(e), **result)
     return config["authority"]["provisioners"]
 
 

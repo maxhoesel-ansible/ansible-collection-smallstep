@@ -15,11 +15,12 @@ Currently, the following components are available:
 #### Modules
 
 - ca_provisioner: Add and remove provisioners on a step-ca server
+- ca_claims: Manage claims of providers on a step-ca server
 
 #### Roles
 
 - ca_server: Install and initialize a step-ca server
-- (TODO) ca_cli: Install and initialize the step-cli client
+- step_client: Install and initialize the step-cli client
 
 ## Installation
 
@@ -43,3 +44,26 @@ To install the collection directly from this repository, run:
 #### Tarball install
 
 You can also install a specific version of this collection manually by downloading a tarball from the [releases](https://github.com/maxhoesel/ansible-collection-smallstep/releases).
+
+## Testing
+
+All components of this collection are automatically tested against a broad set of Ansible and Python versions on the controller.
+
+### Testing Matrix
+
+#### Ansible Versions
+
+- Current Release
+- Previous Release
+- Upcoming Release
+
+#### Python Versions
+
+- Lowest supported version by this collection (3.6)
+- Current Python release
+
+## License & Author
+
+Created & Maintained by Max Hösel (@maxhoesel)
+
+GPL 3.0 or later

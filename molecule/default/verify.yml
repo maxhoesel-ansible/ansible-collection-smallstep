@@ -1,18 +1,26 @@
 ---
 # This is an example playbook to execute Ansible tests.
 
-- name: Verify server installation
-  hosts: server-*
+- hosts: servers
   tasks:
-  - include_tasks: 'tests/verify_server.yml'
+  - name: Include ca_server vars
+    include_vars: '{{ item }}'
+    loop:
+    - ../../roles/ca_server/defaults/main.yml
+    - ../../roles/ca_server/vars/main.yml
+    - '../../roles/ca_server/vars/{{ ansible_os_family }}.yml'
+  - name: Verify ca_server role
+    include_tasks: 'tests/verify_server.yml'
+  - name: Verify ca_provisioner module
+    include_tasks: 'tests/verify_ca_provisioner.yml'
+  - name: Verify ca_claims module
+    include_tasks: 'tests/verify_ca_claims.yml'
 
-- name: Verify ca_provisioner module
-  hosts: server-*
+- hosts: clients
+  name: Verify step_client role
   tasks:
-  - include_tasks: 'tests/verify_ca_provisioner.yml'
-
-#- name: Verify client installation
-
+  - name: Verify step_client role
+    include_tasks: 'tests/verify_step_client.yml'
 #- name: Create provisioners for clients
 
 #- name: Verify client provisioning and renewal

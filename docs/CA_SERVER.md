@@ -17,8 +17,8 @@ Requirements
 A host running one of the below distributions with become privileges:
 
 - Ubuntu 18.04 LTS or newer
-- Debian 9 or newer
-- CentOS 8
+- Debian 10 or newer
+- CentOS 8 or newer
 
 Other distributions based on Debian or RHEL may also work, but they are not officially supported.
 
