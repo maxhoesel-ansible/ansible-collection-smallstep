@@ -72,7 +72,7 @@ Role Variables
 - Name of the default provisioner generated during setup
 - Default: `ansible-init`
 
-##### `stepca_provisione_remove`
+##### `stepca_provisioner_remove`
 - Whether to remove the default provisioner once setup is complete
 - Default: `yes`
 
