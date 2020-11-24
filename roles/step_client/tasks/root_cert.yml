@@ -4,7 +4,7 @@
       url: '{{ item.url }}'
     ignore_errors: yes
     register: stepclient_cert_test
-    loop: '{{ stepclient_ca_certs }}'
+    loop: '{{ stepclient_ca_servers }}'
 
   - name: Temporary certificate folder is present
     file:
@@ -26,9 +26,9 @@
     when: '"CERTIFICATE_VERIFY_FAILED" in item.msg'
     loop: '{{ stepclient_cert_test.results }}'
 
-  #always:
-  #- name: Temporary certificate folder is absent
-  #  file:
-  #    path: '{{ stepclient_tmpdir }}'
-  #    state: absent
-  #  become: yes
+  always:
+  - name: Temporary certificate folder is absent
+    file:
+      path: '{{ stepclient_tmpdir }}'
+      state: absent
+    become: yes
