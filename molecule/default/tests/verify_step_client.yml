@@ -2,4 +2,4 @@
   uri:
     url: '{{ item.url }}'
     status_code: [200, 404]
-  loop: '{{ stepclient_ca_certs }}'
+  loop: '{{ stepclient_ca_servers }}'

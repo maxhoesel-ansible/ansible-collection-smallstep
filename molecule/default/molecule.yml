@@ -115,7 +115,7 @@ provisioner:
           clients:
             vars:
               # TODO: Generate this list automaticallyW
-              stepclient_ca_certs:
+              stepclient_ca_servers:
                 - url: 'https://server-ubuntu-20:443'
                   fp: 93edf189e74fa44e9dfe74fc18d4cfd5d93b09cc210d2352171d5ea9dd70669c
                 - url: 'https://server-ubuntu-18:443'

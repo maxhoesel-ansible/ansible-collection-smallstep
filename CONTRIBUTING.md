@@ -88,3 +88,16 @@ What matters is that the final pull contains one commit following the spec above
 3. Create a pull request from your branch onto the `devel` branch of the main repository
 4. The CI tests will run automatically and inform you if any more changes need to be made
 5. Wait for feedback or approval
+
+## Release Workflow
+
+This project uses sematic versioning. Name versions accordingly.
+
+0. Install [git-chlog](https://github.com/git-chglog/git-chglog) to generate the changelog
+1. Create a new branch named "vX.Y.Z" and check it out
+2. Bump the version number in `galaxy.yml` and commit the change
+3. Run `git-chlog --next-tag vX.Y.Z` to update the changelog. Make sure to remove any mentions of "unreleased", then commit it
+4. Push the branch and create a pull request onto `main`
+5. Wait for all tests to complete, then merge it.
+6. Create a release referencing main, with a link to the changelog and add a collection.tar.gz archive
+7. Merge main back into devel
