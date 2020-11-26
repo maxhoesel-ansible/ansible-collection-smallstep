@@ -24,4 +24,3 @@
 
 - name: Insatll step cli
   include: 'install_{{ ansible_os_family }}.yml'
-  become: yes
