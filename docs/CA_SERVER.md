@@ -14,7 +14,7 @@ Note that this role does **not** manage the server once it has been created - yo
 Requirements
 ------------
 
-A host running one of the below distributions with become privileges:
+A host running one of the below distributions with `become` privileges:
 
 - Ubuntu 18.04 LTS or newer
 - Debian 10 or newer
@@ -113,6 +113,7 @@ Example Playbook
     stepca_intermediate_password: 'super-secret-intermediate-password'
     # Enable SSH CA support
     stepca_ssh: yes
+  become: yes
 ```
 
 License
