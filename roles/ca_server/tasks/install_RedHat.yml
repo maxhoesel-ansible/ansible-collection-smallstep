@@ -20,20 +20,3 @@
       path: '/tmp/step-certificates_{{ stepca_version }}'
       state: absent
   when: stepca_current_version.stdout != stepca_version
-
-- block:
-  - name: Download and extract step release [EL]
-    unarchive:
-      src: 'https://github.com/smallstep/cli/releases/download/v{{ step_version }}/step_linux_{{ step_version }}_amd64.tar.gz'
-      dest: /tmp
-      remote_src: yes
-    retries: 3
-    delay: 3
-  - name: Install step binary [EL]
-    shell: 'cp /tmp/step_{{ step_version }}/bin/* {{ stepca_executable_path }}/'
-  always:
-  - name: Remove step release archive [EL]
-    file:
-      path: '/tmp/step_{{ step_version }}'
-      state: absent
-  when: step_current_version.stdout != step_version
