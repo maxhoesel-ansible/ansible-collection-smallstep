@@ -28,3 +28,4 @@
 
 - name: Insatll step-ca
   include: 'install_{{ ansible_os_family }}.yml'
+  become: yes
