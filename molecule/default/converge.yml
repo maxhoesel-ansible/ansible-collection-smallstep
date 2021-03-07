@@ -15,10 +15,8 @@
   hosts: servers
   roles:
   - role: maxhoesel.smallstep.ca_server
-  become: yes
 
 - name: Install step clients
   hosts: clients
   roles:
   - role: maxhoesel.smallstep.step_client
-  become: yes

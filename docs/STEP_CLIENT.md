@@ -6,7 +6,7 @@ Install the `step` command-line tool on a system
 Requirements
 ------------
 
-A host running one of the below distributions with `become` privileges:
+A host running one of the below distributions with become privileges:
 
 - Ubuntu 18.04 LTS or newer
 - Debian 10 or newer
@@ -32,7 +32,6 @@ Example Playbook
 
 ```
 - hosts: all
-  become: yes
   roles:
   - role: maxhoesel.smallstep.step_client
 ```

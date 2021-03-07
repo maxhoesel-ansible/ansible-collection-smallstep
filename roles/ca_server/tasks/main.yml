@@ -18,6 +18,7 @@
     shell: /usr/sbin/nologin
     password: '*'
     home: '{{ stepca_home }}'
+  become: yes
 - name: stepca_logdir exists
   file:
     path: '{{ stepca_logdir }}'
@@ -25,15 +26,19 @@
     group: '{{ stepca_user }}'
     state: directory
     mode: 0755
+  become: yes
 
 - name: Look for existing configuration
   stat:
     path: '{{ stepca_home }}/.step/config/ca.json'
   register: stepca_config_file
+  become: yes
 - name: Initialize CA
   include: init.yml
+  become: yes
   become_user: '{{ stepca_user }}'
   when: not stepca_config_file.stat.exists
 
 - name: Setup systemd service
   include: service.yml
+  become: yes
