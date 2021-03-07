@@ -27,11 +27,6 @@ Example Playbook
 ```
 - hosts: all
   roles:
-  - role: maxhoesel.smallstep.step_client
+  - role: maxhoesel.smallstep.step_cli
     become: yes
 ```
-
-License
--------
-
-GPL 3 or later
