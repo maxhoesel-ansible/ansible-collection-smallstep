@@ -1,17 +1,17 @@
-- name: Install step client
-  include_role:
-    name: maxhoesel.smallstep.step_client
-
 # These pipes squelch the "command not found" error message if the binary isn't installed yet.
 # Instead, they return "", which we simply use as our version string.
 # Not the cleanest solution, but it's simple and works well.
-- name: Get current step-ca version
+- name: Get current version [step-ca]
   shell: "{{ stepca_executable_path }}/step-ca version | cut -d' ' -f 2 | cut -d'/' -f 2 | awk 'FNR == 1'" # noqa 306
   changed_when: no
   register: stepca_current_version
+- name: Get current version [step]
+  shell: "{{ stepca_executable_path }}/step version | cut -d' ' -f 2 | cut -d'/' -f 2 | awk 'FNR == 1'" # noqa 306
+  changed_when: no
+  register: step_current_version
 
 - block:
-  - name: Get latest step-ca release information
+  - name: Get latest release information [step-ca]
     uri:
       url: https://api.github.com/repos/smallstep/certificates/releases/latest
       body_format: json
@@ -21,11 +21,26 @@
     run_once: yes
     retries: 3
     delay: 3
-  - name: Set release tag
+  - name: Set release tag [step-ca]
     set_fact:
       stepca_version: '{{ (stepca_latest_release.json.tag_name)[1:] }}'
   when: stepca_version == 'latest'
+- block:
+  - name: Get latest release information [step]
+    uri:
+      url: https://api.github.com/repos/smallstep/cli/releases/latest
+      body_format: json
+      return_content: yes
+    register: step_latest_release
+    delegate_to: localhost
+    run_once: yes
+    retries: 3
+    delay: 3
+  - name: Set release tag [step]
+    set_fact:
+      step_version: '{{ (step_latest_release.json.tag_name)[1:] }}'
+  when: step_version == 'latest'
 
-- name: Insatll step-ca
+- name: Insatll step-ca and step cli
   include: 'install_{{ ansible_os_family }}.yml'
   become: yes

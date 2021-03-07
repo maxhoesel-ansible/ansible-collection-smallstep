@@ -4,7 +4,7 @@ maxhoesel.smallstep.ca_server
 Install a basic Smallstep Certificate server using `step-ca`.
 
 This role performs the following actions:
-1. Install `step` (using the `step_client` role) and `step-ca` on the remote host
+1. Install `step` and `step-ca` on the remote hosts
 2. Initialize a ca server with `step ca init` if none is found
 3. Install a systemd service for the server
 4. Print the root CA fingerprint for you to distribute to your clients
