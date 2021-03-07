@@ -1,6 +1,11 @@
 maxhoesel.smallstep.step_client
 =========
 
+## WARNING
+
+This role has been deprecated and replaced by `step_cli` role and the `step_ca_bootstrap` module.
+This role will be removed in a future release of this collection.
+
 Install the `step` command-line tool on a system
 
 Requirements
