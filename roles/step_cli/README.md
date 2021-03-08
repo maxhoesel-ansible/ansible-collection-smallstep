@@ -1,19 +1,16 @@
-maxhoesel.smallstep.step_client
-=========
+# maxhoesel.smallstep.step_cli
 
 Install the `step` CLI tool on a host
 
-Requirements
-------------
+## Requirements
 
-A host running one of the below distributions with `become` privileges:
+- The following distributions are currently supported:
+  - Ubuntu 18.04 LTS or newer
+  - Debian 10 or newer
+  - CentOS 8 or newer
+- This role requires root access. Make sure to run this role with `become: yes` or equivalent
 
-- Ubuntu 18.04 LTS or newer
-- Debian 10 or newer
-- CentOS 8 or newer
-
-Role Variables
---------------
+## Role Variables
 
 ##### `step_cli_version`
 - Set the version of step to install
@@ -21,8 +18,7 @@ Role Variables
 - Default: `latest`
 
 
-Example Playbook
-----------------
+## Example Playbook
 
 ```
 - hosts: all

@@ -1,6 +1,6 @@
 ---
 - block:
-    - name: Get latest step-cli release information [RedHat/Other]
+    - name: Get latest step-cli release information
       uri:
         url: https://api.github.com/repos/smallstep/cli/releases/latest
         body_format: json
