@@ -2,12 +2,6 @@
 - name: Converge
   hosts: all
   tasks:
-    # Current step-cli relases don't have a .deb file attached to them, so we need to use an older one
-    - name: Set fixed release for debian hosts
-      set_fact:
-        step_cli_version: "0.15.3"
-      when: ansible_os_family == "Debian"
-
     - name: "Include step_cli"
       include_role:
         name: "step_cli"
