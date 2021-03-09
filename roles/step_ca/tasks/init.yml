@@ -1,0 +1,92 @@
+---
+- name: Look for existing install
+  stat:
+    path: "{{ step_ca_path }}/config/ca.json"
+  register: step_ca_config
+
+- block:
+    - name: Generate arguments for `step ca init`
+      set_fact:
+        step_ca_init_args: "{{ step_ca_init_args | default([]) + [item] }}"
+      loop:
+        - "--name='{{ step_ca_name }}'"
+        - "--dns='{{ step_ca_dns }}'"
+        - "--address='{{ step_ca_address }}'"
+        - "--provisioner='{{ step_ca_tmp_provisioner }}'"
+        # We delete the initial provisioner later on, so it's fine to use the same password temporarily
+        - "--password-file='{{ step_ca_root_password_file }}'"
+        - "--provisioner-password-file='{{ step_ca_root_password_file }}'"
+        # Optional parameters simply pass an empty string as an argument if they're not defined
+        - "{% if step_ca_url %}--with-ca-url='{{ step_ca_url }}'{% else %}''{% endif %}"
+        - "{% if step_ca_ssh %}--ssh{% else %}''{% endif %}"
+        # Existing keychain
+        - "{% if step_ca_existing_root_file %}--root='{{ step_ca_existing_root_file }}'{% else %}''{% endif %}"
+        - "{% if step_ca_existing_key_file %}--key='{{ step_ca_existing_key_file }}'{% else %}''{% endif %}"
+        # RA variables
+        - "{% if step_ca_ra %}--ra='{{ step_ca_ra }}'{% else %}''{% endif %}"
+        - "{% if step_ca_ra_issuer %}--issuer='{{ step_ca_ra_issuer }}'{% else %}''{% endif %}"
+        - "{% if step_ca_ra_credentials_file %}--credentials-file='{{ step_ca_ra_credentials_file }}'{% else %}''{% endif %}"
+
+    - name: Create root and intermediate password files
+      copy:
+        content: "{{ item.password }}"
+        dest: "{{ item.file }}"
+        owner: "{{ step_ca_user }}"
+        mode: 0700
+        group: "{{ step_ca_user }}"
+      loop:
+        - password: "{{ step_ca_root_password }}"
+          file: "{{ step_ca_root_password_file }}"
+        - password: "{{ step_ca_intermediate_password }}"
+          file: "{{ step_ca_intermediate_password_file }}"
+    - name: Initialize CA
+      command: "{{ step_cli_executable }} ca init {{ step_ca_init_args | join(' ') }}"
+      environment:
+        STEPPATH: "{{ step_ca_path }}"
+      become: yes
+      become_user: "{{ step_ca_user }}"
+
+    - name: Change password for intermediate key
+      shell: |
+        set timeout 300
+        spawn {{ step_cli_executable }} crypto change-pass {{ step_ca_path }}/secrets/intermediate_ca_key -f
+        expect "Please enter the password to decrypt"
+        send -- "{{ step_ca_root_password }}\r"
+        expect "Please enter the password to encrypt"
+        send -- "{{ step_ca_intermediate_password }}\r"
+        expect
+      args:
+        executable: expect
+      become: yes
+      become_user: "{{ step_ca_user }}"
+
+    - name: Change password for SSH keys
+      shell: |
+        set timeout 300
+        spawn {{ step_cli_executable }} crypto change-pass {{ step_ca_path }}/secrets/{{ item }} -f
+        expect "Please enter the password to decrypt"
+        send -- "{{ step_ca_root_password }}\r"
+        expect "Please enter the password to encrypt"
+        send -- "{{ step_ca_intermediate_password }}\r"
+        expect
+      args:
+        executable: expect
+      become: yes
+      become_user: "{{ step_ca_user }}"
+      loop:
+        - ssh_host_ca_key
+        - ssh_user_ca_key
+      when: step_ca_ssh
+
+    - name: Remove initial provisioner
+      command: "{{ step_cli_executable }} ca provisioner remove {{ step_ca_tmp_provisioner }} --type JWK"
+      environment:
+        STEPPATH: "{{ step_ca_path }}"
+      become: yes
+      become_user: "{{ step_ca_user }}"
+  always:
+    - name: Root password file is absent
+      file:
+        path: "{{ step_ca_root_password_file }}"
+        state: absent
+  when: not step_ca_config.stat.exists

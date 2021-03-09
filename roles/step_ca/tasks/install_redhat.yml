@@ -1,0 +1,38 @@
+---
+- name: Requirements are installed [RedHat]
+  package:
+    name: expect
+
+- name: Look for existing step-ca binary [RedHat]
+  stat:
+    path: "{{ step_ca_executable }}"
+  register: step_ca_present
+- name: Get currently installed step-ca version [RedHat]
+  shell: >
+    set -o pipefail &&
+    {{ step_ca_executable }} version | cut -d' ' -f 2 | cut -d'/' -f 2 | awk 'FNR == 1'
+  args:
+    executable: /bin/bash
+  changed_when: no
+  check_mode: no
+  register: step_ca_installed_version
+  when: step_ca_present.stat.exists
+
+- block:
+    - name: Download and extract step-ca archive [RedHat]
+      unarchive:
+        src: "https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-certificates_linux_{{ step_ca_version }}_amd64.tar.gz"
+        dest: /tmp/
+        remote_src: yes
+      retries: 3
+      delay: 3
+    - name: Install step-ca binary [RedHat]
+      shell: >
+        set -o pipefail &&
+        cp /tmp/step-certificates_{{ step_ca_version }}/bin/step-ca {{ step_ca_executable }}
+  always:
+    - name: Remove step release archive [RedHat]
+      file:
+        path: "/tmp/step-certificates_{{ step_ca_version }}"
+        state: absent
+  when: (step_ca_installed_version.stdout) | default("") != step_ca_version

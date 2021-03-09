@@ -1,0 +1,8 @@
+---
+step_ca_executable: /usr/bin/step-ca
+step_cli_executable: /usr/bin/step
+
+step_ca_root_password_file: "{{ step_ca_path }}/.password_root.txt"
+step_ca_intermediate_password_file: "{{ step_ca_path }}/.password.txt"
+
+step_ca_tmp_provisioner: "tmp_provisioner"

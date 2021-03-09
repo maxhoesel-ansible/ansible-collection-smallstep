@@ -1,0 +1,13 @@
+- hosts: all
+  tasks:
+    - name: Install step_cli
+      include_role:
+        name: step_cli
+
+    - name: Copy existing ca cert/key to nodes
+      copy:
+        src: "{{ item }}"
+        dest: /tmp/
+      loop:
+        - "existing.crt"
+        - "existing.key"
