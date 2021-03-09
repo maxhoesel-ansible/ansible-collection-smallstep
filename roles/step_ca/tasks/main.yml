@@ -1,0 +1,42 @@
+---
+- include: check.yml
+
+- block:
+    - name: Get latest step-ca release information
+      uri:
+        url: https://api.github.com/repos/smallstep/certificates/releases/latest
+        body_format: json
+        return_content: yes
+      register: step_ca_latest_release
+      delegate_to: localhost
+      run_once: yes
+      retries: 3
+      delay: 5
+    - name: Set latest release version
+      set_fact:
+        step_ca_version: "{{ (step_ca_latest_release.json.tag_name)[1:] }}"
+  when: step_ca_version == 'latest'
+
+- include: "install_{{ ansible_os_family | lower }}.yml"
+
+- name: step_ca_user is present
+  user:
+    name: "{{ step_ca_user }}"
+    password: "*"
+    home: "{{ step_ca_path }}"
+    shell: /usr/sbin/nologin
+    system: yes
+- name: Paths are present
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_user }}"
+    mode: 0700
+  loop:
+    - "{{ step_ca_path }}"
+    - "{{ step_ca_path }}/db"
+
+- include: init.yml
+
+- include: service.yml

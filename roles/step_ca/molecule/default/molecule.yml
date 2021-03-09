@@ -1,0 +1,81 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+platforms:
+  # Note on containers:
+  # - We use the images provided by geerlingguy, as they provide out-of-the-box
+  #   support for Ansible and systemd (needed to test service management).
+  # - The containers run as privileged containers so that we can
+  #   use systemd functionality. This *should* be possible with unpriliged
+  #   containers as well, but is quite the headache.
+  - name: step-ca-ubuntu-20
+    groups:
+      - ubuntu
+    image: "geerlingguy/docker-ubuntu2004-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+
+  - name: step-ca-ubuntu-18
+    groups:
+      - ubuntu
+    image: "geerlingguy/docker-ubuntu1804-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+
+  - name: step-ca-debian-10
+    groups:
+      - debian
+    image: "geerlingguy/docker-debian10-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+
+  - name: step-ca-centos-8
+    groups:
+      - centos
+    image: "geerlingguy/docker-centos8-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+
+provisioner:
+  name: ansible
+  config_options:
+    ssh_connection:
+      pipelining: yes
+  inventory:
+    hosts:
+      all:
+        vars:
+          step_ca_name: molecule
+          step_ca_user: step-molecule
+          step_ca_root_password: molecule
+          step_ca_intermediate_password: molecule-intermediate
+          step_ca_path: /etc/step-ca-molecule
+          step_ca_ssh: yes
+          step_ca_existing_root_file: /tmp/existing.crt
+          step_ca_existing_key_file: /tmp/existing.key
+        children:
+          # The current 15.8 release does not have a deb file attached to it, so we use an older
+          # release for now
+          debian:
+            vars:
+              step_cli_version: "0.15.3"
+          ubuntu:
+            vars:
+              step_cli_version: "0.15.3"
+
+verifier:
+  name: ansible
