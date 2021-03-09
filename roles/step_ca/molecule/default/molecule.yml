@@ -67,15 +67,6 @@ provisioner:
           step_ca_ssh: yes
           step_ca_existing_root_file: /tmp/existing.crt
           step_ca_existing_key_file: /tmp/existing.key
-        children:
-          # The current 15.8 release does not have a deb file attached to it, so we use an older
-          # release for now
-          debian:
-            vars:
-              step_cli_version: "0.15.3"
-          ubuntu:
-            vars:
-              step_cli_version: "0.15.3"
 
 verifier:
   name: ansible
