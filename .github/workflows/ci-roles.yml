@@ -8,7 +8,7 @@ defaults:
 
 jobs:
   molecule:
-    name: ${{ matrix.role }} [ansible-base_${{ matrix.ansible-version }}]
+    name: ${{ matrix.role }} [${{ matrix.ansible-version }}]
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -17,8 +17,7 @@ jobs:
         role: ["step_cli", "step_ca"]
         ansible-version:
           - "ansible>=2.9,<2.10"
-          - "ansible-base>=2.10,<2.11"
-          - "https://github.com/ansible/ansible/archive/devel.tar.gz"
+          - "ansible-base"
     steps:
       - name: Check out codebase
         uses: actions/checkout@v2
