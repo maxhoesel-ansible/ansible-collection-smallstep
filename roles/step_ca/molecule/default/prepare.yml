@@ -8,6 +8,9 @@
       copy:
         src: "{{ item }}"
         dest: /tmp/
+        owner: root
+        group: root
+        mode: 0755
       loop:
         - "existing.crt"
         - "existing.key"
