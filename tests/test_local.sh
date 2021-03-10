@@ -19,6 +19,13 @@ show_help() {
     printf "    -h: This help screen\n"
 }
 
+test_role() {
+    printf "Testing role %s with molecule..\n" "$1"
+    cd "$1"
+    molecule "$MOLECULE_COMMAND"
+    cd ..
+}
+
 run() {
     # Go into root directory of project
     cd "$SCRIPT_DIR/../"
@@ -38,13 +45,15 @@ run() {
 
     printf "\nRunning Linters...\n\n"
     export ANSIBLE_COLLECTIONS_PATH="$COLLECTIONS_DIR"
-    yamllint .
-    ansible-lint . "$SCRIPT_DIR/../roles/"* "$SCRIPT_DIR"/../molecule/default/tests/* \
-        "$SCRIPT_DIR"/../molecule/default/converge.yml "$SCRIPT_DIR"/../molecule/default/converge.yml
+    ansible-lint 
 
-    printf "\nRunning molecule...\n\n"
+    printf "\nRunning molecule tests for roles\n\n"
     export TESTENV_COLLECTIONS="$COLLECTIONS_DIR"
-    molecule "$MOLECULE_COMMAND"
+    cd roles
+    test_role step_cli
+    test_role step_ca
+    cd ..
+
 }
 
 set +u

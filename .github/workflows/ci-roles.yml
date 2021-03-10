@@ -12,12 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      max-parallel: 12
+      max-parallel: 10
       matrix:
         role: ["step_cli", "step_ca"]
-        ansible-version:
-          - "ansible>=2.9,<2.10"
-          - "ansible-base"
+        ansible-version: ["ansible", "ansible>=2.9,<2.10"]
     steps:
       - name: Check out codebase
         uses: actions/checkout@v2
@@ -31,9 +29,11 @@ jobs:
         run: pip3 install --upgrade pip
 
       - name: Install molecule dependencies
-        run: | # molecule needs community.general for docker modules
-          pip3 install "${{ matrix.ansible-version }}" docker molecule molecule-docker
-          ansible-galaxy collection install community.general community.docker
+        run: |
+          pip3 install "${{ matrix.ansible-version }}"
+          pip3 install -r requirements.txt
+          ansible-galaxy collection install -r collections/requirements.yml
+        working-directory: "smallstep/roles/${{ matrix.role }}/molecule/default"
       - name: Run Molecule tests
         run: molecule test
         env:
