@@ -1,0 +1,42 @@
+---
+name: CI Roles
+on: [push, pull_request]
+
+defaults:
+  run:
+    working-directory: "smallstep"
+
+jobs:
+  molecule:
+    name: ${{ matrix.role }} [${{ matrix.ansible-version }}]
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        role: ["step_cli", "step_ca"]
+        ansible-version: ["ansible", "ansible>=2.9,<2.10"]
+    steps:
+      - name: Check out codebase
+        uses: actions/checkout@v2
+        with:
+          path: "smallstep"
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.6"
+      - name: Set up pip
+        run: pip3 install --upgrade pip
+
+      - name: Install molecule dependencies
+        run: |
+          pip3 install "${{ matrix.ansible-version }}"
+          pip3 install -r requirements.txt
+          ansible-galaxy collection install -r collections/requirements.yml
+        working-directory: "smallstep/roles/${{ matrix.role }}/molecule/default"
+      - name: Run Molecule tests
+        run: molecule test
+        env:
+          PY_COLORS: "1"
+          ANSIBLE_FORCE_COLOR: "1"
+        working-directory: "smallstep/roles/${{ matrix.role }}"
