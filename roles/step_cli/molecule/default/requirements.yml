@@ -1,0 +1,3 @@
+collections:
+  # Used by molecule-docker to manage containers
+  - name: community.docker
