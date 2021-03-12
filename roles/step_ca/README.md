@@ -109,6 +109,14 @@ These variables need to be set as a group
 - Default: `""`
 
 
+### step-cli 
+
+##### `step_cli_executable`
+- Path or name of the step-cli executable to use for executing commands in this role
+- Can be an absolute path or a command (make sure the executable is in $PATH) for all users
+- Default: `step-cli`
+
+
 ## Example Playbooks
 
 ```

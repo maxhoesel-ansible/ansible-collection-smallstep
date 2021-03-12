@@ -17,7 +17,6 @@ Install the `step` CLI tool on a host
 - Can be a version tag (e.g. `0.15.3`), or `latest` to always install the most recent version
 - Default: `latest`
 
-
 ## Example Playbook
 
 ```

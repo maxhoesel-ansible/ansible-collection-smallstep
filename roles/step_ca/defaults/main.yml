@@ -19,3 +19,6 @@ step_ca_ssh: false
 step_ca_ra: ""
 step_ca_ra_issuer: ""
 step_ca_ra_credentials_file: ""
+
+# CLI vars
+step_cli_executable: step-cli
