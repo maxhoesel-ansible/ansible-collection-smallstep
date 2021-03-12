@@ -13,7 +13,7 @@
           - ansible_facts.services["step-ca.service"].status == "enabled"
 
     - name: Test step ca health
-      command: step ca health
+      command: step-cli ca health
       environment:
         STEPPATH: "{{ step_ca_path }}"
       become: yes

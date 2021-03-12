@@ -1,12 +1,14 @@
 ---
-- name: Look for `step` executable
-  stat:
-    path: "{{ step_cli_executable }}"
+- name: Look for step_cli_executable
+  command: "{{ step_cli_executable }} version"
+  ignore_errors: yes
+  changed_when: no
+  check_mode: no
   register: step_ca_cli_install
 - name: Verify that `step-cli` is installed
   assert:
-    that: step_ca_cli_install.stat.exists
-    fail_msg: "could not find `step` executable at {{ step_cli_executable }}. Please install it with step_cli"
+    that: not step_ca_cli_install.failed
+    fail_msg: "could not find {{ step_cli_executable }}. Please install it with maxhoesel.smallstep.step_cli first"
 
 - name: Verify that step_ca_name and step_ca_root_password are set
   assert:
