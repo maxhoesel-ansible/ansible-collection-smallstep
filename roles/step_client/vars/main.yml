@@ -1,2 +1,0 @@
-stepclient_tmpdir: /tmp/ansible-stepclient
-stepclient_executable_path: /usr/bin
