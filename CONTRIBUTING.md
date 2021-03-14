@@ -31,7 +31,9 @@ To begin development on this collection, perform the following steps:
     - Docker: Must be running for tests and be manageable by the current user.
       You must also have the `docker` pip package installed.
     - Ansible: This collection always supports the latest and second-latest release
-    - pip: `molecule molecule-docker` for testing roles
+    - To test roles, run while in the role you want to test:
+      - `pip install -r requirements.txt`
+      - `ansible-galaxy install -r collections/requirements.yml`
 
 ### Make your changes
 
@@ -70,6 +72,9 @@ Example: `fix(step_ca): also clean up on EL8`
   If ansible-test complains about the doc spec and argspec not matching, add this line to all the `ignore` files in `tests/sanity`:
   `plugins/modules/your_module_name.py validate-modules:doc-default-does-not-match-spec # Can't always rely on $STEPPATH being set`
 
+#### Hints for role development
+
+- If you are adding a new role, make sure to add it to both the hacking script and the CI job
 
 ### Update Tests and Documentation
 
