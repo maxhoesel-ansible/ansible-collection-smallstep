@@ -1,5 +1,5 @@
 ---
-name: CI Roles
+name: CI Modules
 on: [push, pull_request]
 
 defaults:
@@ -7,16 +7,13 @@ defaults:
     working-directory: "smallstep"
 
 jobs:
-  molecule:
-    name: "${{ matrix.role }} ${{ matrix.ansible-version }}"
+  ansible-test:
+    name: "ansible-test ${{ matrix.ansible-version }}"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       max-parallel: 10
       matrix:
-        role:
-          - step_ca
-          - step_cli
         ansible-version:
           - stable-2.9
           - stable-2.10
@@ -34,22 +31,17 @@ jobs:
       - name: Install Ansible
         run: pip3 install https://github.com/ansible/ansible/archive/${{ matrix.ansible-version }}.tar.gz --disable-pip-version-check
 
-      - name: Install Molecule dependencies
-        run: |
-          pip3 install -r requirements.txt
-          ansible-galaxy collection install -r collections/requirements.yml
-        working-directory: "smallstep/roles/${{ matrix.role }}/molecule/default"
+      - name: Install ansible-test dependencies
+        run: pip3 install docker
 
       - name: Build collection
-        run: ansible-galaxy collection build
+        run: ansible-galaxy collection build .
       - name: Install collection
-        run: ansible-galaxy collection install maxhoesel-smallstep-*.tar.gz
+        run: ansible-galaxy collection install maxhoesel-smallstep-*.tar.gz -p .
 
-      - name: Run ansible-lint
-        run: ansible-lint -v
-      - name: Run Molecule tests
-        run: molecule test
-        working-directory: "smallstep/roles/${{ matrix.role }}"
-        env:
-          PY_COLORS: "1"
-          ANSIBLE_FORCE_COLOR: "1"
+      - name: Run sanity tests
+        run: ansible-test sanity --docker --requirements -v --color --python 3.6 plugins/
+        working-directory: smallstep/ansible_collections/maxhoesel/smallstep
+      - name: Run Integration tests
+        run: ansible-test integration --docker --requirements -v --coverage --color --python 3.6
+        working-directory: smallstep/ansible_collections/maxhoesel/smallstep
