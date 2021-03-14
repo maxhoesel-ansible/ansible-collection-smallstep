@@ -32,21 +32,15 @@ jobs:
       - name: Set up pip
         run: pip3 install --upgrade pip
       - name: Install Ansible
-        run: pip3 install https://github.com/ansible/ansible/archive/${{ matrix.ansible-version }}.tar.gz --disable-pip-version-check
+        run: pip3 install https://github.com/ansible/ansible/archive/${{ matrix.ansible-version }}.tar.gz
 
       - name: Install Molecule dependencies
         run: |
-          pip3 install -r requirements.txt
-          ansible-galaxy collection install -r collections/requirements.yml
-        working-directory: "smallstep/roles/${{ matrix.role }}/molecule/default"
-
-      - name: Build collection
-        run: ansible-galaxy collection build
-      - name: Install collection
-        run: ansible-galaxy collection install maxhoesel-smallstep-*.tar.gz
+          pip3 install -r roles/${{ matrix.role }}/molecule/default/requirements.txt
+          ansible-galaxy collection install -r roles/${{ matrix.role }}/molecule/default/collections/requirements.yml
 
       - name: Run ansible-lint
-        run: ansible-lint -v
+        run: ansible-lint -vv
       - name: Run Molecule tests
         run: molecule test
         working-directory: "smallstep/roles/${{ matrix.role }}"

@@ -33,7 +33,7 @@ To begin development on this collection, perform the following steps:
     - Ansible: This collection always supports the latest and second-latest release
     - To test roles, run while in the role you want to test:
       - `pip install -r requirements.txt`
-      - `ansible-galaxy install -r collections/requirements.yml`
+      - `ansible-galaxy collection install -r collections/requirements.yml`
 
 ### Make your changes
 
