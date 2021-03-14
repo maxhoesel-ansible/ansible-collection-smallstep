@@ -1,2 +1,7 @@
 # Don't automatically install roles from galaxy
 offline: true
+
+exclude_paths:
+  - tests/integration/targets/
+  - .github/
+  - .chlog/
