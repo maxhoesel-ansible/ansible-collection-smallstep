@@ -1,1 +1,0 @@
-../../docs/STEP_CLIENT.md

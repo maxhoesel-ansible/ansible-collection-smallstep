@@ -1,0 +1,14 @@
+---
+- name: Systemd unit file is present
+  template:
+    src: step-ca.service.j2
+    dest: /etc/systemd/system/step-ca.service
+    owner: root
+    group: root
+    mode: 0644
+
+- name: Service is enabled and running
+  systemd:
+    name: step-ca.service
+    state: started
+    enabled: yes

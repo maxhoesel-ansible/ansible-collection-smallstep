@@ -1,0 +1,47 @@
+---
+- name: Look for step_cli_executable
+  command: "{{ step_cli_executable }} version"
+  ignore_errors: yes
+  changed_when: no
+  check_mode: no
+  register: step_ca_cli_install
+- name: Verify that `step-cli` is installed
+  assert:
+    that: not step_ca_cli_install.failed
+    fail_msg: "could not find {{ step_cli_executable }}. Please install it with maxhoesel.smallstep.step_cli first"
+
+- name: Verify that step_ca_name and step_ca_root_password are set
+  assert:
+    that:
+      - step_ca_name is defined
+      - step_ca_name | length > 0
+      - step_ca_root_password is defined
+      - step_ca_root_password | length > 0
+    fail_msg: step_ca_name and step_ca_root_password must both be set
+
+- name: Verify existing root cert/key
+  assert:
+    that:
+      - step_ca_existing_root_file | length > 0
+      - step_ca_existing_key_file | length > 0
+    fail_msg: Existing root cert/key variables must be passed as a group
+  when: >
+    step_ca_existing_root_file | length > 0 or
+    step_ca_existing_key_file | length > 0
+
+- name: Verify RA variables
+  assert:
+    that:
+      - step_ca_ra | length > 0
+      - step_ca_ra_issuer | length > 0
+      - step_ca_ra_credentials_file | length > 0
+    fail_msg: RA variables must be passed as a group
+  when: >
+    step_ca_ra | length > 0 or
+    step_ca_ra_issuer | length > 0 or
+    step_ca_ra_credentials_file | length > 0
+
+- name: set step_ca_intermediate_password
+  set_fact:
+    step_ca_intermediate_password: "{{ step_ca_root_password }}"
+  when: not step_ca_intermediate_password is defined

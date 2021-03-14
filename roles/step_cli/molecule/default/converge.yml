@@ -1,0 +1,7 @@
+---
+- name: Converge
+  hosts: all
+  tasks:
+    - name: "Include step_cli"
+      include_role:
+        name: "step_cli"

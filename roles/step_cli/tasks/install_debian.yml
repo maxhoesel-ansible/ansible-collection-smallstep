@@ -1,0 +1,13 @@
+- name: Dependencies are installed [Debian]
+  apt:
+    name:
+      - xz-utils
+    update_cache: yes
+  retries: 3
+  delay: 5
+
+- name: step-cli is installed [Debian]
+  apt:
+    deb: "https://github.com/smallstep/cli/releases/download/v{{ step_cli_version }}/step-cli_{{ step_cli_version }}_amd64.deb"
+  retries: 3
+  delay: 5

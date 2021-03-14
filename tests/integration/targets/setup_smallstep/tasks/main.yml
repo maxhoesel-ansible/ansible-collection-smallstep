@@ -1,0 +1,30 @@
+- name: Install sudo
+  package:
+    name: sudo
+    state: present
+
+- name: Install step-cli
+  include_role:
+    name: maxhoesel.smallstep.step_cli
+
+- name: Copy existing ca cert/key to nodes
+  copy:
+    src: "{{ item }}"
+    dest: /tmp/
+    owner: root
+    group: root
+    mode: 0755
+  loop:
+    - "existing.crt"
+    - "existing.key"
+
+- name: Install step-ca
+  include_role:
+    name: maxhoesel.smallstep.step_ca
+  vars:
+    step_ca_name: module-tests
+    step_ca_root_password: "{{ step_ca_password }}"
+    step_ca_dns: "127.0.0.1"
+    step_ca_ssh: yes
+    step_ca_existing_root_file: /tmp/existing.crt
+    step_ca_existing_key_file: /tmp/existing.key

@@ -1,0 +1,8 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Verify that step-cli is installed
+      command: /usr/bin/step-cli version
+      changed_when: no

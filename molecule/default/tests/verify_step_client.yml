@@ -1,5 +1,0 @@
-- name: Verify that CA cert is installed
-  uri:
-    url: '{{ item.url }}'
-    status_code: [200, 404]
-  loop: '{{ stepclient_ca_servers }}'

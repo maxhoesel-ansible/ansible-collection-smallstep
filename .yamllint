@@ -29,8 +29,8 @@ rules:
   indentation: disable
   key-duplicates: enable
   line-length: disable
-  new-line-at-end-of-file: disable
+  new-line-at-end-of-file: enable
   new-lines:
     type: unix
-  trailing-spaces: disable
+  trailing-spaces: enable
   truthy: disable

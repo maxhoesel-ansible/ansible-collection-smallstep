@@ -144,6 +144,5 @@ dmypy.json
 .prof
 
 maxhoesel-smallstep-*.tar.gz
-
-# Testing files
-tests/testenv
+# Adding this to gitignore breaks ansible-test. so let's not do that
+#ansible_collections/
