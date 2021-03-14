@@ -1,6 +1,11 @@
 ---
 name: CI Modules
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - "plugins/**"
+      - "tests/**"
+  pull_request:
 
 defaults:
   run:

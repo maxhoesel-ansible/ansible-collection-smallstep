@@ -1,6 +1,10 @@
 ---
 name: CI Roles
-on: [push, pull_request]
+on:
+  push:
+    paths:
+      - "roles/**"
+  pull_request:
 
 defaults:
   run:
