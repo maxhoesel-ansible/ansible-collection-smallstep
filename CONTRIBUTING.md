@@ -28,10 +28,11 @@ To begin development on this collection, perform the following steps:
 1. Fork the repo
 2. Clone your fork to your machine
 3. Install the following depdencies:
-    - Docker: Must be running for tests and be manageable by the current user.
+    - Ansible: This collection always supports the latest release of `ansible-base`, as well as one previous release
+    - Python 3.6 is the minimum supported version for this collection
+    - (tests) Docker: Must be running for tests and be manageable by the current user.
       You must also have the `docker` pip package installed.
-    - Ansible: This collection always supports the latest and second-latest release
-    - To test roles, run while in the role you want to test:
+    - (tests) To test roles, run while in the role you want to test:
       - `pip install -r requirements.txt`
       - `ansible-galaxy collection install -r collections/requirements.yml`
 
