@@ -14,7 +14,7 @@ short_description: Manage provisioners for a Smallstep CA server
 version_added: '0.3.0'
 description: Use this module to create and remove provisioners from a Smallstep CA server.
 requirements:
-  - C(step-cli) tool and C(step-ca) server installed on remote host
+  - C(step-ca) server running on remote host
   - Read access to I(ca_config) on the remote host
 notes:
   - This module does B(not) modify existing provisioners - it will only add or remove them.
@@ -132,6 +132,10 @@ extends_documentation_fragment: maxhoesel.smallstep.step_cli
 """
 
 EXAMPLES = r"""
+# NOTE: All examples assume that the module is executed as a user with STEPPATH set to
+# the step-ca config directory. If this is not the case, you can always specify the required
+# parameters with ca_config
+
 - name: Add a single JWK provisioner using an auto-generated asymmetric key pair
   maxhoesel.smallstep.ca_provisioner:
     name: max@smallstep.com
@@ -234,10 +238,6 @@ CA_CONFIG = "{steppath}/config/ca.json".format(steppath=os.environ.get("STEPPATH
 
 
 def add_provisioner(module, result):
-    # step ignores invalid parameters, so we can be lazy and just pass through
-    # all user-supplied parameters for provisioners, even if their type doesn't match
-    # (e.g. Azure params for a GCP provisioner). We do however handle the jwk keys
-    # separately as they are positional parameters instead of params.
     args = {
         "aws_account": "--aws-account",
         "aws_iid_roots_file": "--iid-roots",
