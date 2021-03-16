@@ -29,6 +29,7 @@ def run_step_cli_command(cli_executable, cli_command, module, result, params=Non
     args.extend(cli_command)
     if not params:
         params = []
+
     for param in params:
         if module.params[param]:
             if module.argument_spec[param].get("type", "str") in ["str", "int", "float", "path", "raw", "bytes"]:
@@ -42,6 +43,14 @@ def run_step_cli_command(cli_executable, cli_command, module, result, params=Non
     if not module.check_mode:
         rc, result["stdout"], result["stderr"] = module.run_command(args)
         if rc != 0:
-            result["msg"] = "Error running command {cmd}".format(cmd=args)
+            if "error allocating terminal" in result["stderr"]:
+                result["msg"] = (
+                    "step-cli tried and failed to open a terminal for interactive input. "
+                    "This usually means that you're missing a parameter that step-cli is now asking for, "
+                    "such as a password file, provisioner, or confirmation to overwrite existing files. "
+                    "Failed command: '{cmd}'".format(cmd=" ".join(args))
+                )
+            else:
+                result["msg"] = "Error running command '{cmd}'".format(cmd=" ".join(args))
             module.fail_json(**result)
     return result
