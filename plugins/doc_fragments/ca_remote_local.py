@@ -13,7 +13,6 @@ class ModuleDocFragment(object):
       ca_config:
         description: The path to the certificate authority configuration file.
         type: path
-        default: $STEPPATH/config/ca.json
       ca_url:
         description: URI of the targeted Step Certificate Authority.
         type: str
@@ -21,4 +20,5 @@ class ModuleDocFragment(object):
         description: >
           Don't contact the CA. Offline mode uses the configuration, certificates, and keys created with step ca init,
           but can accept a different configuration file using --ca-config flag.
+        type: bool
     '''
