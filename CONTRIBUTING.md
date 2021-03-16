@@ -60,18 +60,8 @@ Example: `fix(step_ca): also clean up on EL8`
 - If you need to call `step-cli`, do so via `run_step_cli_command()` in `run.py`.
   This function automatically assembles command-line arguments for you - all you
   need to do is provide it with a simple mapping dict. It also handles errors and check mode for you
-- If you are using the `ca_config` parameter, make sure to initialize it like so:
-  ```
-  CA_CONFIG = "{steppath}/config/ca.json".format(steppath=os.environ.get("STEPPATH", os.environ["HOME"] + "/.step"))
-  ...
-  module_args = dict(
-    ca_config=dict(type="path", default=CA_CONFIG),
-    ...
-  )
-  ```
-  This ensures that the config file is read from the correct path, regardless of whether STEPPATH is set or not.
-  If ansible-test complains about the doc spec and argspec not matching, add this line to all the `ignore` files in `tests/sanity`:
-  `plugins/modules/your_module_name.py validate-modules:doc-default-does-not-match-spec # Can't always rely on $STEPPATH being set`
+- If you need to troubleshoot inside the ansible-test container, add `--docker-terminate never` to the
+  call inside the hacking script. The container will then persist even on failure, and you can debug it
 
 #### Hints for role development
 
