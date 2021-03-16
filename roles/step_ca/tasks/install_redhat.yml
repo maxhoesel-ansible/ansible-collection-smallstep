@@ -21,7 +21,7 @@
 - block:
     - name: Download and extract step-ca archive [RedHat]
       unarchive:
-        src: "https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-certificates_linux_{{ step_ca_version }}_amd64.tar.gz"
+        src: "https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-ca_linux_{{ step_ca_version }}_amd64.tar.gz"
         dest: /tmp/
         remote_src: yes
       retries: 3
@@ -29,10 +29,10 @@
     - name: Install step-ca binary [RedHat]
       shell: >
         set -o pipefail &&
-        cp /tmp/step-certificates_{{ step_ca_version }}/bin/step-ca {{ step_ca_executable }}
+        cp /tmp/step-ca_{{ step_ca_version }}/bin/step-ca {{ step_ca_executable }}
   always:
     - name: Remove step release archive [RedHat]
       file:
-        path: "/tmp/step-certificates_{{ step_ca_version }}"
+        path: "/tmp/step-ca_{{ step_ca_version }}"
         state: absent
   when: (step_ca_installed_version.stdout) | default("") != step_ca_version
