@@ -10,6 +10,6 @@
 
 - name: step-cli is installed [Debian]
   apt:
-    deb: "https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-certificates_{{ step_ca_version }}_amd64.deb"
+    deb: "https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-ca_{{ step_ca_version }}_amd64.deb"
   retries: 3
   delay: 5
