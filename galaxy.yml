@@ -55,4 +55,6 @@ build_ignore:
     - hacking
     - "*-smallstep-*.tar.gz"
     - ".github"
+    - ".gitlint"
+    - ".pre-commit-config.yaml"
     - ".chglog"

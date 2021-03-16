@@ -40,8 +40,8 @@ jobs:
 
       - name: Install Molecule dependencies
         run: |
-          pip3 install -r roles/${{ matrix.role }}/molecule/default/requirements.txt
-          ansible-galaxy collection install -r roles/${{ matrix.role }}/molecule/default/collections/requirements.yml
+          pip3 install -r hacking/requirements.txt
+          ansible-galaxy collection install -r hacking/collections/requirements.yml
 
       - name: Run ansible-lint
         run: ansible-lint -vv
