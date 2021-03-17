@@ -7,28 +7,18 @@ options:
   # NOTE: Commented out commit types should be used when appropiate.
   # They will not show up in the changelogs
   commits:
-     filters:
-       Type:
-         - docs
-         - feat
-         - fix
-         - perf
-         #- ci
-         #- refactor
-         #- style
-         #- test
-         #- chore
+    filters:
+      Type:
+        - docs
+        - feat
+        - fix
+        - perf
   commit_groups:
-     title_maps:
-       docs: Documentation
-       feat: Features
-       fix: Bug Fixes
-       perf: Performance Improvements
-       #ci: Changes to the CI pipeline
-       #refactor: Code Refactoring
-       #chore: Other Non-Functional Aspects (e.g. CI, gitignore)
-       #style: Code Style and Conventions
-       #test: Testing Framework
+    title_maps:
+      feat: Features
+      fix: Bug Fixes
+      docs: Documentation
+      perf: Performance Improvements
   header:
     pattern: "^(\\w*)(?:\\(([\\w\\$\\.\\-\\*\\s]*)\\))?\\:\\s(.*)$"
     pattern_maps:
