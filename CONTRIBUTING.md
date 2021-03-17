@@ -23,18 +23,22 @@ it also leaves a trail in the repo for other people to follow in the future.
 
 ### Fork and setup your local environment
 
-To begin development on this collection, perform the following steps:
+To begin development on this collection, you need the following dependencies installed:
 
-1. Fork the repo
-2. Clone your fork to your machine
-3. Install the following depdencies:
-    - Ansible: This collection always supports the latest release of `ansible-base`, as well as one previous release
-    - Python 3.6 is the minimum supported version for this collection
-    - (tests) Docker: Must be running for tests and be manageable by the current user.
-      You must also have the `docker` pip package installed.
-    - (tests) To test roles, run while in the role you want to test:
-      - `pip install -r requirements.txt`
-      - `ansible-galaxy collection install -r collections/requirements.yml`
+- Docker, accessible by your local user account
+- Python 3.6 or higher
+
+Fork the repo and clone it to your local machine, then run `hacking/env_setup.sh`.
+This script will set up a local dev environment for you. In particular, it will:
+
+- Create a virtualenv in hacking/venv/
+- Install all the dev dependencies in it
+- Install and activate commit hooks to lint commit messages and catch common errors
+
+To begin, activate the venv with `. hacking/venv/bin/activate`
+
+If you need to clear the environment for whatever reason, just run
+`deactivate && rm -rf ./venv`
 
 ### Make your changes
 
@@ -44,11 +48,10 @@ All commits **must** follow the [conventional-commits standard](https://www.conv
 
 `<type>(optional scope): <description>`
 
-- Valid types can be found in `.chlog/config.yml`
 - Valid scopes are all components of this collection, such as modules or roles
 - The description must be lower-case
 
-Example: `fix(step_ca): also clean up on EL8`
+Example: `fix(step_ca): clean up files on EL8`
 
 #### Hints for module development
 
@@ -65,7 +68,7 @@ Example: `fix(step_ca): also clean up on EL8`
 
 #### Hints for role development
 
-- If you are adding a new role, make sure to add it to both the hacking script and the CI job
+- If you are adding a new role, make sure to add its molecule tests to both the hacking script and the CI job
 
 ### Update Tests and Documentation
 
@@ -89,16 +92,16 @@ Some additional hints:
 - All targets call the `setup_smallstep` target via the dependency declared in `meta/main.yml`. This target performs basic setup
   of both step-cli and step-ca using, so you don't need to install them in your target
 - See `targets/setup_smallstep/defaults/main.yml` for some variables you can use in your tests
-- You can run modules from this collection with `environment: {"STEPPATH": "{{ STEP_CA_PATH }}"}` if you don't want to specify ca_config for every call
+- You can run modules from this collection with `environment: {"STEPPATH": "{{ STEP_CA_PATH }}"}` if you don't want to specify ca_config/ca_url for every module call
 
 ### Submitting your Changes
 
 The "Before-opening-a-PR-Checklist":
 
-- Your commit history is clean and follows the conventional commits standard
-- All local tests succeed (both roles and modules)
+- Your commit history is clean
 - The documentation is up-to-date
-- (Rebasing against the current devel is always a good idea)
+- All local tests and commit hooks succeed
+- (Rebasing against the current devel before pushing is always a good idea)
 
 ## Release Workflow
 

@@ -5,3 +5,4 @@ exclude_paths:
   - tests/integration/targets/
   - .github/
   - .chlog/
+  - .pre-commit-config.yaml
