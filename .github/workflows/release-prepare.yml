@@ -18,6 +18,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: "smallstep"
+          fetch-depth: 0
       - name: Install git-chglog
         run: |
           wget https://github.com/git-chglog/git-chglog/releases/download/v0.11.2/git-chglog_0.11.2_linux_amd64.tar.gz -O ../git-chglog.tar.gz
