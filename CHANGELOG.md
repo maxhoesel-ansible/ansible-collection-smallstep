@@ -1,3 +1,30 @@
+
+<a name="v0.3.0"></a>
+## [v0.3.0] - 2021-03-18
+### Bug Fixes
+- use step-cli name for step executable (d2e8126)
+- **step_ca:** adjust archive name to upstream (76d7828)
+- **step_cli:** update deb file name to follow upstream (35862f6)
+
+### Documentation
+- bump collection version (e7b27ef)
+- updated changelog (d6e2fde)
+- updated git-chlog config (a37ac2d)
+- update module vevelopment information (05177ed)
+- update contribution information (0801fa8)
+- **step_ca_provisioner:** update documentation (e508707)
+- **step_cli:** fix invalid distro tags (9b7325f)
+- **step_cli:** minor corrections and fixes (d11367d)
+- **step_cli:** fix readme errors (5d98139)
+- **step_client:** add deprecation warning (fad0039)
+
+### Features
+- add step_ca_certificate and _token modules (9aaf5ab)
+- **step_ca:** add reworked step_ca role (539d8b1)
+- **step_ca_bootstrap:** add bootstrap module (43c2b91)
+- **step_cli:** add reworked step_cli role to replace step_client (65c25c5)
+
+
 <a name="v0.2.1"></a>
 ## [v0.2.1] - 2020-11-25
 ### Bug Fixes
@@ -28,5 +55,6 @@
 <a name="v0.1.0"></a>
 ## v0.1.0 - 2020-11-13
 
+[v0.3.0]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.2.1...v0.3.0
 [v0.2.1]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.2.0...v0.2.1
 [v0.2.0]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.1.0...v0.2.0
