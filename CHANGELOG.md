@@ -7,6 +7,7 @@
 - **step_cli:** update deb file name to follow upstream (35862f6)
 
 ### Documentation
+- updated changelog for v0.3.0 (9e0eb7a)
 - updated changelog (d6e2fde)
 - updated git-chlog config (a37ac2d)
 - update module vevelopment information (05177ed)
