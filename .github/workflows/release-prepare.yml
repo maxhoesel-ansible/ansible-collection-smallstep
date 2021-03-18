@@ -1,0 +1,49 @@
+---
+name: Prepare Release
+on:
+  push:
+    branches:
+      - 'release_**'
+
+defaults:
+  run:
+    working-directory: "smallstep"
+
+jobs:
+  prepare-release:
+    name: "Prepare Release"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out codebase
+        uses: actions/checkout@v2
+        with:
+          path: "smallstep"
+      - name: Install git-chglog
+        run: |
+          wget https://github.com/git-chglog/git-chglog/releases/download/v0.11.2/git-chglog_0.11.2_linux_amd64.tar.gz -O ../git-chglog.tar.gz
+          (cd .. && tar xf git-chglog.tar.gz)
+
+      - name: Get release version
+        run: |
+          echo "release_version=$(cat galaxy.yml | grep version: | cut -d ' ' -f 2)" >> $GITHUB_ENV
+
+      - name: Generate full changelog
+        run: "../git-chglog --next-tag v${{ env.release_version }} --output CHANGELOG.md"
+
+      - name: Commit changelog and create PR
+        id: pr
+        uses: peter-evans/create-pull-request@v3
+        with:
+          path: smallstep
+          commit-message: "docs: updated changelog for v${{ env.release_version }}"
+          committer: GitHub Actions <noreply@github.com>
+          branch: "release_${{ env.release_version }}"
+          base: main
+          title: "Release ${{ env.release_version }}"
+          body: |
+            (This release PR was automatically generated via GitHub Actions)
+
+      - name: Print outputs
+        run: |
+          echo "Pull Request Number - ${{ steps.cpr.outputs.pull-request-number }}"
+          echo "Pull Request URL - ${{ steps.cpr.outputs.pull-request-url }}"

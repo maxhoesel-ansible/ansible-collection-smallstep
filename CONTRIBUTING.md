@@ -107,11 +107,8 @@ The "Before-opening-a-PR-Checklist":
 
 This project uses sematic versioning. Name versions accordingly.
 
-0. Install [git-chlog](https://github.com/git-chglog/git-chglog) to generate the changelog
-1. Create a new branch named "vX.Y.Z" and check it out
-2. Bump the version number in `galaxy.yml` and commit the change
-3. Run `git-chlog --next-tag vX.Y.Z` to update the changelog. Make sure to remove any mentions of "unreleased", then commit it
-4. Push the branch and create a pull request onto `main`
-5. Wait for all tests to complete, then merge it.
-6. Create a release referencing main, with a link to the changelog and add a collection.tar.gz archive
-7. Merge main back into devel
+1. Create a new branch named "release_X.Y.Z" and check it out
+2. Bump the version number in `galaxy.yml`
+3. Commit and push the change. This will trigger a CI job (`release-prepare.yml`) that prepares the release
+4. Check the generated pull request and get it approved
+5. Once merged onto main, the CI will then create the release artifacts and publish the new version onto Galaxy
