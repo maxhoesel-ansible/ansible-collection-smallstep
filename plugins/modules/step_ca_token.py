@@ -99,9 +99,6 @@ options:
   rekey:
     description: Create a token for authorizing 'rekey' requests. The audience will be invalid for any other API request.
     type: bool
-  root:
-    description: The path to the PEM file used as the root certificate authority.
-    type: path
   san:
     description: >
       Add dns/ip/email/uri Subject Alternative Name(s) (SANs) that should be authorized.
