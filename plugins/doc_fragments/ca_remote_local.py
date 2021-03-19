@@ -21,4 +21,7 @@ class ModuleDocFragment(object):
           Don't contact the CA. Offline mode uses the configuration, certificates, and keys created with step ca init,
           but can accept a different configuration file using --ca-config flag.
         type: bool
+      root:
+        description: The path to the PEM file used as the root certificate authority.
+        type: path
     '''

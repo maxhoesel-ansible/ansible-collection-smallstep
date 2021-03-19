@@ -125,9 +125,6 @@ options:
       Standalone is a mode in which the step process will run a server that will will respond to ACME challenge validation requests.
       Standalone is the default mode for serving challenge validation requests.
     type: bool
-  root:
-    description: The path to the PEM file used as the root certificate authority.
-    type: path
   token:
     description: The one-time token used to authenticate with the CA in order to create the certificate.
     type: str
