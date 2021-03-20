@@ -4,7 +4,11 @@ on:
   push:
     paths:
       - "roles/**"
+      - ".github/workflows/**"
   pull_request:
+    paths:
+      - "roles/**"
+      - ".github/workflows/**"
 
 defaults:
   run:
