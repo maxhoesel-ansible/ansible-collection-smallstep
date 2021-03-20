@@ -5,7 +5,12 @@ on:
     paths:
       - "plugins/**"
       - "tests/**"
+      - ".github/workflows/**"
   pull_request:
+    paths:
+      - "plugins/**"
+      - "tests/**"
+      - ".github/workflows/**"
 
 defaults:
   run:
