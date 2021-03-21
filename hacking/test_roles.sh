@@ -1,8 +1,15 @@
 #!/usr/bin/env bash
 
-(ansible-lint -v \
-    && (cd roles/step_cli && molecule test) \
-    && (cd roles/step_ca && molecule test) \
-)
+set -eu
 
-./hacking/cleanup.sh
+cleanup() {
+    ./hacking/cleanup.sh
+}
+
+trap cleanup err exit
+
+ansible-lint -v
+
+for role in roles/*; do
+    (cd "$role" && molecule test)
+done
