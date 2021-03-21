@@ -15,16 +15,34 @@ defaults:
     working-directory: "smallstep"
 
 jobs:
+  discover-roles:
+    runs-on: ubuntu-latest
+    outputs:
+      roles: ${{ steps.set-roles.outputs.roles }}
+    steps:
+      - name: Check out codebase
+        uses: actions/checkout@v2
+        with:
+          path: "smallstep"
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.6"
+      - name: Discover roles
+        id: set-roles
+        run: |
+          export roles=$(python3 -c "import os; import json; print(json.dumps(os.listdir('roles')));")
+          echo "::set-output name=roles::$roles"
+
   molecule:
     name: "${{ matrix.role }} ${{ matrix.ansible-version }}"
+    needs: discover-roles
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       max-parallel: 10
       matrix:
-        role:
-          - step_ca
-          - step_cli
+        role: ${{ fromJson(needs.discover-roles.outputs.roles) }}
         ansible-version:
           - stable-2.9
           - stable-2.10
@@ -49,6 +67,7 @@ jobs:
 
       - name: Run ansible-lint
         run: ansible-lint -vv
+
       - name: Run Molecule tests
         run: molecule test
         working-directory: "smallstep/roles/${{ matrix.role }}"

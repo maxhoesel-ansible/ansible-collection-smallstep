@@ -68,7 +68,7 @@ Example: `fix(step_ca): clean up files on EL8`
 
 #### Hints for role development
 
-- If you are adding a new role, make sure to add its molecule tests to both the hacking script and the CI job
+None so far
 
 ### Update Tests and Documentation
 
