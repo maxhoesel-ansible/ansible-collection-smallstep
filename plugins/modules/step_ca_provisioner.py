@@ -243,6 +243,7 @@ def add_provisioner(module, result):
         "aws_iid_roots_file": "--iid-roots",
         "azure_tenant": "--azure-tenant",
         "azure_resource_group": "--azure-resource-group",
+        "ca_config": "--ca-config",
         "disable_custom_sans": "--disable-custom-sans",
         "disable_trust_on_first_use": "--disable-trust-on-first-use",
         "gcp_service_account": "--gcp-service-account",
