@@ -1,0 +1,3 @@
+# Data for all hosts that need to access a local CA
+step_acme_cert_ca_url: https://step-ca.localdomain
+step_acme_cert_ca_provisioner: ACME
