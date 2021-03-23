@@ -1,0 +1,52 @@
+---
+- include: check.yml
+
+- name: service user is present
+  user:
+    name: "{{ step_service_user }}"
+    shell: /bin/bash
+    password: "*"
+    home: "{{ step_service_user_home }}"
+
+- name: step directory is present
+  file:
+    path: "{{ step_service_user_home }}/step"
+    owner: "{{ step_service_user }}"
+    group: "{{ step_service_user }}"
+    mode: "750"
+    state: directory
+
+- name: steppath symlink is present
+  file:
+    src: "{{ step_service_user_home }}/step"
+    dest: "{{ step_service_user_home }}/.step"
+    state: link
+    owner: "{{ step_service_user }}"
+    group: "{{ step_service_user }}"
+    mode: "750"
+
+- name: service user is bootstrapped
+  maxhoesel.smallstep.step_ca_bootstrap:
+    ca_url: "{{ step_bootstrap_ca_url }}"
+    fingerprint: "{{ step_bootstrap_fingerprint }}"
+    step_cli_executable: "{{ step_cli_executable }}"
+  become: yes
+  become_user: "{{ step_service_user }}"
+
+- name: check if cert is already installed
+  stat:
+    path: "{{ step_service_user_home }}/.cert_installed"
+  register: step_bootstrap_installed
+
+- block:
+  - name: root cert is installed
+    command: "step-cli certificate install {{ step_service_user_home }}/.step/certs/root_ca.crt --all"
+
+  - name: Write install file
+    copy:
+      content: This file tells step_bootstrap_host that the root cert is already installed on the local system
+      dest: "{{ step_service_user_home }}/.cert_installed"
+      owner: "{{ step_service_user }}"
+      group: "{{ step_service_user }}"
+      mode: "750"
+  when: step_bootstrap_install_cert and not step_bootstrap_installed.stat.exists

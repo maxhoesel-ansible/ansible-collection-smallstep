@@ -1,0 +1,10 @@
+---
+step_cli_executable: step-cli
+
+step_service_user: step
+step_service_user_home: /etc/step
+
+#step_bootstrap_ca_url:
+#step_bootstrap_fingerprint:
+
+step_bootstrap_install_cert: yes
