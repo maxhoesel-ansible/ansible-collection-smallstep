@@ -1,0 +1,16 @@
+- name: Verify that required parameters are set
+  assert:
+    that:
+      - step_acme_cert_ca_provisioner is defined
+      - step_acme_cert_ca_provisioner | length > 0
+
+- name: Look for step_cli_executable
+  command: "{{ step_cli_executable }} version"
+  ignore_errors: yes
+  changed_when: no
+  check_mode: no
+  register: step_cli_install
+- name: Verify that `step-cli` is installed
+  assert:
+    that: not step_cli_install.failed
+    fail_msg: "could not find {{ step_cli_executable }}. Please install it with maxhoesel.smallstep.step_cli first"

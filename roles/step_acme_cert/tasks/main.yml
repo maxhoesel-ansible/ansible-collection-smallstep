@@ -1,0 +1,13 @@
+---
+# tasks file for step_acme_cert
+- include: check.yml
+
+- name: Look for existing certificate
+  stat:
+    path: "{{ step_acme_cert_certfile.path }}"
+  register: step_acme_cert_current_cert
+
+- include: get_cert.yml
+  when: not step_acme_cert_current_cert.stat.exists
+
+- include: renewal.yml
