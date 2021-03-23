@@ -7,3 +7,5 @@ rm -r ansible_collections
 rm maxhoesel-smallstep-*.tar.gz
 
 ansible-galaxy collection build --force .
+
+ansible-galaxy collection install maxhoesel-smallstep-*.tar.gz -p .
