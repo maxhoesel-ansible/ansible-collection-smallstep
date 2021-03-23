@@ -65,6 +65,11 @@ jobs:
           pip3 install -r hacking/requirements.txt
           ansible-galaxy collection install -r hacking/collections/requirements.yml
 
+      - name: Build and install collection
+        run: |
+          ansible-galaxy collection build --force
+          ansible-galaxy collection install maxhoesel-smallstep-*.tar.gz --force
+
       - name: Run ansible-lint
         run: ansible-lint -vv
 
