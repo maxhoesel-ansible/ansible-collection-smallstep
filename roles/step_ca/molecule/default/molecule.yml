@@ -13,6 +13,7 @@ platforms:
   - name: step-ca-ubuntu-20
     groups:
       - ubuntu
+      - ca
     image: "geerlingguy/docker-ubuntu2004-ansible"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
@@ -23,6 +24,7 @@ platforms:
   - name: step-ca-ubuntu-18
     groups:
       - ubuntu
+      - ca
     image: "geerlingguy/docker-ubuntu1804-ansible"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
@@ -33,6 +35,7 @@ platforms:
   - name: step-ca-debian-10
     groups:
       - debian
+      - ca
     image: "geerlingguy/docker-debian10-ansible"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
@@ -43,6 +46,7 @@ platforms:
   - name: step-ca-centos-8
     groups:
       - centos
+      - ca
     image: "geerlingguy/docker-centos8-ansible"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
@@ -56,17 +60,7 @@ provisioner:
     ssh_connection:
       pipelining: yes
   inventory:
-    hosts:
-      all:
-        vars:
-          step_ca_name: molecule
-          step_ca_user: step-molecule
-          step_ca_root_password: molecule
-          step_ca_intermediate_password: molecule-intermediate
-          step_ca_path: /etc/step-ca-molecule
-          step_ca_ssh: yes
-          step_ca_existing_root_file: /tmp/existing.crt
-          step_ca_existing_key_file: /tmp/existing.key
-
+    links:
+      group_vars: ../../../../tests/molecule/group_vars
 verifier:
   name: ansible
