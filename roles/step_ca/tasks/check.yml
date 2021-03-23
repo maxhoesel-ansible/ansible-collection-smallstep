@@ -1,15 +1,4 @@
 ---
-- name: Look for step_cli_executable
-  command: "{{ step_cli_executable }} version"
-  ignore_errors: yes
-  changed_when: no
-  check_mode: no
-  register: step_ca_cli_install
-- name: Verify that `step-cli` is installed
-  assert:
-    that: not step_ca_cli_install.failed
-    fail_msg: "could not find {{ step_cli_executable }}. Please install it with maxhoesel.smallstep.step_cli first"
-
 - name: Verify that step_ca_name and step_ca_root_password are set
   assert:
     that:
@@ -45,3 +34,14 @@
   set_fact:
     step_ca_intermediate_password: "{{ step_ca_root_password }}"
   when: not step_ca_intermediate_password is defined
+
+- name: Look for step_cli_executable
+  command: "{{ step_cli_executable }} version"
+  ignore_errors: yes
+  changed_when: no
+  check_mode: no
+  register: step_cli_install
+- name: Install step_cli
+  include_role:
+    name: maxhoesel.smallstep.step_cli
+  when: step_cli_install.failed

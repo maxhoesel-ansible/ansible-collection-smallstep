@@ -3,10 +3,12 @@
 Install and initialize a Smallstep certificates server (`step-ca`).
 
 This role performs the following actions:
-1. Install `step-ca`
-2. Create a user to run the step-ca server, if it doesn't already exist
-3. Initialize a fresh ca server with no provisioners using `step ca init`
-4. Daemonize step-ca using a systemd service
+
+1. Install `step-cli`if required
+2. Install `step-ca`
+3. Create a user to run the step-ca server, if it doesn't already exist
+4. Initialize a fresh ca server with no provisioners using `step ca init`
+5. Daemonize step-ca using a systemd service
 
 ## Requirements
 
@@ -15,7 +17,6 @@ This role performs the following actions:
   - Debian 10 or newer
   - CentOS 8 or newer
 - This role requires root access. Make sure to run this role with `become: yes` or equivalent
-- The host must already have `step-cli` installed. Use the `step_cli` role to do so
 - This role requires `expect` to answer some interactive prompts. It will automatically install
   `expect` if it is not present
 
@@ -109,7 +110,7 @@ These variables need to be set as a group
 - Default: `""`
 
 
-### step-cli 
+### step-cli
 
 ##### `step_cli_executable`
 - Path or name of the step-cli executable to use for executing commands in this role
