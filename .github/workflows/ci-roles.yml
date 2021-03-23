@@ -70,12 +70,46 @@ jobs:
           ansible-galaxy collection build --force
           ansible-galaxy collection install maxhoesel-smallstep-*.tar.gz --force
 
-      - name: Run ansible-lint
-        run: ansible-lint -vv
-
       - name: Run Molecule tests
         run: molecule test
         working-directory: "smallstep/roles/${{ matrix.role }}"
         env:
           PY_COLORS: "1"
           ANSIBLE_FORCE_COLOR: "1"
+
+  lint:
+    name: "ansible-lint ${{ matrix.ansible-version }}"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        ansible-version:
+          - stable-2.9
+          - stable-2.10
+    steps:
+      - name: Check out codebase
+        uses: actions/checkout@v2
+        with:
+          path: "smallstep"
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.6"
+      - name: Set up pip
+        run: pip3 install --upgrade pip
+      - name: Install Ansible
+        run: pip3 install https://github.com/ansible/ansible/archive/${{ matrix.ansible-version }}.tar.gz
+
+      - name: Install Molecule dependencies
+        run: |
+          pip3 install -r hacking/requirements.txt
+          ansible-galaxy collection install -r hacking/collections/requirements.yml
+
+      - name: Build and install collection
+        run: |
+          ansible-galaxy collection build --force
+          ansible-galaxy collection install maxhoesel-smallstep-*.tar.gz --force
+
+      - name: Run ansible-lint
+        run: ansible-lint -vv

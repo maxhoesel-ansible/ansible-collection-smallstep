@@ -6,6 +6,7 @@
       command: step-cli ca health
       become: yes
       become_user: step-molecule
+      changed_when: no
 
     # This will execute as root, so the cert will only be valid
     # if the system-wide install succeeded
