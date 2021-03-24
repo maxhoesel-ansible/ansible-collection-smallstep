@@ -38,8 +38,8 @@ You can also install the most recent version of this collection by referencing t
 
 ## Usage
 
-In addition to a set of modules that wrap around `step-cli` commands, allowing to perform typical `step-cli`/`ca` operations,
-this collection also contains several roles that perform typical tasks related to `step-cli` and `step-ca`. They are:
+In addition to a set of modules that wrap around `step-cli` commands to perform typical `step-cli`/`ca` operations,
+this collection also contains several roles that run more broad tasks related to `step-cli` and `step-ca`. They are:
 
 - `step_ca`: Install and initialize a step certificate authority on a host
 - `step_bootstrap_host`: Initialize a host to trust an existing step CA and create a service user for communicating with the CA via `step-cli`
@@ -123,7 +123,7 @@ You can take a look at the available modules to further configure your CA and ho
 ### About step-cli config and service users
 
 Most of the modules in this collection wrap around the `step-cli` command, which reads its configuration from
-$STEPPATH (~/.step) by default. Alternatively, it is possible to pass required configuration parameters via command-line args.
+`$STEPPATH` (`~/.step` by default). Alternatively, it is possible to pass required configuration parameters via command-line args.
 
 This collection makes things easy for you by installing a cli and ca user with the `step_bootstrap_host` and `step_ca` roles respectively
 These users are named `step` and `step-ca` and can access the CA remotely/locally without any further configuration required.
@@ -136,6 +136,7 @@ this is not recommended.
 
 Some modules can be run both remotely via the client and directly on the CA (e.g. `step_ca_certificate`), while others are remote/local-only
 (e.g. `step_ca_bootstrap` is remote-only, while `step_ca_provisioner` is local-only). See the module documentation for details.
+
 ---
 
 ```yaml
@@ -167,6 +168,7 @@ up an ACME workflow.
 
 Make sure that you are familiar with the way ACME works. You will need a functioning DNS environment at the very least
 to make use of ACME certs.
+
 ---
 
 `acme.yml`:
