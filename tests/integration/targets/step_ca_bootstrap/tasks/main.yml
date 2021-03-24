@@ -1,36 +1,51 @@
-- name: Bootstrap Host
-  maxhoesel.smallstep.step_ca_bootstrap:
-    ca_url: "{{ step_ca_url }}"
-    fingerprint: "{{ step_ca_fingerprint }}"
-    install: yes
+- name: Create bootstrap user
+  user:
+    name: step-bootstrap
+    shell: /bin/bash
+    home: /home/step-bootstrap
+    password: "*"
 
-- name: Get step-cli config
-  command: "cat ~/.step/config/defaults.json"
-  register: step_cli_config
-- name: Verify that step-cli config is correct
-  assert:
-    that:
-      - (step_cli_config.stdout | from_json).fingerprint == step_ca_fingerprint
-      - (step_cli_config.stdout | from_json)['ca-url'] == step_ca_url
+- block:
+  - name: Bootstrap Host
+    maxhoesel.smallstep.step_ca_bootstrap:
+      ca_url: "{{ step_ca_url }}"
+      fingerprint: "{{ step_ca_fingerprint }}"
+      install: no # Can't test system-wide install as it could affect the other test targets
 
-- name: Try to bootstrap again
-  maxhoesel.smallstep.step_ca_bootstrap:
-    ca_url: "{{ step_ca_url }}"
-    fingerprint: "{{ step_ca_fingerprint }}"
-    install: yes
-  register: second_run
+  - name: Get step-cli config
+    command: "cat ~/.step/config/defaults.json"
+    register: step_cli_config
+  - name: Verify that step-cli config is correct
+    assert:
+      that:
+        - (step_cli_config.stdout | from_json).fingerprint == step_ca_fingerprint
+        - (step_cli_config.stdout | from_json)['ca-url'] == step_ca_url
 
-- name: Verify that module is idempotent
-  assert:
-    that: not second_run.changed
+  - name: Try to bootstrap again
+    maxhoesel.smallstep.step_ca_bootstrap:
+      ca_url: "{{ step_ca_url }}"
+      fingerprint: "{{ step_ca_fingerprint }}"
+      install: yes
+    register: second_run
+  - name: Verify that module is idempotent
+    assert:
+      that: not second_run.changed
 
-- name: Force bootstrapping to occur
-  maxhoesel.smallstep.step_ca_bootstrap:
-    ca_url: "{{ step_ca_url }}"
-    fingerprint: "{{ step_ca_fingerprint }}"
+  - name: Force bootstrapping to occur
+    maxhoesel.smallstep.step_ca_bootstrap:
+      ca_url: "{{ step_ca_url }}"
+      fingerprint: "{{ step_ca_fingerprint }}"
+      force: yes
+    register: forced_run
+  - name: Verify that forcing worked
+    assert:
+      that: forced_run.changed
+
+  become: yes
+  become_user: step-bootstrap
+
+- name: Remove bootstrap user
+  user:
+    name: step-bootstrap
+    state: absent
     force: yes
-  register: forced_run
-
-- name: Verify that forcing worked
-  assert:
-    that: forced_run.changed

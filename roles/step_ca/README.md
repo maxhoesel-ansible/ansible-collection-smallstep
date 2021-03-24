@@ -27,11 +27,20 @@ This role performs the following actions:
 ##### `step_ca_version`
 - Set the version of step-ca to install
 - Can be a version tag (e.g. `0.15.3`), or `latest` to always install the most recent version
+- Note that the role will query the GitHub API if this value is set to `latest`. Try setting
+  a specific version if you are running into rate limiting issues
+- Default: `latest`
+
+##### `step_cli_version`
+- Set the version of step to install
+- Can be a version tag (e.g. `0.15.3`), or `latest` to always install the most recent version
+- Note that the role will query the GitHub API if this value is set to `latest`. Try setting
+  a specific version if you are running into rate limiting issues
 - Default: `latest`
 
 ##### `step_ca_user`
 - User under which the step-ca server will run
-- Default: `step`
+- Default: `step-ca`
 
 ##### `step_ca_path`
 - Directory under which to place step-ca configuration files
@@ -127,6 +136,7 @@ These variables need to be set as a group
 - hosts: all
   roles:
     - role: maxhoesel.smallstep.step_ca
+      become: yes
       vars:
         step_ca_name: Foo Bar Private CA
         step_ca_root_password: "very secret password"

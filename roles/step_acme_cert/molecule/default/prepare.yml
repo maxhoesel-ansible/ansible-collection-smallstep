@@ -22,7 +22,6 @@
       maxhoesel.smallstep.step_ca_provisioner:
         name: ACME
         type: ACME
-        ca_config: "{{ step_ca_path }}/config/ca.json"
       become: yes
       become_user: "{{ step_ca_user }}"
 

@@ -36,6 +36,16 @@
   loop:
     - "{{ step_ca_path }}"
     - "{{ step_ca_path }}/db"
+# This symlink is needed to that step-cli can find
+# the ca configuration files without needing to set STEPPATH
+- name: .step symlink is present
+  file:
+    src: "{{ step_ca_path }}"
+    dest: "{{ step_ca_path }}/.step"
+    state: link
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_user }}"
+    mode: 0700
 
 - include: init.yml
 
