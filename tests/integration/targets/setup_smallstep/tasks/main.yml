@@ -35,6 +35,13 @@
       step_ca_existing_root_file: /tmp/existing.crt
       step_ca_existing_key_file: /tmp/existing.key
 
+  - name: Bootstrap host
+    include_role:
+      name: maxhoesel.smallstep.step_bootstrap_host
+    vars:
+      step_bootstrap_ca_url: "{{ step_ca_url }}"
+      step_bootstrap_fingerprint: "{{ step_ca_fingerprint }}"
+
   - name: Install_completed file is present
     copy:
       content: "install finished"

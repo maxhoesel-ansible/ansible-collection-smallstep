@@ -6,7 +6,7 @@
       include_role:
         name: step_bootstrap_host
       vars:
-        step_service_user: step-molecule
-        step_service_user_home: /etc/step-molecule
+        step_cli_user: step-molecule
+        step_cli_user_path: /etc/step-molecule
         step_bootstrap_ca_url: https://step-ca.localdomain
         step_bootstrap_fingerprint: 345bf77397642dc9211a3820af0b1816c4afa430ad249ae705f1456b4bafa046

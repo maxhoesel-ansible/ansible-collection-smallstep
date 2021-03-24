@@ -5,8 +5,6 @@
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_user }}"
     mode: 0600
-  become: yes
-  become_user: "{{ step_ca_user }}"
   loop:
     - tests_key
     - tests_crt
@@ -16,54 +14,45 @@
     dest: "/tmp/tests_passfile"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_user }}"
-    mode: 0600
-  become: yes
-  become_user: "{{ step_ca_user }}"
+    mode: 0644 # needs to be readable by the client requesting the cert
 - name: Create test provisioners
   maxhoesel.smallstep.step_ca_provisioner: "{{ item }}"
-  become: yes
-  become_user: "{{ step_ca_user }}"
-  environment:
-    STEPPATH: "{{ step_ca_path }}"
   loop:
     - name: tests-JWK
       type: JWK
       jwk_password_file: "/tmp/tests_passfile"
+  become: yes
+  become_user: "{{ step_ca_user }}"
+
 - name: Reload Server
   service:
     name: step-ca
     state: reloaded
 
-- name: Create certificate
-  maxhoesel.smallstep.step_ca_certificate:
-    name: "127.0.0.1"
-    crt_file: /tmp/generated_certificate
-    key_file: /tmp/generated_key
-    provisioner: tests-JWK
-    provisioner_password_file: "/tmp/tests_passfile"
-    force: yes
-    not_after: 1h
+- block:
+  - name: Create certificate
+    maxhoesel.smallstep.step_ca_certificate:
+      name: "127.0.0.1"
+      crt_file: /tmp/generated_certificate
+      key_file: /tmp/generated_key
+      provisioner: tests-JWK
+      provisioner_password_file: "/tmp/tests_passfile"
+      force: yes
+      not_after: 1h
+  - name: Try to revoke cert
+    maxhoesel.smallstep.step_ca_revoke:
+      cert: /tmp/generated_certificate
+      key: /tmp/generated_key
+      ca_url: "{{ step_ca_url }}"
+      reason: "Testing cert revocation"
+      reason_code: 1
+      #token: "{{ generated_token.token }}"
+    register: revocation
+  - name: Verify that cert got revoked
+    assert:
+      that: revocation.changed
   become: yes
-  become_user: "{{ step_ca_user }}"
-  environment:
-    STEPPATH: "{{ step_ca_path }}"
-- name: Try to revoke cert
-  maxhoesel.smallstep.step_ca_revoke:
-    cert: /tmp/generated_certificate
-    key: /tmp/generated_key
-    ca_url: "{{ step_ca_url }}"
-    reason: "Testing cert revocation"
-    reason_code: 1
-    #token: "{{ generated_token.token }}"
-  register: revocation
-  become: yes
-  become_user: "{{ step_ca_user }}"
-  environment:
-    STEPPATH: "{{ step_ca_path }}"
-
-- name: Verify that cert got revoked
-  assert:
-    that: revocation.changed
+  become_user: "{{ step_cli_user }}"
 
 - name: Delete generated files
   file:
@@ -73,6 +62,7 @@
     - /tmp/generated_certificate
     - /tmp/generated_key
     - /tmp/tests_passfile
+
 - name: Remove test provisioners
   maxhoesel.smallstep.step_ca_provisioner:
     name: "{{ item.0 }}"
@@ -80,7 +70,5 @@
     state: absent
   become: yes
   become_user: "{{ step_ca_user }}"
-  environment:
-    STEPPATH: "{{ step_ca_path }}"
   loop:
     - ["tests-JWK", "JWK"]

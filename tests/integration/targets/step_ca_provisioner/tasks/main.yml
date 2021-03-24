@@ -5,8 +5,6 @@
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_user }}"
     mode: 0600
-  become: yes
-  become_user: "{{ step_ca_user }}"
   loop:
     - tests_key
     - tests_crt
@@ -17,160 +15,143 @@
     dest: "/tmp/tests_passfile"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_user }}"
-    mode: 0600
+    mode: 0644 # needs to be readable by the client requesting the cert
+
+- block:
+  # The values for these test provisioners are mostly identical to the ones in the smallstep documentation,
+  # so many of the online provisioners do not actually work. Good enough to test our module
+  # functionality still.
+  - name: Create test provisioners
+    maxhoesel.smallstep.step_ca_provisioner: "{{ item }}"
+    loop:
+      - name: tests-JWK
+        type: JWK
+        jwk_password_file: "/tmp/tests_passfile"
+      - name: tests-OIDC
+        type: OIDC
+        oidc_client_id: 1087160488420-8qt7bavg3qesdhs6it824mhnfgcfe8il.apps.googleusercontent.com
+        oidc_configuration_endpoint: https://accounts.google.com/.well-known/openid-configuration
+        oidc_admin_email:
+          - mariano@smallstep.com
+          - max@smallstep.com
+        oidc_domain: smallstep.com
+      - name: tests-Amazon
+        type: AWS
+        aws_account: 123456789
+        instance_age: 1h
+      - name: tests-Google
+        type: GCP
+        gcp_service_account:
+          - 1234567890-compute@developer.gserviceaccount.com
+          - 9876543210-compute@developer.gserviceaccount.com
+        gcp_project:
+          - identity
+          - accounting
+      - name: tests-Azure
+        type: Azure
+        azure_tenant: bc9043e2-b645-4c1c-a87a-78f8644bfe57
+        azure_resource_group:
+          - identity
+          - accounting
+      - name: tests-ACME
+        type: ACME
+      - name: tests-x5c
+        type: X5C
+        x5c_root_file: "/tmp/tests_crt"
+      - name: tests-k8s
+        type: K8sSA
+        k8s_pem_keys_file: "/tmp/tests_crt"
+
+  - name: Create test provisioners again
+    maxhoesel.smallstep.step_ca_provisioner: "{{ item }}"
+    loop:
+      - name: tests-JWK
+        type: JWK
+        jwk_password_file: "/tmp/tests_passfile"
+      - name: tests-OIDC
+        type: OIDC
+        oidc_client_id: 1087160488420-8qt7bavg3qesdhs6it824mhnfgcfe8il.apps.googleusercontent.com
+        oidc_configuration_endpoint: https://accounts.google.com/.well-known/openid-configuration
+        oidc_admin_email:
+          - mariano@smallstep.com
+          - max@smallstep.com
+        oidc_domain: smallstep.com
+      - name: tests-Amazon
+        type: AWS
+        aws_account: 123456789
+        instance_age: 1h
+      - name: tests-Google
+        type: GCP
+        gcp_service_account:
+          - 1234567890-compute@developer.gserviceaccount.com
+          - 9876543210-compute@developer.gserviceaccount.com
+        gcp_project:
+          - identity
+          - accounting
+      - name: tests-Azure
+        type: Azure
+        azure_tenant: bc9043e2-b645-4c1c-a87a-78f8644bfe57
+        azure_resource_group:
+          - identity
+          - accounting
+      - name: tests-ACME
+        type: ACME
+      - name: tests-x5c
+        type: X5C
+        x5c_root_file: "/tmp/tests_crt"
+      - name: tests-k8s
+        type: K8sSA
+        k8s_pem_keys_file: "/tmp/tests_crt"
+    register: second_run
+
+  - name: Verify that nothing changed on the second run
+    assert:
+      that: not second_run.changed
+
+  # Remove the online provisioners before restarting as they may imapct server
+  # functionality
+  - name: Remove online provisioners
+    maxhoesel.smallstep.step_ca_provisioner:
+      name: "{{ item.0 }}"
+      type: "{{ item.1 }}"
+      state: absent
+    loop:
+      - ["tests-OIDC", "OIDC"]
+      - ["tests-Amazon", "AWS"]
+      - ["tests-Google", "GCP"]
+      - ["tests-Azure", "Azure"]
   become: yes
   become_user: "{{ step_ca_user }}"
-
-# The values for these test provisioners are mostly identical to the ones in the documentation,
-# so many of the online provisioners do not actually work. Good enough to test our module
-# functionality still.
-- name: Create test provisioners
-  maxhoesel.smallstep.step_ca_provisioner: "{{ item }}"
-  become: yes
-  become_user: "{{ step_ca_user }}"
-  environment:
-    STEPPATH: "{{ step_ca_path }}"
-  loop:
-    - name: tests-JWK
-      type: JWK
-      jwk_password_file: "/tmp/tests_passfile"
-    - name: tests-OIDC
-      type: OIDC
-      oidc_client_id: 1087160488420-8qt7bavg3qesdhs6it824mhnfgcfe8il.apps.googleusercontent.com
-      oidc_configuration_endpoint: https://accounts.google.com/.well-known/openid-configuration
-      oidc_admin_email:
-        - mariano@smallstep.com
-        - max@smallstep.com
-      oidc_domain: smallstep.com
-    - name: tests-Amazon
-      type: AWS
-      aws_account: 123456789
-      instance_age: 1h
-    - name: tests-Google
-      type: GCP
-      gcp_service_account:
-        - 1234567890-compute@developer.gserviceaccount.com
-        - 9876543210-compute@developer.gserviceaccount.com
-      gcp_project:
-        - identity
-        - accounting
-    - name: tests-Azure
-      type: Azure
-      azure_tenant: bc9043e2-b645-4c1c-a87a-78f8644bfe57
-      azure_resource_group:
-        - identity
-        - accounting
-    - name: tests-ACME
-      type: ACME
-    - name: tests-x5c
-      type: X5C
-      x5c_root_file: "/tmp/tests_crt"
-    - name: tests-k8s
-      type: K8sSA
-      k8s_pem_keys_file: "/tmp/tests_crt"
-
-- name: Create test provisioners again
-  maxhoesel.smallstep.step_ca_provisioner: "{{ item }}"
-  become: yes
-  become_user: "{{ step_ca_user }}"
-  environment:
-    STEPPATH: "{{ step_ca_path }}"
-  loop:
-    - name: tests-JWK
-      type: JWK
-      jwk_password_file: "/tmp/tests_passfile"
-    - name: tests-OIDC
-      type: OIDC
-      oidc_client_id: 1087160488420-8qt7bavg3qesdhs6it824mhnfgcfe8il.apps.googleusercontent.com
-      oidc_configuration_endpoint: https://accounts.google.com/.well-known/openid-configuration
-      oidc_admin_email:
-        - mariano@smallstep.com
-        - max@smallstep.com
-      oidc_domain: smallstep.com
-    - name: tests-Amazon
-      type: AWS
-      aws_account: 123456789
-      instance_age: 1h
-    - name: tests-Google
-      type: GCP
-      gcp_service_account:
-        - 1234567890-compute@developer.gserviceaccount.com
-        - 9876543210-compute@developer.gserviceaccount.com
-      gcp_project:
-        - identity
-        - accounting
-    - name: tests-Azure
-      type: Azure
-      azure_tenant: bc9043e2-b645-4c1c-a87a-78f8644bfe57
-      azure_resource_group:
-        - identity
-        - accounting
-    - name: tests-ACME
-      type: ACME
-    - name: tests-x5c
-      type: X5C
-      x5c_root_file: "/tmp/tests_crt"
-    - name: tests-k8s
-      type: K8sSA
-      k8s_pem_keys_file: "/tmp/tests_crt"
-  register: second_run
-
-- name: Verify that nothing changed on the second run
-  assert:
-    that: not second_run.changed
-
-# Remove the online provisioners before restarting as they may imapct server
-# functionality
-- name: Remove online provisioners
-  maxhoesel.smallstep.step_ca_provisioner:
-    name: "{{ item.0 }}"
-    type: "{{ item.1 }}"
-    state: absent
-  become: yes
-  become_user: "{{ step_ca_user }}"
-  environment:
-    STEPPATH: "{{ step_ca_path }}"
-  loop:
-    - ["tests-OIDC", "OIDC"]
-    - ["tests-Amazon", "AWS"]
-    - ["tests-Google", "GCP"]
-    - ["tests-Azure", "Azure"]
 
 - name: Restart Server
   service:
     name: step-ca
     state: restarted
   become: yes
-- name: Check server health
-  command: "step-cli ca health"
-  environment:
-    STEPPATH: "{{ step_ca_path }}"
-  become: yes
-  become_user: "{{ step_ca_user }}"
-  changed_when: no
 
-- name: Remove test provisioners
-  maxhoesel.smallstep.step_ca_provisioner:
-    name: "{{ item.0 }}"
-    type: "{{ item.1 }}"
-    state: absent
-  become: yes
-  become_user: "{{ step_ca_user }}"
-  environment:
-    STEPPATH: "{{ step_ca_path }}"
-  loop:
-    - ["tests-JWK", "JWK"]
-    - ["tests-ACME", "ACME"]
-    - ["tests-x5c", "X5C"]
-    - ["tests-k8s", "K8sSA"]
+- block:
+  - name: Check server health
+    command: "step-cli ca health"
+    changed_when: no
 
-- name: Get step-ca config
-  command: "cat {{ step_ca_path }}/config/ca.json"
+  - name: Remove test provisioners
+    maxhoesel.smallstep.step_ca_provisioner:
+      name: "{{ item.0 }}"
+      type: "{{ item.1 }}"
+      state: absent
+    loop:
+      - ["tests-JWK", "JWK"]
+      - ["tests-ACME", "ACME"]
+      - ["tests-x5c", "X5C"]
+      - ["tests-k8s", "K8sSA"]
+
+  - name: Get step-ca config
+    command: "cat {{ step_ca_path }}/config/ca.json"
+    register: step_ca_config
+  - name: Verify that all provisioners (except for sshpop) are absent
+    assert:
+      that:
+        - (step_ca_config.stdout | from_json).authority.provisioners | length == 1
+        - (step_ca_config.stdout | from_json).authority.provisioners.0.name == "sshpop"
   become: yes
   become_user: "{{ step_ca_user }}"
-  register: step_ca_config
-- name: Verify that all provisioners (except for sshpop) are absent
-  assert:
-    that:
-      - (step_ca_config.stdout | from_json).authority.provisioners | length == 1
-      - (step_ca_config.stdout | from_json).authority.provisioners.0.name == "sshpop"

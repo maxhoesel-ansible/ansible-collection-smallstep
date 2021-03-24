@@ -15,6 +15,8 @@ Install the `step` CLI tool on a host
 ##### `step_cli_version`
 - Set the version of step to install
 - Can be a version tag (e.g. `0.15.3`), or `latest` to always install the most recent version
+- Note that the role will query the GitHub API if this value is set to `latest`. Try setting
+  a specific version if you are running into rate limiting issues
 - Default: `latest`
 
 ## Example Playbook

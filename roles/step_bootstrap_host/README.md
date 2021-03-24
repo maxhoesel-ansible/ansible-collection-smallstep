@@ -24,12 +24,19 @@ This role is intended to be run on regular hosts in your network that you want t
 - Can be an absolute path or a command (make sure the executable is in $PATH) for all users
 - Default: `step-cli`
 
-##### `step_service_user`
+##### `step_cli_version`
+- Set the version of step to install
+- Can be a version tag (e.g. `0.15.3`), or `latest` to always install the most recent version
+- Note that the role will query the GitHub API if this value is set to `latest`. Try setting
+  a specific version if you are running into rate limiting issues
+- Default: `latest`
+
+##### `step_cli_user`
 - Name of the service user that will be able to communicate with the CA
 - Default: `step`
 
-##### `step_service_user_home`
-- Home directory of the service user. Used to store `step-cli` configuration
+##### `step_cli_user_path`
+- Configuration directory for the service user. Used to store `step-cli` configuration
 - Default: `/etc/step`
 
 ##### `step_bootstrap_ca_url`

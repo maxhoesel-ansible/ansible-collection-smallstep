@@ -5,8 +5,6 @@
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_user }}"
     mode: 0600
-  become: yes
-  become_user: "{{ step_ca_user }}"
   loop:
     - tests_key
     - tests_crt
@@ -16,19 +14,16 @@
     dest: "/tmp/tests_passfile"
     owner: "{{ step_ca_user }}"
     group: "{{ step_ca_user }}"
-    mode: 0600
-  become: yes
-  become_user: "{{ step_ca_user }}"
+    mode: 0644 # needs to be readable by the client requesting the cert
 - name: Create test provisioners
   maxhoesel.smallstep.step_ca_provisioner: "{{ item }}"
-  become: yes
-  become_user: "{{ step_ca_user }}"
-  environment:
-    STEPPATH: "{{ step_ca_path }}"
   loop:
     - name: tests-JWK
       type: JWK
       jwk_password_file: "/tmp/tests_passfile"
+  become: yes
+  become_user: "{{ step_ca_user }}"
+
 - name: Reload Server
   service:
     name: step-ca
@@ -43,42 +38,42 @@
   become: yes
   become_user: "{{ step_ca_user }}"
   register: generated_token
-  environment:
-    STEPPATH: "{{ step_ca_path }}"
-- name: Create certificate with token
-  maxhoesel.smallstep.step_ca_certificate:
-    name: "127.0.0.1"
-    crt_file: /tmp/generated_certificate
-    key_file: /tmp/generated_key
-    provisioner: tests-JWK
-    provisioner_password_file: "/tmp/tests_passfile"
-    force: yes
-    not_after: 1h
-    token: "{{ generated_token.token }}"
-    ca_url: "{{ step_ca_url }}"
 
-- name: Try to renew early
-  maxhoesel.smallstep.step_ca_renew:
-    crt_file: /tmp/generated_certificate
-    key_file: /tmp/generated_key
-    ca_url: "{{ step_ca_url }}"
-    expires_in: 5m
-    force: yes
-  register: early_renewal
-- name: Verify that early renew didn't change anything
-  assert:
-    that: not early_renewal.changed
-- name: Force renewal of the cert
-  maxhoesel.smallstep.step_ca_renew:
-    crt_file: /tmp/generated_certificate
-    key_file: /tmp/generated_key
-    ca_url: "{{ step_ca_url }}"
-    force: yes
-    expires_in: 61m
-  register: forced_renewal
-- name: Verify that forced renewal worked
-  assert:
-    that: forced_renewal.changed
+- block:
+  - name: Create certificate with token
+    maxhoesel.smallstep.step_ca_certificate:
+      name: "127.0.0.1"
+      crt_file: /tmp/generated_certificate
+      key_file: /tmp/generated_key
+      provisioner: tests-JWK
+      provisioner_password_file: "/tmp/tests_passfile"
+      force: yes
+      not_after: 1h
+      token: "{{ generated_token.token }}"
+
+  - name: Try to renew early
+    maxhoesel.smallstep.step_ca_renew:
+      crt_file: /tmp/generated_certificate
+      key_file: /tmp/generated_key
+      expires_in: 5m
+      force: yes
+    register: early_renewal
+  - name: Verify that early renew didn't change anything
+    assert:
+      that: not early_renewal.changed
+  - name: Force renewal of the cert
+    maxhoesel.smallstep.step_ca_renew:
+      crt_file: /tmp/generated_certificate
+      key_file: /tmp/generated_key
+      force: yes
+      expires_in: 61m
+    register: forced_renewal
+  - name: Verify that forced renewal worked
+    assert:
+      that: forced_renewal.changed
+
+  become: yes
+  become_user: "{{ step_cli_user }}"
 
 - name: Delete generated files
   file:
@@ -88,6 +83,7 @@
     - /tmp/generated_certificate
     - /tmp/generated_key
     - /tmp/tests_passfile
+
 - name: Remove test provisioners
   maxhoesel.smallstep.step_ca_provisioner:
     name: "{{ item.0 }}"
@@ -95,7 +91,5 @@
     state: absent
   become: yes
   become_user: "{{ step_ca_user }}"
-  environment:
-    STEPPATH: "{{ step_ca_path }}"
   loop:
     - ["tests-JWK", "JWK"]

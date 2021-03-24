@@ -14,8 +14,6 @@
 
     - name: Test step ca health
       command: step-cli ca health
-      environment:
-        STEPPATH: "{{ step_ca_path }}"
       become: yes
       become_user: "{{ step_ca_user }}"
       changed_when: no
