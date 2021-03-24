@@ -59,6 +59,8 @@ provisioner:
   config_options:
     ssh_connection:
       pipelining: yes
+    defaults:
+      forks: 15
   inventory:
     links:
       group_vars: ../../../../tests/molecule/group_vars
