@@ -9,6 +9,7 @@ on:
     paths:
       - "roles/**"
       - ".github/workflows/**"
+  workflow_dispatch:
 
 defaults:
   run:
