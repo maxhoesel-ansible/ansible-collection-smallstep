@@ -11,6 +11,7 @@ on:
       - "plugins/**"
       - "tests/**"
       - ".github/workflows/**"
+  workflow_dispatch:
 
 defaults:
   run:
