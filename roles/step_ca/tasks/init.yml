@@ -39,6 +39,7 @@
           file: "{{ step_ca_root_password_file }}"
         - password: "{{ step_ca_intermediate_password }}"
           file: "{{ step_ca_intermediate_password_file }}"
+      no_log: yes
     - name: Initialize CA
       command: "{{ step_cli_executable }} ca init {{ step_ca_init_args | join(' ') }}"
       environment:
