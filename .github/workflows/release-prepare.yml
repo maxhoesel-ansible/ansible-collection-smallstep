@@ -5,10 +5,6 @@ on:
     branches:
       - 'release_**'
 
-defaults:
-  run:
-    working-directory: "smallstep"
-
 jobs:
   prepare-release:
     name: "Prepare Release"
@@ -17,12 +13,11 @@ jobs:
       - name: Check out codebase
         uses: actions/checkout@v2
         with:
-          path: "smallstep"
           fetch-depth: 0
-      - name: Install git-chglog
+      - name: Install dependencies
         run: |
-          wget https://github.com/git-chglog/git-chglog/releases/download/v0.11.2/git-chglog_0.11.2_linux_amd64.tar.gz -O ../git-chglog.tar.gz
-          (cd .. && tar xf git-chglog.tar.gz)
+          wget https://github.com/git-chglog/git-chglog/releases/download/v0.11.2/git-chglog_0.11.2_linux_amd64.tar.gz -O git-chglog.tar.gz
+          tar xf git-chglog.tar.gz
 
       - name: Configure git
         run: |
@@ -34,7 +29,7 @@ jobs:
           echo "release_version=$(cat galaxy.yml | grep version: | cut -d ' ' -f 2)" >> $GITHUB_ENV
 
       - name: Generate full changelog
-        run: "../git-chglog --next-tag v${{ env.release_version }} --output CHANGELOG.md"
+        run: "./git-chglog --next-tag v${{ env.release_version }} --output CHANGELOG.md"
 
       - name: Commit and push changelog
         run: |
@@ -48,3 +43,4 @@ jobs:
           destination_branch: "main"
           pr_title: "Release ${{ env.release_version }}"
           pr_body: "(This release PR was automatically generated via GitHub Actions)"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
