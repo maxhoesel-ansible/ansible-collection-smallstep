@@ -16,6 +16,7 @@ This role performs the following actions:
   - Ubuntu 18.04 LTS or newer
   - Debian 10 or newer
   - CentOS 8 or newer
+- Supported architectures: amd64, arm64
 - This role requires root access. Make sure to run this role with `become: yes` or equivalent
 - This role requires `expect` to answer some interactive prompts. It will automatically install
   `expect` if it is not present

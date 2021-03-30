@@ -1,13 +1,13 @@
 ---
-- name: Requirements are installed [RedHat]
+- name: Requirements are installed
   package:
     name: expect
 
-- name: Look for existing step-ca binary [RedHat]
+- name: Look for existing step-ca binary
   stat:
     path: "{{ step_ca_executable }}"
   register: step_ca_present
-- name: Get currently installed step-ca version [RedHat]
+- name: Get currently installed step-ca version
   shell: >
     set -o pipefail &&
     {{ step_ca_executable }} version | cut -d' ' -f 2 | cut -d'/' -f 2 | awk 'FNR == 1'
@@ -19,19 +19,21 @@
   when: step_ca_present.stat.exists
 
 - block:
-    - name: Download and extract step-ca archive [RedHat]
+    - name: Download and extract step-ca archive
       unarchive:
-        src: "https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-ca_linux_{{ step_ca_version }}_amd64.tar.gz"
+        src: "https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-ca_linux_{{ step_ca_version }}_{{ step_ca_arch[ansible_architecture] }}.tar.gz"
         dest: /tmp/
         remote_src: yes
       retries: 3
       delay: 3
-    - name: Install step-ca binary [RedHat]
+    - name: Install step-ca binary
       shell: >
         set -o pipefail &&
-        cp /tmp/step-ca_{{ step_ca_version }}/bin/step-ca {{ step_ca_executable }}
+        cp /tmp/step-ca_{{ step_ca_version }}/bin/* {{ step_ca_executable | dirname }}
+      args:
+        executable: /bin/bash
   always:
-    - name: Remove step release archive [RedHat]
+    - name: Remove step release archive
       file:
         path: "/tmp/step-ca_{{ step_ca_version }}"
         state: absent
