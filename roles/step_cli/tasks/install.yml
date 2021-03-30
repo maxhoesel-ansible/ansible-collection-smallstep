@@ -1,8 +1,8 @@
-- name: Look for existing step-cli binary [RedHat]
+- name: Look for existing step-cli binary
   stat:
     path: "{{ step_cli_executable }}"
   register: step_cli_present
-- name: Get currently installed step-cli version [RedHat]
+- name: Get currently installed step-cli version
   shell: >
     set -o pipefail &&
     {{ step_cli_executable }} version | cut -d' ' -f 2 | cut -d'/' -f 2 | awk 'FNR == 1'
@@ -14,19 +14,21 @@
   when: step_cli_present.stat.exists
 
 - block:
-    - name: Download and extract step-cli archive [RedHat]
+    - name: Download and extract step-cli archive
       unarchive:
-        src: "https://github.com/smallstep/cli/releases/download/v{{ step_cli_version }}/step_linux_{{ step_cli_version }}_amd64.tar.gz"
+        src: "https://github.com/smallstep/cli/releases/download/v{{ step_cli_version }}/step_linux_{{ step_cli_version }}_{{ step_cli_arch[ansible_architecture] }}.tar.gz"
         dest: /tmp/
         remote_src: yes
       retries: 3
       delay: 3
-    - name: Install step-cli binary [RedHat]
+    - name: Install step-cli binary
       shell: >
         set -o pipefail &&
         cp /tmp/step_{{ step_cli_version }}/bin/step {{ step_cli_executable }}
+      args:
+        executable: /bin/bash
   always:
-    - name: Remove step release archive [RedHat]
+    - name: Remove step release archive
       file:
         path: "/tmp/step_{{ step_cli_version }}"
         state: absent

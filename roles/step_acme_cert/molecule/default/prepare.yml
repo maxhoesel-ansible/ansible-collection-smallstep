@@ -1,3 +1,9 @@
+- hosts: ubuntu:debian
+  tasks:
+    - name: Update apt
+      apt:
+        update_cache: yes
+
 - hosts: ca
   tasks:
     - name: Copy existing ca cert/key to nodes
@@ -29,12 +35,6 @@
       systemd:
         name: step-ca
         state: reloaded
-
-- hosts: ubuntu:debian
-  tasks:
-    - name: Update apt
-      apt:
-        update_cache: yes
 
 - hosts: clients
   tasks:
