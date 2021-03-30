@@ -2,3 +2,7 @@
 # Upstream uses /usr/bin instead of /usr/local/bin. Not a fan,
 # but we follow along for consistencies sake
 step_cli_executable: /usr/bin/step-cli
+
+step_cli_arch:
+  x86_64: "amd64"
+  aarch64: "arm64"

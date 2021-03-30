@@ -1,6 +1,6 @@
 
-<a name="v0.3.0"></a>
-## [v0.3.0] - 2021-03-29
+<a name="v0.3.1"></a>
+## [v0.3.1] - 2021-03-30
 ### Bug Fixes
 - hide password during initialization (56fb923)
 - use step-cli name for step executable (d2e8126)
@@ -21,6 +21,7 @@
 - **step_client:** add deprecation warning (fad0039)
 
 ### Features
+- add arm64 support to step_ca and step_cli ([#49](https://github.com/maxhoesel/ansible-collection-smallstep/issues/49)) (9133d7b)
 - add step_ca_certificate and _token modules (9aaf5ab)
 - **step_acme_cert:** add acme_cert role (aab5cd9)
 - **step_bootstrap_host:** add bootstrap_host role (82ba298)
@@ -30,6 +31,40 @@
 - **step_ca_renew:** add ca_renew module ([#42](https://github.com/maxhoesel/ansible-collection-smallstep/issues/42)) (16c6d7c)
 - **step_ca_revoke:** add ca_revoke module ([#43](https://github.com/maxhoesel/ansible-collection-smallstep/issues/43)) (46c2007)
 - **step_cli:** add reworked step_cli role to replace step_client (65c25c5)
+
+
+<a name="v0.3.0"></a>
+## [v0.3.0] - 2021-03-29
+### Bug Fixes
+- hide password during initialization (02b9211)
+- use step-cli name for step executable (7bfb28f)
+- **step_ca:** adjust archive name to upstream (6dbdb03)
+- **step_ca_provisioner:** actually use ca_path (8243cfd)
+- **step_cli:** update deb file name to follow upstream (f08f26e)
+
+### Documentation
+- updated changelog for v0.3.0 (9c46512)
+- minor formatting fixes in README (7a8feab)
+- updated changelog (9308387)
+- updated git-chlog config (0e8e2cd)
+- update module vevelopment information (f8a9b60)
+- update contribution information (9770b6a)
+- **step_ca_provisioner:** update documentation (7bf388d)
+- **step_cli:** fix invalid distro tags (00d8db1)
+- **step_cli:** minor corrections and fixes (2da11bd)
+- **step_cli:** fix readme errors (817a46d)
+- **step_client:** add deprecation warning (5c8e382)
+
+### Features
+- add step_ca_certificate and _token modules (6a1bac0)
+- **step_acme_cert:** add acme_cert role (1f4b0e1)
+- **step_bootstrap_host:** add bootstrap_host role (5601e95)
+- **step_ca:** install step-cli if missing (459695a)
+- **step_ca:** add reworked step_ca role (490ca6a)
+- **step_ca_bootstrap:** add bootstrap module (c3bddad)
+- **step_ca_renew:** add ca_renew module ([#42](https://github.com/maxhoesel/ansible-collection-smallstep/issues/42)) (6c6be57)
+- **step_ca_revoke:** add ca_revoke module ([#43](https://github.com/maxhoesel/ansible-collection-smallstep/issues/43)) (287b26a)
+- **step_cli:** add reworked step_cli role to replace step_client (06d7b58)
 
 
 <a name="v0.2.1"></a>
@@ -62,6 +97,7 @@
 <a name="v0.1.0"></a>
 ## v0.1.0 - 2020-11-13
 
+[v0.3.1]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.3.0...v0.3.1
 [v0.3.0]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.2.1...v0.3.0
 [v0.2.1]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.2.0...v0.2.1
 [v0.2.0]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.1.0...v0.2.0
