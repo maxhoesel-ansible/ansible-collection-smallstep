@@ -2,7 +2,7 @@
 
 So you want to contribute something to this collection? Awesome! This guide should give you all the information needed to get started.
 
-Note that by contributing to this collection, you agree with the code of conduct you can find [here.](https://github.com/maxhoesel/ansible-collection-smallstep/blob/devel/CODE_OF_CONDUCT.md)
+Note that by contributing to this collection, you agree with the code of conduct you can find [here.](https://github.com/maxhoesel/ansible-collection-smallstep/blob/main/CODE_OF_CONDUCT.md)
 
 ## Contribution Workflow
 
@@ -101,14 +101,26 @@ The "Before-opening-a-PR-Checklist":
 - Your commit history is clean
 - The documentation is up-to-date
 - All local tests and commit hooks succeed
-- (Rebasing against the current devel before pushing is always a good idea)
+- (Rebasing against the current main before pushing is always a good idea)
 
 ## Release Workflow
 
 This project uses sematic versioning. Name versions accordingly.
 
-1. Create a new branch named "release_X.Y.Z" and check it out
-2. Bump the version number in `galaxy.yml`
-3. Commit and push the change. This will trigger a CI job (`release-prepare.yml`) that prepares the release
-4. Check the generated pull request and get it approved
-5. Once merged onto main, the CI will then create the release artifacts and publish the new version onto Galaxy
+For now, releases are simply tags on the main branch, with no separate release branch currently in use.
+
+---
+**NOTE**
+
+This still needs to be implemented
+
+---
+
+To create a release, simply run the "Create Release" GitHub Action with the desired version number (e.g. "0.3.0").
+This action will:
+
+1. Bump the version number in `galaxy.yml`
+2. Update the changelog
+3. Commit the changes in a "Release" commit and push it
+4. Create a GitHub release (which will also create a tag at that commit)
+5. Build the collection and publish the new release on galaxy
