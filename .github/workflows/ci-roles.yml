@@ -72,7 +72,7 @@ jobs:
           ansible-galaxy collection install maxhoesel-smallstep-*.tar.gz --force
 
       - name: Run Molecule tests
-        run: molecule test
+        run: if [[ -f ./molecule/test.sh ]]; then ./molecule/test.sh; else molecule test; fi
         working-directory: "smallstep/roles/${{ matrix.role }}"
         env:
           PY_COLORS: "1"
