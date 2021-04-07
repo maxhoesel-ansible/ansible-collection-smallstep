@@ -1,7 +1,0 @@
-ansible
-ansible-lint
-docker
-molecule
-molecule-docker
-gitlint
-pre-commit

@@ -52,9 +52,6 @@ issues: https://github.com/maxhoesel/ansible-collection-smallstep/issues
 # uses 'fnmatch' to match the files or directories. Some directories and files like 'galaxy.yml', '*.pyc', '*.retry',
 # and '.git' are always filtered
 build_ignore:
-    - hacking
-    - "*-smallstep-*.tar.gz"
+    - "*.tar.gz"
     - ".github"
-    - ".gitlint"
-    - ".pre-commit-config.yaml"
     - ".chglog"

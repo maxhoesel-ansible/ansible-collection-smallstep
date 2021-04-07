@@ -3,7 +3,7 @@
 extends: default
 
 ignore: |
-  tests/testenv/
+  .tox/
 
 rules:
   braces:
