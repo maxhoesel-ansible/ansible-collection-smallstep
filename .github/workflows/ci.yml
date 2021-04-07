@@ -1,0 +1,105 @@
+---
+name: CI
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: "Lint"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out codebase
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.6"
+      - name: Set up pip
+        run: pip3 install --upgrade pip
+
+      - name: Install tox
+        run: sudo apt update && sudo apt install -y tox
+
+      - name: Lint collection
+        run: tox -e lint
+
+
+  modules:
+    name: "Modules"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out codebase
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.6"
+      - name: Set up pip
+        run: pip3 install --upgrade pip
+
+      - name: Install tox
+        run: sudo apt update && sudo apt install -y tox
+
+      - name: Run sanity tests
+        run: tox -e sanity -- --docker --color -v --python 3.6
+      - name: Run integration tests
+        run: tox -e integration -- --docker --color -v --python 3.6
+
+
+  discover-roles:
+    runs-on: ubuntu-latest
+    outputs:
+      roles: ${{ steps.set-roles.outputs.roles }}
+    steps:
+      - name: Check out codebase
+        uses: actions/checkout@v2
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.6"
+      - name: Discover roles
+        id: set-roles
+        run: |
+          export roles=$(python3 -c "import os; import json; print(json.dumps(os.listdir('roles')));")
+          echo "::set-output name=roles::$roles"
+
+  roles:
+    name: "${{ matrix.role }}"
+    runs-on: ubuntu-latest
+    needs: discover-roles
+    strategy:
+      fail-fast: false
+      max-parallel: 50
+      matrix:
+        role: ${{ fromJson(needs.discover-roles.outputs.roles) }}
+    steps:
+      - name: Check out codebase
+        uses: actions/checkout@v2
+
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.6"
+      - name: Install ansible-base
+        run: |
+          pip3 install --upgrade pip
+          pip3 install ansible-base
+
+      - name: Build and install collection
+        run: |
+          ansible-galaxy collection build --force
+          ansible-galaxy collection install *.tar.gz --force
+
+      - name: Install tox
+        run: sudo apt update && sudo apt install -y tox
+
+      - name: Initialize tox
+        run: tox -l
+      - name: Run role tests
+        run: tox -e "$(tox -l | grep ansible | grep ${{ matrix.role }} | tr '\n' ',')"

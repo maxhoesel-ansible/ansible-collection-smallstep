@@ -21,7 +21,7 @@ This collection contains role and modules to help you install, configure, and ma
 
 ### Dependencies
 
-- ansible-base, either the most recent release or the release before
+- A recent version of ansible. We test against the current and previous major release
 - Python 3.6 or newer
 
 Individual roles and modules may have additional dependencies, please check their respective documentation.
