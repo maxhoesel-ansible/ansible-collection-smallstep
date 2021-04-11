@@ -1,4 +1,7 @@
 ---
+- name: Load Distribution-specific vars
+  include_vars: "{{ ansible_os_family }}.yml"
+
 - block:
     - name: Get latest step-cli release information
       uri:
@@ -16,3 +19,4 @@
   when: step_cli_version == 'latest'
 
 - include: "install.yml"
+- include: "capabilities.yml"
