@@ -12,6 +12,8 @@ platforms:
   #   containers as well, but is quite the headache.
   - name: step-cli-ubuntu-20
     image: "geerlingguy/docker-ubuntu2004-ansible"
+    groups:
+      - ubuntu
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true
@@ -19,6 +21,8 @@ platforms:
     pre_build_image: true
   - name: step-cli-ubuntu-18
     image: "geerlingguy/docker-ubuntu1804-ansible"
+    groups:
+      - ubuntu
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true
@@ -26,6 +30,8 @@ platforms:
     pre_build_image: true
   - name: step-cli-debian-10
     image: "geerlingguy/docker-debian10-ansible"
+    groups:
+      - debian
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true
@@ -33,6 +39,8 @@ platforms:
     pre_build_image: true
   - name: step-cli-centos-8
     image: "geerlingguy/docker-centos8-ansible"
+    groups:
+      - centos
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true
