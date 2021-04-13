@@ -1,0 +1,4 @@
+- name: restart renewal service
+  service:
+    name: '{{ step_acme_cert_renewal_service }}'
+    state: restarted
