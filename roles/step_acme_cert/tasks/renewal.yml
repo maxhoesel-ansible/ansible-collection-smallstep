@@ -22,7 +22,7 @@
       owner: root
       group: root
       mode: "600"
-      validate: 'bash -c "cat /etc/sudoers.d/step-renew %s | visudo -cf-"'
+      #validate: 'bash -c "cat /etc/sudoers.d/step-renew %s | visudo -cf-"'
   when: step_acme_cert_renewal_reload_services
 
 - name: Renewal service is installed
