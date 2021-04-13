@@ -32,6 +32,7 @@
     owner: root
     group: root
     mode: 0644
+  notify: restart renewal service
 
 - name: Renewal service is enabled and running
   systemd:
