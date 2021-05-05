@@ -39,7 +39,7 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 
 ##### `step_acme_cert_webroot_path`
 - If set, this role will use `step-cli`s webroot mode to get a new certificate. You need to make sure that `step_service_user` has write permissions in this directory.
-- If empty, this role will use the standalone mode instead, causing `step-cli` to bind itself to port 80. The `step-cli` binary installed via the `step_cli` role already has the required capabilites to do so regardless of the user running it. If you installed `step-cli` yourself, you will need to make sure that the executable can bind to port 80 via some other means.
+- If empty, this role will use the standalone mode instead, causing `step-cli` to bind itself to port 80. The `step-cli` binary installed via the `step_cli` role already has the required capabilities to do so regardless of the user running it. If you installed `step-cli` yourself, you will need to make sure that the executable can bind to port 80 via some other means.
 - Default: ""
 
 ### Certificate
