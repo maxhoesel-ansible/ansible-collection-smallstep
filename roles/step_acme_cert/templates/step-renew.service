@@ -8,7 +8,7 @@ Type=simple
 Restart=always
 RestartSec=1
 User={{ step_service_user }}
-ExecStart={{ step_cli_executable_absolute.stdout }} ca renew {{ step_acme_cert_certfile.path }} {{ step_acme_cert_keyfile.path }} --daemon --force --expires-in {{ step_acme_cert_renewal_when }}{% if step_acme_cert_renewal_reload_services %} --exec "sudo systemctl try-reload-or-restart {{ step_acme_cert_renewal_reload_services | join(' ') }}"{% endif %}
+ExecStart={{ step_cli_executable_absolute.stdout }} ca renew {{ step_acme_cert_certfile.path }} {{ step_acme_cert_keyfile.path }} --daemon --force{% if step_acme_cert_renewal_when is defined %} --expires-in {{ step_acme_cert_renewal_when }}{% endif %}{% if step_acme_cert_renewal_reload_services %} --exec "sudo systemctl try-reload-or-restart {{ step_acme_cert_renewal_reload_services | join(' ') }}"{% endif %}
 
 [Install]
 WantedBy=multi-user.target

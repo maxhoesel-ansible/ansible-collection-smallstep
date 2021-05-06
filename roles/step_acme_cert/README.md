@@ -55,7 +55,7 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 
 ##### `step_acme_cert_duration`
 - Valid duration of the certificate
-- Default: `24h` (the step-ca default value)
+- Default: undefined (uses the default for the given provisioner)
 
 ##### `step_acme_cert_contact`
 - Contact email for the CA for important notifications
@@ -80,7 +80,7 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 
 ##### `step_acme_cert_renewal_when`
 - Renew the cert when it expires in this amount of time
-- Default: `8h` (1/3 of the 24h step-ca default)
+- Default: undefined (uses the smallstep default: 1/3 of the certificates valid duration, i.e. 8 hours for a 24h cert)
 
 ##### `step_acme_cert_renewal_reload_services`
 - Reload or restart these systemd services upon a cert renewal
