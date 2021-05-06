@@ -12,9 +12,7 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
   - Debian 10 or newer
   - CentOS 8 or newer
 - This role requires root access. Make sure to run this role with `become: yes` or equivalent
-- `step-cli` must be installed.
-- The host must be bootstrapped with `step_bootstrap_host`.
-  In particular, `step_service_user` must have a functional `step-cli` environment.
+- The host must be bootstrapped with `step_bootstrap_host` and the root user must be able to access the CA.
 
 ## Role Variables
 
@@ -25,12 +23,6 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 - Can be an absolute path or a command (make sure the executable is in $PATH) for all users
 - Default: `step-cli`
 
-##### `step_service_user`
-- User that will perform the ACME request and run the renewal job
-- The user must already exist
-- Use the `step_bootstrap_host` role to create and initialize the service user
-- Default: `step`
-
 ### CA
 
 ##### `step_acme_cert_ca_provisioner`
@@ -39,7 +31,8 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 
 ##### `step_acme_cert_webroot_path`
 - If set, this role will use `step-cli`s webroot mode to get a new certificate. You need to make sure that `step_service_user` has write permissions in this directory.
-- If empty, this role will use the standalone mode instead, causing `step-cli` to bind itself to port 80. The `step-cli` binary installed via the `step_cli` role already has the required capabilities to do so regardless of the user running it. If you installed `step-cli` yourself, you will need to make sure that the executable can bind to port 80 via some other means.
+- If empty, this role will use the standalone mode instead, causing `step-cli` to bind itself to port 80. Make sure that no other services are listening on this port.
+  Note that `step-cli` only needs to bind to this port when getting a *new* certificate. It does not need to bind if it is only *renewing* a certificate.
 - Default: ""
 
 ### Certificate
@@ -55,7 +48,7 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 
 ##### `step_acme_cert_duration`
 - Valid duration of the certificate
-- Default: undefined (uses the default for the given provisioner)
+- Default: undefined (uses the default for the given provisioner, typically 24h)
 
 ##### `step_acme_cert_contact`
 - Contact email for the CA for important notifications
@@ -64,12 +57,9 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 ##### `step_acme_cert_certfile`/`step_acme_cert_keyfile`
 - Details about the cert/key files on disk
 - Is a dict with the following elements:
-  - `path`: Absolute path to the cert/key file. Defaults to `/etc/step/step.crt|step.key`, which is created by `step_bootstrap_host`.
-            The directories must already exist.
+  - `path`: Absolute path to the cert/key file. Defaults to `/etc/ssl/step.crt|step.key`. The directory must already exist.
   - `mode`: File mode for the cert/key file. Defaults to `644` for the cert and `600` for the key
-  - `owner`/`group`: Owner and group of the file. Defaults to `{{ step_service_user }}`.
-- Make sure that `{{ step_service_user }}` can write still write to the cert/key file if you decide to change the `mode`/`owner`/`group` parameters,
-  or renewal might fail.
+  - `owner`/`group`: Owner and group of the file. Defaults to root.
 
 ### Renewal
 
@@ -79,12 +69,12 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 - Default: `step-renew`
 
 ##### `step_acme_cert_renewal_when`
-- Renew the cert when it expires in this amount of time
+- Renew the cert when its remaining valid time crosses this threshold
 - Default: undefined (uses the smallstep default: 1/3 of the certificates valid duration, i.e. 8 hours for a 24h cert)
 
 ##### `step_acme_cert_renewal_reload_services`
-- Reload or restart these systemd services upon a cert renewal
-- Must be a list of services
+- Reload or restart these systemd services after a cert renewal
+- Must be a list of systemd units
 - Example: `["nginx", "mysqld"]`
 - Default: `[]`
 
@@ -93,7 +83,7 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 ```
 - hosts: all
   roles:
-    # Bootstrap the host to create the service user
+    # Bootstrap the host
     - role: maxhoesel.smallstep.step_bootstrap_host
       vars:
         step_bootstrap_ca_url: https://myca.localdomain
@@ -103,7 +93,7 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
     - role: maxhoesel.smallstep.step_acme_cert
       vars:
         step_acme_cert_ca_provisioner: ACME
-        # Use webroot instead of standalone, as that requires binding to port 80 -> root. Make sure that the user has write permissions to the webroot
-        step_acme_cert_webroot_path: /var/www/html
+        # Use webroot instead of standalone if you are running a HTTP server
+        #step_acme_cert_webroot_path: /var/www/html
       become: yes
 ```

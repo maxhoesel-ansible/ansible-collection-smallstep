@@ -12,7 +12,6 @@
     step_cli_executable: "{{ step_cli_executable }}"
     webroot: "{{ step_acme_cert_webroot_path }}"
   become: yes
-  become_user: "{{ step_service_user }}"
 
 - name: Cert and key permissions are set
   file:

@@ -1,12 +1,12 @@
 # maxhoesel.smallstep.step_bootstrap_host
 
-Configure a host to trust your CA and setup a service user to perform certificate jobs and renewals.
+Configure a host to trust your CA and install `step-cli` to access it.
 
 This role is intended to be run on regular hosts in your network that you want to cooperate with your existing CA. It will:
 
 1. Install `step-cli` if required
-2. Create a service user to CA by running `step-cli` commands/collection modules as that user
-3. Install the CA root cert into the system trust store
+2. Install the CA root cert into the system trust store
+3. Configure the root user to automatically connect to your CA when running `step-cli`.
 
 ## Requirements
 
@@ -31,14 +31,6 @@ This role is intended to be run on regular hosts in your network that you want t
   a specific version if you are running into rate limiting issues
 - Default: `latest`
 
-##### `step_cli_user`
-- Name of the service user that will be able to communicate with the CA
-- Default: `step`
-
-##### `step_cli_user_path`
-- Configuration directory for the service user. Used to store `step-cli` configuration
-- Default: `/etc/step`
-
 ##### `step_bootstrap_ca_url`
 - URL of the `step-ca` CA
 - Example: https://myca.localdomain
@@ -51,6 +43,7 @@ This role is intended to be run on regular hosts in your network that you want t
 
 ##### `step_bootstrap_install_cert`
 - Whether to install the CA cert into the system root trust store(s)
+- If set to false, this role only installs `step-cli` and configures the root user to run `step-cli` against your CA
 - Default: Yes
 
 

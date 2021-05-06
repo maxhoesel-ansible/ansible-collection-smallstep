@@ -30,28 +30,27 @@
     state: reloaded
 
 - block:
-  - name: Create normal certificate on CA
-    maxhoesel.smallstep.step_ca_certificate:
-      name: "127.0.0.1"
-      crt_file: /tmp/generated_certificate
-      key_file: /tmp/generated_key
-      provisioner: tests-JWK
-      provisioner_password_file: "/tmp/tests_passfile"
-      san:
-        - foo.bar
-      kty: RSA
-      size: 4096
-      not_after: 3h
-      not_before: 1m
-  - name: Delete generated cert
-    file:
-      path: "{{ item }}"
-      state: absent
-    loop:
-      - /tmp/generated_certificate
-      - /tmp/generated_key
+    - name: Create normal certificate on CA
+      maxhoesel.smallstep.step_ca_certificate:
+        name: "127.0.0.1"
+        crt_file: /tmp/generated_certificate
+        key_file: /tmp/generated_key
+        provisioner: tests-JWK
+        provisioner_password_file: "/tmp/tests_passfile"
+        san:
+          - foo.bar
+        kty: RSA
+        size: 4096
+        not_after: 3h
+        not_before: 1m
+    - name: Delete generated cert
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - /tmp/generated_certificate
+        - /tmp/generated_key
   become: yes
-  become_user: "{{ step_cli_user }}"
 
 - name: Get token for certificate creation
   maxhoesel.smallstep.step_ca_token:
@@ -64,21 +63,20 @@
   register: generated_token
 
 - block:
-  - name: Create certificate with token on CA
-    maxhoesel.smallstep.step_ca_certificate:
-      name: "127.0.0.1"
-      crt_file: /tmp/generated_certificate
-      key_file: /tmp/generated_key
-      provisioner: tests-JWK
-      provisioner_password_file: "/tmp/tests_passfile"
-      force: yes
-      kty: EC
-      crv: P-384
-      not_after: 3h
-      not_before: 1m
-      token: "{{ generated_token.token }}"
+    - name: Create certificate with token on CA
+      maxhoesel.smallstep.step_ca_certificate:
+        name: "127.0.0.1"
+        crt_file: /tmp/generated_certificate
+        key_file: /tmp/generated_key
+        provisioner: tests-JWK
+        provisioner_password_file: "/tmp/tests_passfile"
+        force: yes
+        kty: EC
+        crv: P-384
+        not_after: 3h
+        not_before: 1m
+        token: "{{ generated_token.token }}"
   become: yes
-  become_user: "{{ step_cli_user }}"
 
 - name: Delete generated files
   file:

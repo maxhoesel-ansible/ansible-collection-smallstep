@@ -32,7 +32,7 @@
         content: "{{ item.password }}"
         dest: "{{ item.file }}"
         owner: "{{ step_ca_user }}"
-        mode: 0700
+        mode: 0600
         group: "{{ step_ca_user }}"
       loop:
         - password: "{{ step_ca_root_password }}"

@@ -40,40 +40,38 @@
   register: generated_token
 
 - block:
-  - name: Create certificate with token
-    maxhoesel.smallstep.step_ca_certificate:
-      name: "127.0.0.1"
-      crt_file: /tmp/generated_certificate
-      key_file: /tmp/generated_key
-      provisioner: tests-JWK
-      provisioner_password_file: "/tmp/tests_passfile"
-      force: yes
-      not_after: 1h
-      token: "{{ generated_token.token }}"
+    - name: Create certificate with token
+      maxhoesel.smallstep.step_ca_certificate:
+        name: "127.0.0.1"
+        crt_file: /tmp/generated_certificate
+        key_file: /tmp/generated_key
+        provisioner: tests-JWK
+        provisioner_password_file: "/tmp/tests_passfile"
+        force: yes
+        not_after: 1h
+        token: "{{ generated_token.token }}"
 
-  - name: Try to renew early
-    maxhoesel.smallstep.step_ca_renew:
-      crt_file: /tmp/generated_certificate
-      key_file: /tmp/generated_key
-      expires_in: 5m
-      force: yes
-    register: early_renewal
-  - name: Verify that early renew didn't change anything
-    assert:
-      that: not early_renewal.changed
-  - name: Force renewal of the cert
-    maxhoesel.smallstep.step_ca_renew:
-      crt_file: /tmp/generated_certificate
-      key_file: /tmp/generated_key
-      force: yes
-      expires_in: 61m
-    register: forced_renewal
-  - name: Verify that forced renewal worked
-    assert:
-      that: forced_renewal.changed
-
+    - name: Try to renew early
+      maxhoesel.smallstep.step_ca_renew:
+        crt_file: /tmp/generated_certificate
+        key_file: /tmp/generated_key
+        expires_in: 5m
+        force: yes
+      register: early_renewal
+    - name: Verify that early renew didn't change anything
+      assert:
+        that: not early_renewal.changed
+    - name: Force renewal of the cert
+      maxhoesel.smallstep.step_ca_renew:
+        crt_file: /tmp/generated_certificate
+        key_file: /tmp/generated_key
+        force: yes
+        expires_in: 61m
+      register: forced_renewal
+    - name: Verify that forced renewal worked
+      assert:
+        that: forced_renewal.changed
   become: yes
-  become_user: "{{ step_cli_user }}"
 
 - name: Delete generated files
   file:

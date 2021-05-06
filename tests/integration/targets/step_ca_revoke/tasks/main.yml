@@ -30,29 +30,27 @@
     state: reloaded
 
 - block:
-  - name: Create certificate
-    maxhoesel.smallstep.step_ca_certificate:
-      name: "127.0.0.1"
-      crt_file: /tmp/generated_certificate
-      key_file: /tmp/generated_key
-      provisioner: tests-JWK
-      provisioner_password_file: "/tmp/tests_passfile"
-      force: yes
-      not_after: 1h
-  - name: Try to revoke cert
-    maxhoesel.smallstep.step_ca_revoke:
-      cert: /tmp/generated_certificate
-      key: /tmp/generated_key
-      ca_url: "{{ step_ca_url }}"
-      reason: "Testing cert revocation"
-      reason_code: 1
-      #token: "{{ generated_token.token }}"
-    register: revocation
-  - name: Verify that cert got revoked
-    assert:
-      that: revocation.changed
+    - name: Create certificate
+      maxhoesel.smallstep.step_ca_certificate:
+        name: "127.0.0.1"
+        crt_file: /tmp/generated_certificate
+        key_file: /tmp/generated_key
+        provisioner: tests-JWK
+        provisioner_password_file: "/tmp/tests_passfile"
+        force: yes
+        not_after: 1h
+    - name: Try to revoke cert
+      maxhoesel.smallstep.step_ca_revoke:
+        cert: /tmp/generated_certificate
+        key: /tmp/generated_key
+        reason: "Testing cert revocation"
+        reason_code: 1
+        #token: "{{ generated_token.token }}"
+      register: revocation
+    - name: Verify that cert got revoked
+      assert:
+        that: revocation.changed
   become: yes
-  become_user: "{{ step_cli_user }}"
 
 - name: Delete generated files
   file:
