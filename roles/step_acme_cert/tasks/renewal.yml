@@ -8,21 +8,21 @@
   check_mode: no
 
 - block:
-  - name: Get absolute systemctl command path # noqa command-instead-of-shell
-    shell: "command -v systemctl"
-    register: _step_systemctl_binary
-    become: yes
-    become_user: "{{ step_service_user }}"
-    changed_when: no
-    check_mode: no
-  - name: Step user has sudo permissions to restart required systemd units
-    template:
-      src: sudo-renewal.j2
-      dest: /etc/sudoers.d/step-renew
-      owner: root
-      group: root
-      mode: "600"
-      #validate: 'bash -c "cat /etc/sudoers.d/step-renew %s | visudo -cf-"'
+    - name: Get absolute systemctl command path # noqa command-instead-of-shell
+      shell: "command -v systemctl"
+      register: _step_systemctl_binary
+      become: yes
+      become_user: "{{ step_service_user }}"
+      changed_when: no
+      check_mode: no
+    - name: Step user has sudo permissions to restart required systemd units
+      template:
+        src: sudo-renewal.j2
+        dest: /etc/sudoers.d/step-renew
+        owner: root
+        group: root
+        mode: "600"
+        #validate: 'bash -c "cat /etc/sudoers.d/step-renew %s | visudo -cf-"'
   when: step_acme_cert_renewal_reload_services
 
 - name: Renewal service is installed
@@ -37,5 +37,6 @@
 - name: Renewal service is enabled and running
   systemd:
     daemon_reload: yes
-    name: '{{ step_acme_cert_renewal_service }}'
+    name: "{{ step_acme_cert_renewal_service }}"
     state: started
+    enabled: yes
