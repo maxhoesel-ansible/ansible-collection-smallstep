@@ -17,9 +17,6 @@
         - "existing.crt"
         - "existing.key"
 
-    - name: Install step-cli
-      include_role:
-        name: step_cli
     - name: Install step-ca
       include_role:
         name: step_ca

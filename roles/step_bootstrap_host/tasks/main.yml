@@ -1,52 +1,27 @@
 ---
 - include: check.yml
 
-- name: service user is present
-  user:
-    name: "{{ step_cli_user }}"
-    shell: /bin/bash
-    password: "*"
-    home: "{{ step_cli_user_path }}"
-
-- name: step directory is present
-  file:
-    path: "{{ step_cli_user_path }}/step"
-    owner: "{{ step_cli_user }}"
-    group: "{{ step_cli_user }}"
-    mode: "750"
-    state: directory
-
-- name: steppath symlink is present
-  file:
-    src: "{{ step_cli_user_path }}"
-    dest: "{{ step_cli_user_path }}/.step"
-    state: link
-    owner: "{{ step_cli_user }}"
-    group: "{{ step_cli_user }}"
-    mode: "750"
-
-- name: service user is bootstrapped
+- name: Host is bootstrapped
   maxhoesel.smallstep.step_ca_bootstrap:
     ca_url: "{{ step_bootstrap_ca_url }}"
     fingerprint: "{{ step_bootstrap_fingerprint }}"
     step_cli_executable: "{{ step_cli_executable }}"
   become: yes
-  become_user: "{{ step_cli_user }}"
 
 - name: check if cert is already installed
   stat:
-    path: "{{ step_cli_user_path }}/.cert_installed"
+    path: "/root/.step/.cert_installed"
   register: step_bootstrap_installed
 
 - block:
-  - name: root cert is installed
-    command: "step-cli certificate install {{ step_cli_user_path }}/.step/certs/root_ca.crt --all"
+    - name: Instal CA cert into trust stores
+      command: "step-cli certificate install /root/.step/certs/root_ca.crt --all"
 
-  - name: Write install file
-    copy:
-      content: This file tells step_bootstrap_host that the root cert is already installed on the local system
-      dest: "{{ step_cli_user_path }}/.cert_installed"
-      owner: "{{ step_cli_user }}"
-      group: "{{ step_cli_user }}"
-      mode: "750"
+    - name: Write install file
+      copy:
+        content: This file tells step_bootstrap_host that the root cert is already installed on the local system
+        dest: "/root/.step/.cert_installed"
+        owner: root
+        group: root
+        mode: "640"
   when: step_bootstrap_install_cert and not step_bootstrap_installed.stat.exists

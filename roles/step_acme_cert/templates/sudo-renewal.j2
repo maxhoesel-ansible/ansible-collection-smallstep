@@ -1,2 +1,0 @@
-Cmnd_Alias  STEP_RENEW = {{ _step_systemctl_binary.stdout }} try-reload-or-restart {{ step_acme_cert_renewal_reload_services | join(' ') }}
-{{ step_service_user }} ALL=NOPASSWD: STEP_RENEW

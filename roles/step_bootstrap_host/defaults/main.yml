@@ -1,9 +1,6 @@
 ---
 step_cli_executable: step-cli
 
-step_cli_user: step
-step_cli_user_path: /etc/step
-
 #step_bootstrap_ca_url:
 #step_bootstrap_fingerprint:
 

@@ -2,10 +2,9 @@
 - name: Verify
   hosts: clients
   tasks:
-    - name: Verify that service user is able to access ca
+    - name: Verify that root is able to access ca
       command: step-cli ca health
       become: yes
-      become_user: step-molecule
       changed_when: no
 
     # This will execute as root, so the cert will only be valid

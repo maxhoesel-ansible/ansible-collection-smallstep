@@ -26,14 +26,14 @@
         step_acme_cert_webroot_path: "{{ webroots[ansible_os_family] }}"
         step_acme_cert_duration: 1h
         step_acme_cert_certfile:
-          path: /etc/step/step.crt
+          path: /etc/ssl/step.crt
           mode: "644"
-          owner: "{{ step_service_user }}"
+          owner: root
           group: "{{ webgroup[ansible_os_family] }}"
         step_acme_cert_keyfile:
-          path: /etc/step/step.key
+          path: /etc/ssl/step.key
           mode: "640"
-          owner: "{{ step_service_user }}"
+          owner: root
           group: "{{ webgroup[ansible_os_family] }}"
         step_acme_cert_renewal_service: step-renew-webroot
         step_acme_cert_renewal_when: 59m # force renewal to happen every minute

@@ -6,13 +6,12 @@
     key_file: "{{ step_acme_cert_keyfile.path }}"
     force: yes
     name: "{{ step_acme_cert_name }}"
-    not_after: "{{ step_acme_cert_duration }}"
+    not_after: "{{ step_acme_cert_duration|default(omit) }}"
     san: "{{ step_acme_cert_san }}"
     standalone: "{{ step_acme_cert_webroot_path | bool }}"
     step_cli_executable: "{{ step_cli_executable }}"
     webroot: "{{ step_acme_cert_webroot_path }}"
   become: yes
-  become_user: "{{ step_service_user }}"
 
 - name: Cert and key permissions are set
   file:

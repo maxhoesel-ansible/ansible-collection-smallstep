@@ -4,11 +4,28 @@ Install and initialize a Smallstep certificates server (`step-ca`).
 
 This role performs the following actions:
 
-1. Install `step-cli`if required
+1. Install `step-cli` if required
 2. Install `step-ca`
 3. Create a user to run the step-ca server, if it doesn't already exist
 4. Initialize a fresh ca server with no provisioners using `step ca init`
 5. Daemonize step-ca using a systemd service
+
+---
+**NOTE**
+
+Please make sure that you have read the [considerations](https://smallstep.com/docs/step-ca/certificate-authority-server-production) for running a step-ca server in production.
+`step_ca` follows these considerations where possible, but you should still be familiar with the basic operation of the `step-ca` server.
+
+---
+
+---
+**ABOUT PRIVATE KEYS**
+
+By default `step-ca` generates two keys when initialized - a root CA key and an intermediate key used to sign certificates. Both are present and encrypted on the ca host after this role exits,
+with the `step-ca` server configured to read the intermediate key password from a protected file in `step_ca_path`. The root key can thus only be decrypted with the password set in `step_ca_root_password`.
+
+It is thus **very** important that you **back up your root key and password** in a safe and secure location. The details of your backup scheme will depend on your environment and threat model.
+---
 
 ## Requirements
 

@@ -1,6 +1,5 @@
 ---
 step_cli_executable: step-cli
-step_service_user: step
 
 #step_acme_cert_ca_url:
 #step_acme_cert_ca_provisioner:
@@ -8,20 +7,20 @@ step_acme_cert_webroot_path: ""
 
 step_acme_cert_name: "{{ ansible_fqdn }}"
 step_acme_cert_san: []
-step_acme_cert_duration: 24h
+#step_acme_cert_duration: 24h
 step_acme_cert_contact: root@localhost
 
 step_acme_cert_certfile:
-  path: /etc/step/step.crt
+  path: /etc/ssl/step.crt
   mode: "644"
-  owner: "{{ step_service_user }}"
-  group: "{{ step_service_user }}"
+  owner: root
+  group: root
 step_acme_cert_keyfile:
-  path: /etc/step/step.key
+  path: /etc/ssl/step.key
   mode: "600"
-  owner: "{{ step_service_user }}"
-  group: "{{ step_service_user }}"
+  owner: root
+  group: root
 
 step_acme_cert_renewal_service: step-renew
-step_acme_cert_renewal_when: 8h
+#step_acme_cert_renewal_when: 8h
 step_acme_cert_renewal_reload_services: []
