@@ -1,4 +1,15 @@
 
+<a name="v0.4.0"></a>
+## [v0.4.0] - 2021-05-07
+### Bug Fixes
+- **step_acme_cert:** ensure daemon is enabled ([56d041d](https://github.com/maxhoesel/ansible-collection-smallstep/commit/56d041d))
+- **step_acme_cert:** try to renew expired certs ([195eafe](https://github.com/maxhoesel/ansible-collection-smallstep/commit/195eafe))
+
+### Features
+- use root user for step-cli bootstrapping ([12672c9](https://github.com/maxhoesel/ansible-collection-smallstep/commit/12672c9))
+- **step_acme_cert:** automatically get renew time ([a3fe8f6](https://github.com/maxhoesel/ansible-collection-smallstep/commit/a3fe8f6))
+
+
 <a name="v0.3.2"></a>
 ## [v0.3.2] - 2021-04-16
 ### Bug Fixes
@@ -114,6 +125,7 @@
 <a name="v0.1.0"></a>
 ## v0.1.0 - 2020-11-13
 
+[v0.4.0]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.3.2...v0.4.0
 [v0.3.2]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.3.1...v0.3.2
 [v0.3.1]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.3.0...v0.3.1
 [v0.3.0]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.2.1...v0.3.0
