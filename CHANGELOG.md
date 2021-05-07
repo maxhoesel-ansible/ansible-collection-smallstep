@@ -1,4 +1,13 @@
 
+<a name="v0.4.1"></a>
+## [v0.4.1] - 2021-05-07
+### Bug Fixes
+- **step_acme_cert:** remove community.cryto dep ([#59](https://github.com/maxhoesel/ansible-collection-smallstep/issues/59)) ([0802b09](https://github.com/maxhoesel/ansible-collection-smallstep/commit/0802b09))
+
+### Documentation
+- **step_acme_cert:** remove user permission bit ([baf9d04](https://github.com/maxhoesel/ansible-collection-smallstep/commit/baf9d04))
+
+
 <a name="v0.4.0"></a>
 ## [v0.4.0] - 2021-05-07
 ### Bug Fixes
@@ -125,6 +134,7 @@
 <a name="v0.1.0"></a>
 ## v0.1.0 - 2020-11-13
 
+[v0.4.1]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.0...v0.4.1
 [v0.4.0]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.3.2...v0.4.0
 [v0.3.2]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.3.1...v0.3.2
 [v0.3.1]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.3.0...v0.3.1
