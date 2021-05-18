@@ -43,6 +43,7 @@ jobs:
       - name: Commit and push Release
         run: |
           git add CHANGELOG.md
+          git add galaxy.yml
           git commit -m "Release ${{ github.event.inputs.version }}"
           git push
 
