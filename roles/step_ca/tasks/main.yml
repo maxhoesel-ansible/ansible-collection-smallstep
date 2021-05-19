@@ -9,6 +9,7 @@
         return_content: yes
       register: step_ca_latest_release
       delegate_to: localhost
+      become: no
       run_once: yes
       retries: 3
       delay: 5
