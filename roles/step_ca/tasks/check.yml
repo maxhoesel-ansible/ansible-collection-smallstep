@@ -1,5 +1,5 @@
 ---
-- name: Verify that step_ca_name and step_ca_root_password are set
+- name: Verify that step_ca_name and step_ca_root_password are set # noqa no-log-password
   assert:
     that:
       - step_ca_name is defined

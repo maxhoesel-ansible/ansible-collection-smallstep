@@ -26,6 +26,7 @@
     home: "{{ step_ca_path }}"
     shell: /usr/sbin/nologin
     system: yes
+  no_log: true
 - name: Paths are present
   file:
     path: "{{ item }}"
@@ -36,7 +37,7 @@
   loop:
     - "{{ step_ca_path }}"
     - "{{ step_ca_path }}/db"
-# This symlink is needed to that step-cli can find
+# This symlink is needed so that step-cli can find
 # the ca configuration files without needing to set STEPPATH
 - name: .step symlink is present
   file:
