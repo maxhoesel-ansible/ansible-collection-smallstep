@@ -237,6 +237,6 @@ to make use of ACME certs.
 
 ## License & Author
 
-Created & Maintained by Max Hösel (@maxhoesel)
+Created & Maintained by Max Hösel (@maxhoesel) and Contributors
 
 Licensed under the GPL 3.0 or later
