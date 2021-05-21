@@ -1,4 +1,13 @@
 
+<a name="v0.4.2"></a>
+## [v0.4.2] - 2021-05-20
+### Bug Fixes
+- don't use privilege escalation when delegating locally ([#62](https://github.com/maxhoesel/ansible-collection-smallstep/issues/62)) ([60e1d44](https://github.com/maxhoesel/ansible-collection-smallstep/commit/60e1d44))
+
+### Documentation
+- change author notice in readme ([fbcc807](https://github.com/maxhoesel/ansible-collection-smallstep/commit/fbcc807))
+
+
 <a name="v0.4.1"></a>
 ## [v0.4.1] - 2021-05-07
 ### Bug Fixes
@@ -134,6 +143,7 @@
 <a name="v0.1.0"></a>
 ## v0.1.0 - 2020-11-13
 
+[v0.4.2]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.1...v0.4.2
 [v0.4.1]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.0...v0.4.1
 [v0.4.0]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.3.2...v0.4.0
 [v0.3.2]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.3.1...v0.3.2
