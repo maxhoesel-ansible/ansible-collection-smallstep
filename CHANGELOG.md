@@ -1,4 +1,10 @@
 
+<a name="v0.4.3"></a>
+## [v0.4.3] - 2021-05-24
+### Bug Fixes
+- **step_ca_boostrap:** don't fail on ubuntu 18.04 ([#64](https://github.com/maxhoesel/ansible-collection-smallstep/issues/64)) ([67331de](https://github.com/maxhoesel/ansible-collection-smallstep/commit/67331de))
+
+
 <a name="v0.4.2"></a>
 ## [v0.4.2] - 2021-05-20
 ### Bug Fixes
@@ -143,6 +149,7 @@
 <a name="v0.1.0"></a>
 ## v0.1.0 - 2020-11-13
 
+[v0.4.3]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.2...v0.4.3
 [v0.4.2]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.1...v0.4.2
 [v0.4.1]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.0...v0.4.1
 [v0.4.0]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.3.2...v0.4.0
