@@ -84,7 +84,7 @@ def run_module():
         try:
             with open(DEFAULTS_FILE, "rb") as f:
                 config = json.load(f)
-        except OSError:
+        except (OSError, IOError):
             # The file probably doesn't exist yet, continue for now
             config = {}
         if config.get("fingerprint", "") == module.params["fingerprint"]:
