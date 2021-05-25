@@ -9,6 +9,7 @@
 
 - name: Check if certificate is valid
   changed_when: no
+  check_mode: no
   command: "step-cli certificate verify {{ step_acme_cert_certfile.path }}"
   ignore_errors: true
   register: _step_acme_cert_validity
