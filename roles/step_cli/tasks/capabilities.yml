@@ -5,6 +5,7 @@
 - name: Get binary capabilities
   command: "getcap {{ step_cli_executable }}"
   changed_when: no
+  check_mode: no
   register: step_cli_binary_capabilities
 - name: Set CAP_NET_BIND_SERVICE capability for step-cli to bind to ports <1024 for ACME protocol
   command: "setcap CAP_NET_BIND_SERVICE=+eip {{ step_cli_executable }}"
