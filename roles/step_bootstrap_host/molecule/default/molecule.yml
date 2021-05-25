@@ -68,7 +68,7 @@ platforms:
     override_command: false
     pre_build_image: true
     networks:
-     - name: smallstep_bootstrap_host
+      - name: smallstep_bootstrap_host
 
   - name: step-host-centos-8
     hostname: step-host-centos-8.localdomain
@@ -94,5 +94,21 @@ provisioner:
   inventory:
     links:
       group_vars: ../../../../tests/molecule/group_vars
+
+scenario:
+  test_sequence:
+    - lint
+    - destroy
+    - dependency
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - check # also run check mode in regular tests
+    - side_effect
+    - verify
+    - destroy
+
 verifier:
   name: ansible
