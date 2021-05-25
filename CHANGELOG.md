@@ -1,4 +1,10 @@
 
+<a name="v0.4.4"></a>
+## [v0.4.4] - 2021-05-25
+### Bug Fixes
+- allow roles to run with --check once configured ([262f25d](https://github.com/maxhoesel/ansible-collection-smallstep/commit/262f25d))
+
+
 <a name="v0.4.3"></a>
 ## [v0.4.3] - 2021-05-24
 ### Bug Fixes
@@ -149,6 +155,7 @@
 <a name="v0.1.0"></a>
 ## v0.1.0 - 2020-11-13
 
+[v0.4.4]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.3...v0.4.4
 [v0.4.3]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.2...v0.4.3
 [v0.4.2]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.1...v0.4.2
 [v0.4.1]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.0...v0.4.1
