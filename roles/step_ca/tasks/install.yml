@@ -26,6 +26,12 @@
         remote_src: yes
       retries: 3
       delay: 3
+    # step-ca needs to be stopped in order to overwrite the executable
+    - name: Stop step-ca process
+      systemd:
+        name: step-ca
+        state: stopped
+      when: step_ca_present.stat.exists
     - name: Install step-ca binary
       shell: >
         set -o pipefail &&
