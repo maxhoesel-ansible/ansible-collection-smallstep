@@ -1,4 +1,7 @@
 
+<a name="v0.4.6"></a>
+## [v0.4.6] - 2021-06-22
+
 <a name="v0.4.5"></a>
 ## [v0.4.5] - 2021-06-04
 ### Bug Fixes
@@ -161,6 +164,7 @@
 <a name="v0.1.0"></a>
 ## v0.1.0 - 2020-11-13
 
+[v0.4.6]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.5...v0.4.6
 [v0.4.5]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.4...v0.4.5
 [v0.4.4]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.3...v0.4.4
 [v0.4.3]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.2...v0.4.3
