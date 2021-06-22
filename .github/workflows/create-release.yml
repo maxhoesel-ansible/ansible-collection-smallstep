@@ -43,12 +43,15 @@ jobs:
           ./tmp-chglog/git-chglog --next-tag v${{ github.event.inputs.version }} --output ./CHANGELOG.md
           rm -rf tmp-chglog
 
-      - name: Commit and push Release
+      - name: Create and push Release commit
         run: |
           git add CHANGELOG.md
           git add galaxy.yml
           git commit -m "Release ${{ github.event.inputs.version }}"
           git push
+
+      - name: Get release commit hash
+        run: echo "release_hash=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
       - name: Build Ansible Collection
         run: ansible-galaxy collection build --force
@@ -60,6 +63,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: v${{ github.event.inputs.version }}
+          commitish: ${{ env.release_hash }}
           release_name: ${{ github.event.inputs.version }}
           draft: false
           prerelease: false
