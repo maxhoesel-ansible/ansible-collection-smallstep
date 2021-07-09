@@ -163,7 +163,7 @@ def run_module():
         output_file=dict(type="path"),
         principal=dict(type="list", elements="str"),
         provisioner=dict(type="str", aliases=["issuer"]),
-        provisioner_password_file=dict(type="path"),
+        provisioner_password_file=dict(type="path", no_log=False),
         return_token=dict(type="bool"),
         revoke=dict(type="bool"),
         renew=dict(type="bool"),
