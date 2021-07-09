@@ -6,6 +6,7 @@
     ca_url: "{{ step_bootstrap_ca_url }}"
     fingerprint: "{{ step_bootstrap_fingerprint }}"
     step_cli_executable: "{{ step_cli_executable }}"
+    force: "{{ step_bootstrap_force | d(omit) }}"
   become: yes
 
 - name: check if cert is already installed
@@ -24,4 +25,6 @@
         owner: root
         group: root
         mode: "640"
-  when: step_bootstrap_install_cert and not step_bootstrap_installed.stat.exists
+  when:
+    - step_bootstrap_install_cert
+    - step_bootstrap_force or not step_bootstrap_installed.stat.exists
