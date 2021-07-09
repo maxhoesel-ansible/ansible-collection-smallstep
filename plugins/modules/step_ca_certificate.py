@@ -187,7 +187,7 @@ def run_module():
         not_after=dict(type="str"),
         not_before=dict(type="str"),
         provisioner=dict(type="str", aliases=["issuer"], required=True),
-        provisioner_password_file=dict(type="path"),
+        provisioner_password_file=dict(type="path", no_log=False),
         san=dict(type="list", elements="str"),
         set=dict(type="list", elements="str"),
         set_file=dict(type="path"),
