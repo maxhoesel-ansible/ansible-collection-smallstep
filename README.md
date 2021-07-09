@@ -40,11 +40,12 @@ You can also install the most recent version of this collection by referencing t
 
 This collection contains several roles that run common tasks related to `step-cli` and `step-ca`. They are:
 
-- `step_ca`: Install and initialize a step certificate authority on a host
-- `step_bootstrap_host`: Initialize a host to trust an existing step CA and create a service user for communicating with the CA via `step-cli`
-- `step_acme_cert`: Generate and install and ACME certificate for a host from an existing step CA. Also sets up automatic renewal.
-
-The `step_cli` role is used by the other roles to install the step client tool. While you can run it on its own, this will not initialize your host to trust your CA.
+- [`step_ca`](roles/step_ca/README.md): Install and initialize a step certificate authority on a host.
+- [`step_bootstrap_host`](roles/step_bootstrap_host/README.md):
+- [`step_bootstrap_host`](roles/step_bootstrap_host/README.md):
+ Initialize a host to trust an existing step CA and create a service user for communicating with the CA via `step-cli`.
+- [`step_acme_cert`](roles/step_acme_cert/README.md): Generate and install and ACME certificate for a host from an existing step CA. Also sets up automatic renewal.
+- [`step_cli`](roles/step_cli/README.md): Used by the other roles to install the step client tool. While you can run it on its own, this will not initialize your host to trust your CA.
 
 Additionally, this collection contains several modules that you can use to configure your CA, get certificates and perform various other tasks.
 These generally required the `step-cli` tool to be present and the host to trust the remote CA. You can do this with `step_bootstrap_host`.
@@ -139,7 +140,7 @@ To actually initialize the clients, you can use `step_bootstrap_host`. This role
 ---
 **NOTE**
 
-If you want to access the CA from your clients CLI at a later point, you need to either run `step-cli` as root or specify the CA url and cert with the `--ca-url` and `--root` flags.
+If you want to access the CA from your clients CLI at a later point, you need to either run `step-cli` as root, or specify the CA url and cert with the `--ca-url` and `--root` flags.
 This is because `step_bootstrap_host` can automatically configure the root user to trust your CA, but it can't do so for other users on the system.
 
 ---

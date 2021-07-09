@@ -95,7 +95,7 @@ options:
 
 EXAMPLES = r"""
 - name: Change the TLS cert duration of a provisioner
-  maxhoesel.smallstep.ca_claims:
+  maxhoesel.smallstep.step_ca_provisioner_claims:
     name: webtokens-1
     type: JWK
     min_tls_cert_duration: 24h
@@ -103,14 +103,14 @@ EXAMPLES = r"""
     default_tls_cert_duration: 168h
 
 - name: Change default (global) claims
-  maxhoesel.smallstep.ca_claims:
+  maxhoesel.smallstep.step_ca_provisioner_claims:
     global_claims: yes
     min_tls_cert_duration: 24h
     max_tls_cert_duration: 720h
     default_tls_cert_duration: 168h
 
 - name: Overwrite the claims of a provisioner with the given parameters
-  maxhoesel.smallstep.ca_claims:
+  maxhoesel.smallstep.step_ca_provisioner_claims:
     name: webtokens-1
     type: JWK
     exclusive: yes
