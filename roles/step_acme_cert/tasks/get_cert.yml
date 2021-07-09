@@ -20,5 +20,5 @@
     owner: "{{ item.owner }}"
     group: "{{ item.group }}"
   loop:
-    - "{{ step_acme_cert_keyfile }}"
-    - "{{ step_acme_cert_certfile }}"
+    - "{{ step_acme_cert_keyfile_defaults | combine(step_acme_cert_keyfile) }}"
+    - "{{ step_acme_cert_certfile_defaults | combine(step_acme_cert_certfile) }}"
