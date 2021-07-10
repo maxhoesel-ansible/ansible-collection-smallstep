@@ -46,6 +46,10 @@ This role is intended to be run on regular hosts in your network that you want t
 - If set to false, this role only installs `step-cli` and configures the root user to run `step-cli` against your CA
 - Default: Yes
 
+##### `step_bootstrap_force`
+- Whether to force bootstrapping of the CA configuration.
+- If true, will cause an overwrite of any existing CA configuration, including root certificate.  Useful to change the CA URL, or even change to a new CA entirely.
+- Default: No
 
 ## Example Playbook
 
