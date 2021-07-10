@@ -10,12 +10,14 @@ step_acme_cert_san: []
 #step_acme_cert_duration: 24h
 step_acme_cert_contact: root@localhost
 
-step_acme_cert_certfile:
+step_acme_cert_certfile: "{{ step_acme_cert_certfile_defaults }}"
+step_acme_cert_certfile_defaults:
   path: /etc/ssl/step.crt
   mode: "644"
   owner: root
   group: root
-step_acme_cert_keyfile:
+step_acme_cert_keyfile: "{{ step_acme_cert_keyfile_defaults }}"
+step_acme_cert_keyfile_defaults:
   path: /etc/ssl/step.key
   mode: "600"
   owner: root
