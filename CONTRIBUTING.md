@@ -91,6 +91,13 @@ Some additional hints:
 - See `targets/setup_smallstep/defaults/main.yml` for some variables you can use in your tests
 - You can run modules from this collection with `environment: {"STEPPATH": "{{ STEP_CA_PATH }}"}` if you don't want to specify ca_config/ca_url for every module call
 
+#### Updating test versions
+
+To update the smallstep cli/ca versions that are used to run the tests, the following files need to be modified:
+
+- `tests/integration/targets/setup_smallstep/vars/versions.yml`: Versions for module integration test
+- `tests/molecule/group_vars/all/versions.yml`: Versions for molecule tests
+
 ### Submitting your Changes
 
 The "Before-opening-a-PR-Checklist":
