@@ -9,7 +9,7 @@ tox -e lint
 tox -e sanity -- --docker --color -v --python 3.6
 
 # Integration tests for modules - we don't have an unit tests as of now
-tox -e integration -- --docker --color -v --python 3.6
+tox -e integration -- --docker --color -v --python 3.6 --docker-terminate success
 
 # Molecule tests - this grabs all molecule scenarios and executes them.
 # Note that to run this command, you need to have
