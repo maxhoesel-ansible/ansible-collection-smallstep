@@ -151,7 +151,6 @@
   - name: Verify that all provisioners (except for sshpop) are absent
     assert:
       that:
-        - (step_ca_config.stdout | from_json).authority.provisioners | length == 1
-        - (step_ca_config.stdout | from_json).authority.provisioners.0.name == "sshpop"
+        - (step_ca_config.stdout | from_json).authority.provisioners == None
   become: yes
   become_user: "{{ step_ca_user }}"

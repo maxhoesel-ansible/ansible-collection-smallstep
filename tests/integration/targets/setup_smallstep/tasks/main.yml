@@ -34,7 +34,6 @@
         step_ca_name: module-tests
         step_ca_root_password: "{{ step_ca_password }}"
         step_ca_dns: "127.0.0.1"
-        step_ca_ssh: yes
         step_ca_existing_root_file: /tmp/existing.crt
         step_ca_existing_key_file: /tmp/existing.key
     - name: Bootstrap host
