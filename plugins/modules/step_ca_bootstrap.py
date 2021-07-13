@@ -87,8 +87,13 @@ def run_module():
         except (OSError, IOError):
             # The file probably doesn't exist yet, continue for now
             config = {}
-        if config.get("fingerprint", "") == module.params["fingerprint"]:
-            result["msg"] = "Already bootstrapped and force not set"
+        current_fingerprint = config.get("fingerprint", "")
+        if current_fingerprint != "":
+            if current_fingerprint == module.params["fingerprint"]:
+                result["msg"] = "Already bootstrapped and force not set."
+            else:
+                result["msg"] = "Already bootstrapped to a different CA, and force not set."
+                result["failed"] = True
             module.exit_json(**result)
 
     args = {
