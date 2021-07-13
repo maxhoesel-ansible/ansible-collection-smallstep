@@ -7,8 +7,6 @@
       become: yes
       changed_when: no
 
-    # This will execute as root, so the cert will only be valid
-    # if the system-wide install succeeded
     - name: Attempt to access CA URL
       uri:
         url: https://step-ca.localdomain
