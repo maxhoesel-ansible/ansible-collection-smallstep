@@ -43,7 +43,7 @@ def run_step_cli_command(cli_executable, cli_command, module, result, params=Non
     if not module.check_mode:
         rc, result["stdout"], result["stderr"] = module.run_command(args)
         if rc != 0:
-            if "error allocating terminal" in result["stderr"]:
+            if ("error allocating terminal" in result["stderr"] or "open /dev/tty: no such device or address" in result["stderr"]):
                 result["msg"] = (
                     "step-cli tried and failed to open a terminal for interactive input. "
                     "This usually means that you're missing a parameter that step-cli is now asking for, "
