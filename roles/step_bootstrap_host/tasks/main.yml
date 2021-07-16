@@ -9,17 +9,14 @@
     force: "{{ step_bootstrap_force | d(omit) }}"
   become: yes
 
-# Ansibles env lookup always looks at the connection users env vars.
-# Since we need to check the root users home dir, we check manually
-- name: Get root user home directory
-  shell: echo $HOME
-  register: step_bootstrap_root_home
-  become: yes
-  changed_when: no
-  check_mode: no
+# This requires that facts are gathered, because of the use of `ansible_env`.
+# But can't use `lookup(env, ...)`, since that doesn't query remote system.
+- name: Calculate location of CA root certificate file
+  set_fact:
+    _bootstrap_root_cert_file: "{{ (ansible_env.STEPPATH | d(ansible_env.HOME + '/.step', true)) + '/certs/root_ca.crt' }}"
 
-- name: check if cert is already installed
-  command: "{{ step_cli_executable }} certificate verify {{ lookup('env', 'STEPPATH') | default(step_bootstrap_root_home.stdout + '/.step', true) }}/certs/root_ca.crt"
+- name: Check if root CA cert is already installed
+  command: "{{ step_cli_executable }} certificate verify {{ _bootstrap_root_cert_file }}"
   become: yes
   changed_when: no
   check_mode: no
@@ -28,7 +25,7 @@
   when: step_bootstrap_install_cert
 
 - name: Install CA cert into trust stores
-  command: "step-cli certificate install /root/.step/certs/root_ca.crt --all"
+  command: "step-cli certificate install {{ _bootstrap_root_cert_file }} --all"
   when:
     - step_bootstrap_install_cert
     - step_bootstrap_force or step_bootstrap_installed.failed
