@@ -10,20 +10,14 @@ DOCUMENTATION = r"""
 ---
 module: step_ca_provisioner_claims
 author: Max Hösel (@maxhoesel)
-short_description: Manage default or provisioner claims on a step-ca server
+short_description: Manage default or provisioner claims on a C(step-ca) server
 version_added: '0.2.1'
 description: |
   This module can add, update or remove claims (such as certificate duration) on a step-ca server.
   You can either modify the claims of an individual provisioner, or change the default global claims.
-requirements:
-  - A initialized step-ca server with a C(ca.json) file (write access needed)
 notes:
   - Check mode is supported.
 options:
-  ca_config:
-    description: The path to the certificate authority configuration file.
-    type: path
-    default: $STEPPATH/config/ca.json
   exclusive:
     description: Replace all existing claims for the selected scope with the ones defined in the module parameters.
     type: bool
@@ -91,6 +85,9 @@ options:
   default_user_ssh_duration:
     description: If no certificate validity period is specified, use this value.
     type: str
+
+extends_documentation_fragment:
+  - maxhoesel.smallstep.ca_connection_local_only
 """
 
 EXAMPLES = r"""
@@ -128,14 +125,11 @@ claims:
   type: dict
 """
 
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.validation import check_mutually_exclusive
-
-import copy
-import os
 import json
-
-CA_CONFIG = "{steppath}/config/ca.json".format(steppath=os.environ.get("STEPPATH", os.environ["HOME"] + "/.step"))
+import os
+import copy
+from ansible.module_utils.basic import AnsibleModule
+from ..module_utils.ca_connection_local_only import connection_argspec
 
 
 def get_current_claims(module, config, result):
@@ -164,7 +158,8 @@ def get_current_claims(module, config, result):
                 if p["name"] == p_name and p["type"] == p_type
             ][0]
         except IndexError:
-            result["msg"] = "Could not find provisioner with name {name} and type {type}".format(name=p_name, type=p_type)
+            result["msg"] = "Could not find provisioner with name {name} and type {type}".format(
+                name=p_name, type=p_type)
             module.fail_json(**result)
     else:
         # If type is not specified and multiple provisioners share the same name, we will
@@ -176,7 +171,8 @@ def get_current_claims(module, config, result):
             if p["name"] == module.params["name"]
         }
         if not current_claims:
-            result["msg"] = "Could not find any provisioner with name {name}".format(name=p_name)
+            result["msg"] = "Could not find any provisioner with name {name}".format(
+                name=p_name)
             module.fail_json(**result)
     return current_claims
 
@@ -195,7 +191,8 @@ def write_config(module, config, result):
             json.dump(config, f)
             module.atomic_move(tmpfile, module.params["ca_config"])
     except Exception as e:
-        result["msg"] = "Could not write ca.json file. Exception: {err}".format(err=e)
+        result["msg"] = "Could not write ca.json file. Exception: {err}".format(
+            err=e)
         module.fail_json(**result)
     return result
 
@@ -225,7 +222,8 @@ def update_claims(module, current_config, result):
         "default_user_ssh_duration": "defaultUserSSHDuration",
     }
     current_claims = get_current_claims(module, current_config, result)
-    module_claims = {claims[c]: module.params[c] for c in claims.keys() if module.params[c]}
+    module_claims = {claims[c]: module.params[c]
+                     for c in claims.keys() if module.params[c]}
     # We need a truly separate dict for the new config so that we
     # can compare both to set changed= appropriately when we're done.
     new_config = copy.deepcopy(current_config)
@@ -278,7 +276,6 @@ def update_claims(module, current_config, result):
 
 def run_module():
     module_args = dict(
-        ca_config=dict(type="path", default=CA_CONFIG),
         exclusive=dict(type="bool", default=False),
         global_claims=dict(type="bool", default=False),
         min_tls_cert_duration=dict(),
@@ -295,17 +292,19 @@ def run_module():
         default_user_ssh_duration=dict(),
         name=dict(),
         type=dict(
-            choices=["JWK", "OIDC", "AWS", "GCP", "Azure", "ACME", "X5C", "K8sSA", "SSHPOP"],
+            choices=["JWK", "OIDC", "AWS", "GCP", "Azure",
+                     "ACME", "X5C", "K8sSA", "SSHPOP"],
         ),
     )
     result = dict(changed=False, msg="", claims=dict())
-    module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
+    module = AnsibleModule(argument_spec={**module_args, **connection_argspec}, supports_check_mode=True)
 
     try:
         with open(module.params["ca_config"]) as f:
             config = json.load(f)
     except Exception as e:
-        result["msg"] = "Error when loading ca.json config: {err}".format(err=e)
+        result["msg"] = "Error when loading ca.json config: {err}".format(
+            err=e)
         module.fail_json(**result)
 
     result = update_claims(module, config, result)

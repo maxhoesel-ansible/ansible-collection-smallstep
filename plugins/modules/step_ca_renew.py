@@ -13,8 +13,6 @@ author: Max Hösel (@maxhoesel)
 short_description: Renew a valid certificate
 version_added: '0.3.0'
 description: Renew a valid certificate
-requirements:
-  - A C(step-ca) server, either remote or local
 notes:
   - Check mode is supported.
 options:
@@ -64,7 +62,7 @@ options:
 
 extends_documentation_fragment:
   - maxhoesel.smallstep.step_cli
-  - maxhoesel.smallstep.ca_remote_local
+  - maxhoesel.smallstep.ca_connection_hybrid
 """
 
 EXAMPLES = r"""
@@ -78,9 +76,10 @@ EXAMPLES = r"""
     force: yes
 """
 
-from ansible.module_utils.basic import AnsibleModule
-from ..module_utils.validation import check_step_cli_install
+from ..module_utils.ca_connection_hybrid import connection_run_args, connection_argspec
 from ..module_utils.run import run_step_cli_command
+from ..module_utils.validation import check_step_cli_install
+from ansible.module_utils.basic import AnsibleModule
 
 
 def run_module():
@@ -95,28 +94,26 @@ def run_module():
         pid=dict(type="int"),
         pid_file=dict(type="path"),
         signal=dict(type="int"),
-        root=dict(type="path"),
         step_cli_executable=dict(type="path", default="step-cli"),
-        ca_url=dict(type="str"),
-        ca_config=dict(type="path"),
-        offline=dict(type="bool"),
     )
     result = dict(changed=False, stdout="", stderr="", msg="")
-    module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
+    module = AnsibleModule(argument_spec={**module_args, **connection_argspec}, supports_check_mode=True)
 
-    check_step_cli_install(module, module.params["step_cli_executable"], result)
+    check_step_cli_install(
+        module, module.params["step_cli_executable"], result)
 
     # Positional Parameters
-    params = ["ca", "renew", module.params["crt_file"], module.params["key_file"]]
+    params = ["ca", "renew", module.params["crt_file"],
+              module.params["key_file"]]
     # Regular args
     args = ["expires_in", "force", "exec", "output_file", "password_file", "pid", "pid_file",
-            "signal", "root", "ca_url", "ca_config", "offline"]
+            "signal"]
     # All parameters can be converted to a mapping by just appending -- and replacing the underscores
     args = {arg: "--{a}".format(a=arg.replace("_", "-")) for arg in args}
 
     result = run_step_cli_command(
         module.params["step_cli_executable"], params,
-        module, result, args
+        module, result, {**args, **connection_run_args}
     )
     if "Your certificate has been saved in" in result["stderr"]:
         result["changed"] = True

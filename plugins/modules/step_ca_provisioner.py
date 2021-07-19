@@ -10,12 +10,9 @@ DOCUMENTATION = r"""
 ---
 module: step_ca_provisioner
 author: Max Hösel (@maxhoesel)
-short_description: Manage provisioners for a Smallstep CA server
+short_description: Manage provisioners on a C(step-ca) server
 version_added: '0.3.0'
 description: Use this module to create and remove provisioners from a Smallstep CA server.
-requirements:
-  - C(step-ca) server running on remote host
-  - Read access to I(ca_config) on the remote host
 notes:
   - This module does B(not) modify existing provisioners - it will only add or remove them.
   - It is currently not possible to add JWK provisioners based on existing keys. Only the C(--create) option is supported.
@@ -38,10 +35,6 @@ options:
     description: The Microsoft Azure resource group name used to validate the identity tokens. Must be a list.
     type: list
     elements: str
-  ca_config:
-    description: The path to the certificate authority configuration file.
-    type: path
-    default: $STEPPATH/config/ca.json
   disable_custom_sans:
     description: On cloud provisioners, if enabled only the internal DNS and IP will be added as a SAN. By default it will accept any SAN in the CSR.
     type: bool
@@ -128,7 +121,9 @@ options:
     description: Root certificate (chain) file used to validate the signature on X5C provisioning tokens.
     type: path
 
-extends_documentation_fragment: maxhoesel.smallstep.step_cli
+extends_documentation_fragment:
+  - maxhoesel.smallstep.step_cli
+  - maxhoesel.smallstep.ca_connection_local_only
 """
 
 EXAMPLES = r"""
@@ -227,14 +222,12 @@ EXAMPLES = r"""
     state: absent
 """
 
-import json
-import os
-
-from ansible.module_utils.basic import AnsibleModule
-from ..module_utils.validation import check_step_cli_install
+from ..module_utils.ca_connection_local_only import connection_argspec, connection_run_args
 from ..module_utils.run import run_step_cli_command
-
-CA_CONFIG = "{steppath}/config/ca.json".format(steppath=os.environ.get("STEPPATH", os.environ["HOME"] + "/.step"))
+from ..module_utils.validation import check_step_cli_install
+from ansible.module_utils.basic import AnsibleModule
+import os
+import json
 
 
 def add_provisioner(module, result):
@@ -243,7 +236,6 @@ def add_provisioner(module, result):
         "aws_iid_roots_file": "--iid-roots",
         "azure_tenant": "--azure-tenant",
         "azure_resource_group": "--azure-resource-group",
-        "ca_config": "--ca-config",
         "disable_custom_sans": "--disable-custom-sans",
         "disable_trust_on_first_use": "--disable-trust-on-first-use",
         "gcp_service_account": "--gcp-service-account",
@@ -268,7 +260,7 @@ def add_provisioner(module, result):
 
     result = run_step_cli_command(
         module.params["step_cli_executable"], command,
-        module, result, args
+        module, result, {**args, **connection_run_args}
     )
     result["changed"] = True
     return result
@@ -277,8 +269,9 @@ def add_provisioner(module, result):
 def remove_provisioner(module, result):
     result = run_step_cli_command(
         module.params["step_cli_executable"],
-        ["ca", "provisioner", "remove", module.params["name"], "--type", module.params["type"]],
-        module, result
+        ["ca", "provisioner", "remove", module.params["name"],
+            "--type", module.params["type"]],
+        module, result, connection_run_args
     )
     result["changed"] = True
     return result
@@ -290,7 +283,6 @@ def run_module():
         aws_iid_roots_file=dict(type="path"),
         azure_tenant=dict(),
         azure_resource_group=dict(type="list", elements="str"),
-        ca_config=dict(type="path", default=CA_CONFIG),
         disable_custom_sans=dict(type="bool", default=False),
         disable_trust_on_first_use=dict(type="bool", default=False),
         gcp_service_account=dict(type="list", elements="str"),
@@ -309,15 +301,17 @@ def run_module():
         state=dict(choices=["present", "absent"], default="present"),
         step_cli_executable=dict(type="path", default="step-cli"),
         type=dict(
-            choices=["JWK", "OIDC", "AWS", "GCP", "Azure", "ACME", "X5C", "K8sSA", "SSHPOP"],
+            choices=["JWK", "OIDC", "AWS", "GCP", "Azure",
+                     "ACME", "X5C", "K8sSA", "SSHPOP"],
             required=True,
         ),
         x5c_root_file=dict(type="path"),
     )
     result = dict(changed=False, stdout="", stderr="", msg="")
-    module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
+    module = AnsibleModule(argument_spec={**module_args, **connection_argspec}, supports_check_mode=True)
 
-    check_step_cli_install(module, module.params["step_cli_executable"], result)
+    check_step_cli_install(
+        module, module.params["step_cli_executable"], result)
 
     name = module.params["name"]
     state = module.params["state"]

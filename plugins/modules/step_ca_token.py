@@ -15,8 +15,6 @@ version_added: '0.3.0'
 description: >
   Generate an OTT granting access to the CA. This module returns the token by default,
   but you can also save it on the remote host if you prefer.
-requirements:
-  - A C(step-ca) local  server on the remote host
 notes:
   - Check mode is supported.
 options:
@@ -124,7 +122,7 @@ options:
 
 extends_documentation_fragment:
   - maxhoesel.smallstep.step_cli
-  - maxhoesel.smallstep.ca_remote_local
+  - maxhoesel.smallstep.ca_connection_hybrid
 """
 
 EXAMPLES = r"""
@@ -141,11 +139,12 @@ token:
   no_log: yes
 """
 
-from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.validation import check_mutually_exclusive
-from ansible.module_utils.common.validation import check_required_one_of
-from ..module_utils.validation import check_step_cli_install
+from ..module_utils.ca_connection_hybrid import connection_run_args, connection_argspec
 from ..module_utils.run import run_step_cli_command
+from ..module_utils.validation import check_step_cli_install
+from ansible.module_utils.common.validation import check_required_one_of
+from ansible.module_utils.common.validation import check_mutually_exclusive
+from ansible.module_utils.basic import AnsibleModule
 
 
 def run_module():
@@ -168,40 +167,37 @@ def run_module():
         revoke=dict(type="bool"),
         renew=dict(type="bool"),
         rekey=dict(type="bool"),
-        root=dict(type="path"),
         san=dict(type="list", elements="str"),
         ssh=dict(type="bool"),
         sshpop_cert=dict(type="str"),
         sshpop_key=dict(type="path"),
         x5c_cert=dict(type="str"),
         x5c_key=dict(type="path"),
-        ca_config=dict(type="path"),
-        ca_url=dict(type="str"),
-        offline=dict(type="bool"),
         step_cli_executable=dict(type="path", default="step-cli")
     )
 
     result = dict(changed=False, stdout="", stderr="", msg="")
-    module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
+    module = AnsibleModule(argument_spec={**module_args, **connection_argspec}, supports_check_mode=True)
 
     check_mutually_exclusive(["return_token", "output_file"], module.params)
     check_required_one_of(["return_token", "output_file"], module.params)
 
-    check_step_cli_install(module, module.params["step_cli_executable"], result)
+    check_step_cli_install(
+        module, module.params["step_cli_executable"], result)
 
     # Positional Parameters
     params = ["ca", "token", module.params["name"]]
     # Regular args
     args = ["cert_not_after", "cert_not_before", "force", "host", "k8ssa_token_path", "key", "kid",
             "not_after", "not_before", "output_file", "principal", "provisioner", "provisioner_password_file",
-            "revoke", "renew", "rekey", "root", "san", "ssh", "sshpop_cert", "sshpop_key", "x5c_cert",
-            "x5c_key", "ca_config", "ca_url", "offline"]
+            "revoke", "renew", "rekey", "san", "ssh", "sshpop_cert", "sshpop_key", "x5c_cert",
+            "x5c_key"]
     # All parameters can be converted to a mapping by just appending -- and replacing the underscores
     args = {arg: "--{a}".format(a=arg.replace("_", "-")) for arg in args}
 
     result = run_step_cli_command(
         module.params["step_cli_executable"], params,
-        module, result, args
+        module, result, {**args, **connection_run_args}
     )
     result["changed"] = True
     if module.params["return_token"]:
