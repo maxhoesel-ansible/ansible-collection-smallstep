@@ -1,4 +1,4 @@
-# maxhoesel.smallstep
+# maxhoesel.smallstep - Ansible Collection for Smallstep CA/CLI
 
 ![Release](https://img.shields.io/github/v/release/maxhoesel/ansible-collection-smallstep)
 ![CI Status (Roles)](https://img.shields.io/github/workflow/status/maxhoesel/ansible-collection-smallstep/CI%20Roles/main)
@@ -8,53 +8,84 @@
 ---
 **NOTE**
 
-This collection (and the upstream `step-cli`/`step-ca` packages) are still under active development and do not have an official stable release yet.
-Breaking changes may occur between minor releases (e.g. 0.2 -> 0.3) if they are needed to keep up with upstream changes.
+This collection is stil under active development. While we try to preserve compatibility with previous versions,
+breaking changes may ocurr between minor releases (such as 0.3, 0.4, etc.) if required.
 
 ---
 
-An Ansible collection for managing Smallstep CLI and CA applications.
+An Ansible collection containing roles/modules to install, configure and interact with the [Smallstep certificate server](https://github.com/smallstep/certificates)
+and the [CLI tool](https://github.com/smallstep/cli). Possible uses for this collection include:
 
-This collection contains role and modules to help you install, configure, and maintain both the step-cli client and the CA server using Ansible.
+- Managing your `step-ca` server install (installation, configuration, provisioners)
+- Automated bootstrapping of hosts to trust your CA
+- Token or certificate creation from within your Ansible playbooks
+- [Complete configuration of client certificates via ACME, including automatic renewal](roles/step_acme_cert/README.md)
+
+
+## Components
+
+### Roles
+
+| Role | Description |
+|------|-------------|
+| [`step_ca`](roles/step_ca/README.md) | Install step-ca as an internal CA.
+| [`step_bootstrap_host`](roles/step_bootstrap_host/README.md) | Configure a client host to trust your CA using step-cli.
+| [`step_acme_cert`](roles/step_acme_cert/README.md) | Set up a Let's Encrypt-style certificate on a host using your ca, including automatic renewal.
+| [`step_cli`](roles/step_cli/README.md) | Install step-cli and nothing else. Used by bootstrap_host and step_ca under the hood.
+
+
+### Standalone Modules
+
+None so far
+
+### CA Modules
+
+---
+**NOTE**
+
+To learn more about the differences between Online/Offline/Local-Only Modules, see [this section](module-usage)
+
+---
+
+| Module  | Description | Online | Offline/Local |
+|---------|-------------|--------|---------------|
+| `step_ca_bootstrap` | Initialize `step-cli` to trust a step-ca server | X | |
+| `step_ca_certificate` | Generate a new private key and certificate signed by the CA root certificate | X | `offline` parameter |
+| `step_ca_provisioner` | Manage provisioners on a `step-ca` server | | X |
+| `step_ca_provisioner_claims` | Manage default or provisioner claims on a `step-ca server | | X |
+| `step_ca_renew` | Renew a valid certificate | X | `offline` parameter |
+| `step_ca_revoke` | Revoke a Certificate | X | `offline` parameter |
+| `step_ca_token` | Generate an OTT granting access to the CA | X | `offline` parameter |
 
 ## Installation
 
 ### Dependencies
 
-- A recent version of ansible. We test against the current and the 2 previous major releases
+- A recent release of Ansible. This collection officially supports the 3 most recent Ansible releases.
+  Older versions might still work, but are not supported
 - Python 3.6 or newer
 
-Individual roles and modules may have additional dependencies, please check their respective documentation.
+Individual roles or modules may have additional dependencies, please check their respective documentation.
 
-### Install via ansible-galaxy
+### Install
 
-Install this role via ansible-galaxy:
+Via ansible-galaxy (recommended):
 
 `ansible-galaxy collection install maxhoesel.smallstep`
 
-You can also install the most recent version of this collection by referencing this repository:
+Alternatively, you can download a collection archive from a [previous release](hhttps://github.com/maxhoesel/ansible-collection-smallstep/releases).
+
+You can also clone this repository directly if you want a slightly more up-to-date (and potentially buggy) version.
 
 `ansible-galaxy collection install git+https://github.com/maxhoesel/ansible-collection-smallstep`
 
-## Overview
+## Getting started (Step-By-Step)
 
-This collection contains several roles that run common tasks related to `step-cli` and `step-ca`. They are:
+This section will show you how to install a step-ca server and configure clients to trust that CA using this collection.
+This guide will give you a good overview of how to use the tools in this collection.
 
-- [`step_ca`](roles/step_ca/README.md): Install and initialize a step certificate authority on a host.
-- [`step_bootstrap_host`](roles/step_bootstrap_host/README.md):
-- [`step_bootstrap_host`](roles/step_bootstrap_host/README.md):
- Initialize a host to trust an existing step CA and create a service user for communicating with the CA via `step-cli`.
-- [`step_acme_cert`](roles/step_acme_cert/README.md): Generate and install and ACME certificate for a host from an existing step CA. Also sets up automatic renewal.
-- [`step_cli`](roles/step_cli/README.md): Used by the other roles to install the step client tool. While you can run it on its own, this will not initialize your host to trust your CA.
-
-Additionally, this collection contains several modules that you can use to configure your CA, get certificates and perform various other tasks.
-These generally required the `step-cli` tool to be present and the host to trust the remote CA. You can do this with `step_bootstrap_host`.
-
-If you'd like to know more about an individual module, you can view its documentation using `ansible-doc maxhoesel.smallstep.<step_module_name>`.
-
-## Getting started
-
-Let's say you have a set of hosts and a separate CA that you want these hosts to trust. To achieve this, you can follow the steps below
+Let's start with our inventory: In this example, we have a single server that we want to use as a step CA and three clients that we
+want to trust the server:
 
 ```
 all:
@@ -69,10 +100,9 @@ all:
 
 ### Create a CA
 
-If you are starting from scratch, you will need to create a new step CA first.
-Luckily, this collection has a role just for that - `step_ca`. This role will install and initialize a CA for you,
-which you can then configure however you want. It also installs the `step-cli` tool, allowing you to manage your CA via the modules in this collection.
-Below is a simple example for how to do so. If you want to know more, check out the documentation for `step_ca` and the `step_ca_provisioner(_claims)` modules.
+To create a CA server from scratch, this role contains the [`step_ca`](roles/step_ca/README.md) role.
+It will install and initialize a step-ca server for you, which you can then configure however you want.
+Below is a simple example for how to do so. If you want to know more, check out the documentation for `step_ca`.
 
 ---
 **NOTE**
@@ -109,13 +139,12 @@ See the `step_ca` documentation for more details on how private keys are handled
         msg: "Fingerprint of root cert: {{ root_ca_fp.stdout }}"
 ```
 
-
 ### Bootstrap the clients
 
 To establish trust between your clients and the CA, you will need the fingerprint of the CA root cert - see the [Create a CA](#create-a-ca) section for more details.
 This fingerprint identifies your CA to your clients and allows them to verify the CA cert.
 
-To actually initialize the clients, you can use `step_bootstrap_host`. This role will install `step-cli` and configure the host to trust your CA.
+To actually initialize the clients, you can use [`step_bootstrap_host`](roles/step_bootstrap_host/README.md). This role will install `step-cli` and configure the host to trust your CA.
 
 `clients.yml`:
 
@@ -134,43 +163,44 @@ To actually initialize the clients, you can use `step_bootstrap_host`. This role
     - name: Verify that everything is working
       command: step-cli ca health
       changed_when: no
-      become: yes
 ```
 
----
-**NOTE**
-
-If you want to access the CA from your clients CLI at a later point, you need to either run `step-cli` as root, or specify the CA url and cert with the `--ca-url` and `--root` flags.
-This is because `step_bootstrap_host` can automatically configure the root user to trust your CA, but it can't do so for other users on the system.
-
----
-
 At this point, your CA is up and running and your hosts are configured to trust it. You're ready to go!
-You can take a look at the available modules to further configure your CA and hosts if you whish to do so.
+You can take a look at the available modules to further configure your CA and hosts if you wish to do so.
 
-### Using Modules
+## Module Usage
 
-Most of the modules in this collection wrap around the `step-cli` tool. Note that there are two kinds of modules - those dealing with a CA, remote or local (named `step_ca_<action>`)
-and those dealing with local, standalone actions (named `step_<action>`, TBD).
+This collection contains several modules for mamaging your smallstep environment.
+Most of them wrap around `step-cli` commands, so they usually support all the features of the respective command.
 
-To run the CA modules, you need to provide them with information about your CA. There's several options to do this:
+If you'd like to know more about an individual module, you can view its documentation using `ansible-doc maxhoesel.smallstep.<step_module_name>`.
 
-- Use the root user on a host bootstrapped with `step_bootstrap_host`. This role configures the root user to trust your CA, so you can run `step-cli` commands/modules as root without issues
-- Use the `ca_config` and `root` module parameters to specify the CA url and root certificate.
-- Point them to your CAs config file with `ca_config` (and potentially also the `offline` flag). This obviously only works on your CA host and requires that you run the module as the CA user (`step-ca` if installed using this collection)
+The `step-cli` tool has two sets of commands - standalone and CA.
 
----
-**NOTE**
+- Standalone commands are executed by  `step-cli` directly with no external CA required. Example: `step-cli certificate create`
+- CA commands require the usage of an external step CA (Example: `step-cli ca certificate`). Depending on the module, there are two modes:
+  - Online mode: `step-cli` communicates with the CA over HTTPS and requests the data it needs.
+  - Offline/Local mode: `step-cli` accesses the CA files (certificates, config) directly. This only works on the CA host itself.
 
-Most CA modules can be run both remotely via the client and directly on the CA (e.g. `step_ca_certificate`), but others are remote/local-only
-(e.g. `step_ca_bootstrap` is remote-only, while `step_ca_provisioner` is local-only). See the module documentation for details.
+Most CA modules can use either online or offline mode using the `offline` parameter, but there are some exceptions.
+For example, the `step_ca_provisioner_(claims)` modules(s) need to run in offline mode as they directly write to the CA config.
+See [this table](#ca-modules) for details.
 
----
+In order to talk to your CA in online mode, `step-cli` needs to already trust it. You can achieve this by:
+- Running the module on a host that was configured with `step_bootstrap_host` as root (recommended).
+- Pasing the `ca_url` and `root` parameters to the module.
+
+For offline mode, you need to:
+  - Provide `step-cli` with the path to your CA config (`$STEPPATH/config/ca.json` by default).
+    You can override this with the `ca_config` parameter if required.
+  - Run the module as the user the CA is running as to prevent permission issues
+
+Below are some examples to showcase the different options. These examples assume that a CA is already set up on the local host.
 
 ```yaml
 - hosts: ca
   tasks:
-    - name: Run a module by specifying the CA URL and CA cert
+    - name: Run a module in online mode by specifying the CA URL and CA cert
       maxhoesel.smallstep.step_ca_certificate:
         root: /etc/ssl/myca.crt
         ca_url: https://my-ca.localdomain
@@ -182,58 +212,43 @@ Most CA modules can be run both remotely via the client and directly on the CA (
         #params go here
       become: yes
 
-    - name: Run a module against a locally installed CA
-      maxhoesel.smallstep.step_ca_provisioner:
-        ca_config: /etc/step-ca/config/ca.json
-        #params go here
+    - name: Run a module in offline mode
+      maxhoesel.smallstep.step_ca_certificate:
+        offline: yes
+        # params go here
+      become: yes
       # You should run modules acting on a local CA as the user that the CA runs as.
       # If you configured your CA with `step_ca`, the default user name is `step-ca`.
       become_user: step-ca
+
+    - name: Run a offline-only module and manually supply the ca_config
+      maxhoesel.smallstep.step_ca_provisioner:
+        ca_config: /etc/step-ca/config/ca.json
+        #params go here
+      become: yes
+      become_user: step-ca
 ```
 
-### Getting ACME certs from the CA
+### About `$STEPPATH`
 
-One possible use case for a internal CA is to issue short-lived host certificates via the ACME protocol.
-This collection has a role specifically for that - `step_acme_cert`. Below is a simple example for setting
-up an ACME workflow.
+All modules in this collection respect the `$STEPPATH` environment variable used to customize the step-cli config directory.
+If you want to use a custom `$STEPPATH` for your environment, you can use the `step_cli_steppath` role variables
+and the `environment` ansible parameter for modules:
 
----
-**NOTE**
-
-Make sure that you are familiar with the way ACME works. You will need a functioning DNS environment at the very least
-to make use of ACME certs.
-
----
-
-`acme.yml`:
 
 ```yaml
-- hosts: step_ca
-  become: yes
-  tasks:
-    - name: Add an ACME provisioner to the CA
-      maxhoesel.smallstep.step_ca_provisioner:
-        name: ACME
-        type: ACME
-      become_user: step-ca
-      notify: reload step-ca
-  handlers:
-    - name: reload step-ca
-      systemd:
-        name: step-ca
-        state: reloaded
+  - name: Initialize a host with a custom STEPPATH
+    maxhoesel.smallstep.step_bootstrap_host:
+    vars:
+      step_bootstrap_ca_url: https://my-ca.localdomain
+      step_bootstrap_fingerprint: "your root CA certs fingerprint"
+      step_cli_steppath: /etc/step-cli
 
-- hosts: clients
-  tasks:
-    # This will download a certificate to /etc/step/ that you can then use in other applications.
-    # See the step_acme_cert README for more options
-    - name: Configure an ACME cert + renewal
-      include_role:
-        name: maxhoesel.smallstep.step_acme_cert
-        vars:
-          step_acme_cert_ca_provisioner: ACME
-      become: yes
-
+  - name: Use the custom $STEPPATH in a module
+    maxhoesel.smallstep.step_ca_certificate:
+      # params go here
+    environment:
+      STEPPATH: /etc/step-cli
 ```
 
 ## License & Author

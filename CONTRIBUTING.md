@@ -34,7 +34,7 @@ You should see a list of environments as created by tox, including an env for ev
 
 ### Make your changes
 
-Please make sure that each change is contained in a single, independent commit.
+Please make sure to put each change in an independent, clear and readable commit.
 Follow best practices when it comes to creating and naming commits.
 All commits **must** follow the [conventional-commits standard](https://www.conventionalcommits.org/en/v1.0.0/):
 
@@ -53,11 +53,10 @@ there is no harm in renaming your commit. Note that the CI will also fail if an 
 - Make sure that you have read the [Ansible module conventions](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_best_practices.html)
 - Each module should typically wrap around one step-cli command or a set of closely related commands.
   The modules name should reflect this. For example, step_ca_provisioner performs the same functionality as "step ca provisioner add/remove".
-- Make sure to use the doc fragment and utils already present.
-  You can also add additional utils if they can be used in multiple modules.
+- Make sure to use the doc fragment and utils already present, specifically the connection fragments used for parameters like --ca-url and --offline.
 - If you need to call `step-cli`, do so via `run_step_cli_command()` in `run.py`.
   This function automatically assembles command-line arguments for you - all you
-  need to do is provide it with a simple mapping dict. It also handles errors and check mode for you
+  need to do is provide it with a simple dict of module parameters mapped to their CLI equivalent. It also handles errors and check mode for you
 - If you need to troubleshoot inside the ansible-test container, add `--docker-terminate never` to the
   call inside the hacking script. The container will then persist even on failure, and you can debug it
 
