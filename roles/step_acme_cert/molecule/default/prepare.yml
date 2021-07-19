@@ -49,3 +49,4 @@
       vars:
         step_bootstrap_ca_url: https://step-ca.localdomain
         step_bootstrap_fingerprint: 345bf77397642dc9211a3820af0b1816c4afa430ad249ae705f1456b4bafa046
+        step_cli_steppath: /etc/step-cli-molecule

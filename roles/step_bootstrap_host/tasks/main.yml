@@ -1,6 +1,14 @@
 ---
 - include: check.yml
 
+- name: STEPPATH is present
+  file:
+    path: "{{ step_cli_steppath }}"
+    owner: root
+    group: root
+    mode: "750"
+    state: directory
+
 - name: Host is bootstrapped
   maxhoesel.smallstep.step_ca_bootstrap:
     ca_url: "{{ step_bootstrap_ca_url }}"
@@ -8,15 +16,11 @@
     step_cli_executable: "{{ step_cli_executable }}"
     force: "{{ step_bootstrap_force | d(omit) }}"
   become: yes
+  environment:
+    STEPPATH: "{{ step_cli_steppath }}"
 
-# This requires that facts are gathered, because of the use of `ansible_env`.
-# But can't use `lookup(env, ...)`, since that doesn't query remote system.
-- name: Calculate location of CA root certificate file
-  set_fact:
-    _bootstrap_root_cert_file: "{{ (ansible_env.STEPPATH | d(ansible_env.HOME + '/.step', true)) + '/certs/root_ca.crt' }}"
-
-- name: Check if root CA cert is already installed
-  command: "{{ step_cli_executable }} certificate verify {{ _bootstrap_root_cert_file }}"
+- name: Check if cert is already installed
+  command: "{{ step_cli_executable }} certificate verify {{ step_cli_steppath }}/certs/root_ca.crt"
   become: yes
   changed_when: no
   check_mode: no
@@ -25,7 +29,7 @@
   when: step_bootstrap_install_cert
 
 - name: Install CA cert into trust stores
-  command: "step-cli certificate install {{ _bootstrap_root_cert_file }} --all"
+  command: "step-cli certificate install {{ step_cli_steppath }}/certs/root_ca.crt --all"
   when:
     - step_bootstrap_install_cert
     - step_bootstrap_force or step_bootstrap_installed.failed

@@ -6,12 +6,14 @@
       command: step-cli ca health
       become: yes
       changed_when: no
+      environment:
+        STEPPATH: /etc/step-cli-molecule
 
     - name: Attempt to access CA URL
       uri:
         url: https://step-ca.localdomain
       ignore_errors: yes
       register: ca_query
-    - name: Verify that site is accessible
+    - name: Verify that SSL handshake was successful
       assert:
         that: not ca_query.failed or ca_query.status == 404
