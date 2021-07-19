@@ -13,7 +13,7 @@ def run_step_cli_command(cli_executable, cli_command, module, result, params=Non
         - cli_command: The command to run (e.g. ["ca", "bootstrap"])
         - module: Current module object
         - result: dict containing result values to be passed to exit_json()
-        - params: Mapping of module parameters to their command-line arg equivalent. Each parameter
+        - params: Dictionary of module parameters mapped to their command-line arg equivalent. Each parameter
           is processed according to its type in the argspec:
             - str/path/int/float/raw/bytes are passed as a value to their mapped parameter (e.g. --parameter=value)
             - bool only passes the mapped parameter (e.g. --force)

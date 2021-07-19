@@ -10,7 +10,7 @@ DOCUMENTATION = r"""
 ---
 module: step_ca_bootstrap
 author: Max Hösel (@maxhoesel)
-short_description: Initialize C(step-cli) to work with with a remote CA
+short_description: Initialize C(step-cli) to trust a step-ca server
 version_added: '0.3.0'
 description: >
   Downloads the root certificate from the given cert authority and sets up the local environment to use it.
@@ -61,7 +61,8 @@ from ansible.module_utils.basic import AnsibleModule
 from ..module_utils.validation import check_step_cli_install
 from ..module_utils.run import run_step_cli_command
 
-DEFAULTS_FILE = "{steppath}/config/defaults.json".format(steppath=os.environ.get("STEPPATH", os.environ["HOME"] + "/.step"))
+DEFAULTS_FILE = "{steppath}/config/defaults.json".format(
+    steppath=os.environ.get("STEPPATH", os.environ["HOME"] + "/.step"))
 
 
 def run_module():

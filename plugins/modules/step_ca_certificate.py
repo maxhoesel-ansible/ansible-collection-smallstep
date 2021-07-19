@@ -12,10 +12,7 @@ module: step_ca_certificate
 author: Max Hösel (@maxhoesel)
 short_description: Generate a new private key and certificate signed by the root certificate
 version_added: '0.3.0'
-description: >
-  Calls step-cli to create new certificates from the loca or remote CA.
-requirements:
-  - A C(step-ca) server, either remote (with an access token) or local
+description: Calls step-cli to create new certificates from the local or remote CA.
 notes:
   - Check mode is supported.
 options:
@@ -143,7 +140,7 @@ options:
 
 extends_documentation_fragment:
   - maxhoesel.smallstep.step_cli
-  - maxhoesel.smallstep.ca_remote_local
+  - maxhoesel.smallstep.ca_connection_hybrid
 """
 
 EXAMPLES = r"""
@@ -167,9 +164,10 @@ EXAMPLES = r"""
     key_file: /tmp/mycert.key
 """
 
-from ansible.module_utils.basic import AnsibleModule
-from ..module_utils.validation import check_step_cli_install
+from ..module_utils.ca_connection_hybrid import connection_argspec, connection_run_args
 from ..module_utils.run import run_step_cli_command
+from ..module_utils.validation import check_step_cli_install
+from ansible.module_utils.basic import AnsibleModule
 
 
 def run_module():
@@ -177,7 +175,8 @@ def run_module():
         acme=dict(type="str"),
         contact=dict(type="list", elements="str"),
         crt_file=dict(type="path", required=True),
-        curve=dict(type="str", choices=["P-256", "P-384", "P-521", "Ed25519"], aliases=["crv"]),
+        curve=dict(type="str", choices=[
+                   "P-256", "P-384", "P-521", "Ed25519"], aliases=["crv"]),
         force=dict(type="bool"),
         http_listen=dict(type="str"),
         k8ssa_token_path=dict(type="path"),
@@ -193,33 +192,31 @@ def run_module():
         set_file=dict(type="path"),
         size=dict(type="int"),
         standalone=dict(type="bool"),
-        root=dict(type="path"),
         token=dict(type="str", no_log=True),
         webroot=dict(type="path"),
         x5c_cert=dict(type="str"),
         x5c_key=dict(type="path"),
         step_cli_executable=dict(type="path", default="step-cli"),
-        ca_url=dict(type="str"),
-        ca_config=dict(type="path"),
-        offline=dict(type="bool"),
     )
     result = dict(changed=False, stdout="", stderr="", msg="")
-    module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
+    module = AnsibleModule(argument_spec={**module_args, **connection_argspec}, supports_check_mode=True)
 
-    check_step_cli_install(module, module.params["step_cli_executable"], result)
+    check_step_cli_install(
+        module, module.params["step_cli_executable"], result)
 
     # Positional Parameters
-    params = ["ca", "certificate", module.params["name"], module.params["crt_file"], module.params["key_file"]]
+    params = ["ca", "certificate", module.params["name"],
+              module.params["crt_file"], module.params["key_file"]]
     # Regular args
     args = ["acme", "contact", "curve", "force", "http_listen", "k8ssa_token_path", "kty", "not_after",
             "not_before", "provisioner", "provisioner_password_file", "san", "set", "set_file", "size",
-            "standalone", "root", "token", "webroot", "x5c_cert", "x5c_key", "ca_url", "ca_config", "offline"]
+            "standalone", "token", "webroot", "x5c_cert", "x5c_key"]
     # All parameters can be converted to a mapping by just appending -- and replacing the underscores
     args = {arg: "--{a}".format(a=arg.replace("_", "-")) for arg in args}
 
     result = run_step_cli_command(
         module.params["step_cli_executable"], params,
-        module, result, args
+        module, result, {**args, **connection_run_args}
     )
     result["changed"] = True
     module.exit_json(**result)
