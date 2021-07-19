@@ -22,7 +22,7 @@ class ModuleDocFragment(object):
       ca_url:
         description: >
           URI of the targeted Step Certificate Authority.
-          Used if the module is run in remote mode (default) and the hosts C(step-cli) is not configured to trust the CA.
+          Used if the module is run in online mode (default) and the hosts C(step-cli) is not configured to trust the CA.
         type: str
       offline:
         description: >
@@ -32,6 +32,6 @@ class ModuleDocFragment(object):
       root:
         description: >
           The path to the PEM file used as the root certificate authority.
-          Used if the module is run in remote mode (default) and the hosts C(step-cli) is not configured to trust the CA.
+          Used if the module is run in online mode (default) and the hosts C(step-cli) is not configured to trust the CA.
         type: path
     '''
