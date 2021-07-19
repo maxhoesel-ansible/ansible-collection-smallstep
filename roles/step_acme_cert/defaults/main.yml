@@ -1,5 +1,6 @@
 ---
 step_cli_executable: step-cli
+step_cli_steppath: /root/.step
 
 #step_acme_cert_ca_url:
 #step_acme_cert_ca_provisioner:

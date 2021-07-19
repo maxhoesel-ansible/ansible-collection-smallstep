@@ -23,6 +23,11 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 - Can be an absolute path or a command (make sure the executable is in $PATH) for all users
 - Default: `step-cli`
 
+##### `step_cli_steppath`
+- Optionally set a custom `$STEPPATH` from which to read the step config
+- Example: `/etc/step-cli`
+- Default: `/root/.step/`
+
 ### CA
 
 ##### `step_acme_cert_ca_provisioner`

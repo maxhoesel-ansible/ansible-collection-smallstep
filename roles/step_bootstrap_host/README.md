@@ -24,6 +24,13 @@ This role is intended to be run on regular hosts in your network that you want t
 - Can be an absolute path or a command (make sure the executable is in $PATH) for all users
 - Default: `step-cli`
 
+##### `step_cli_steppath`
+- Optionally set a custom `$STEPPATH` for bootstrapping.
+  All step configuration will be saved in this path instead of the default `$HOME/.step/`
+- **NOTE**: If set, you will have to supply your custom `$STEPPATH` in all future role/module/`step-cli` calls on this host that use the step config
+- Example: `/etc/step-cli`
+- Default: `/root/.step/`
+
 ##### `step_cli_version`
 - Set the version of step to install
 - Can be a version tag (e.g. `0.15.3`), or `latest` to always install the most recent version

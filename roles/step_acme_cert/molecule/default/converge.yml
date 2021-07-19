@@ -12,6 +12,8 @@
     - name: Get standalone cert
       include_role:
         name: "step_acme_cert"
+      vars:
+        step_cli_steppath: /etc/step-cli-molecule
 
     - name: Start nginx
       systemd:
@@ -38,6 +40,7 @@
         step_acme_cert_renewal_service: step-renew-webroot
         step_acme_cert_renewal_when: 59m # force renewal to happen every minute
         step_acme_cert_renewal_reload_services: [nginx]
+        step_cli_steppath: /etc/step-cli-molecule
 
     - name: Install Nginx site [Debian]
       copy:
