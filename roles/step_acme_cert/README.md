@@ -44,7 +44,7 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 ##### `step_acme_cert_san`
 - Subject Alternate Names to add to the cert
 - Must be a list of valid SANs
-- Default: `[ {{ ansible_default_ipv4.address }} ]`
+- Default: `[]`
 
 ##### `step_acme_cert_duration`
 - Valid duration of the certificate
