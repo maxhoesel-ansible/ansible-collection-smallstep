@@ -1,0 +1,8 @@
+argument_specs:
+  main:
+    short_description: Main entrypoint
+    options:
+      step_cli_version:
+        type: str
+        default: latest
+        description: Version of step-cli to install

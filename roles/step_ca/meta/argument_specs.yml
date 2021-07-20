@@ -1,0 +1,69 @@
+argument_specs:
+  main:
+    short_description: Main entrypoint
+    options:
+      # Install options
+      step_ca_version:
+        type: str
+        default: latest
+        description: Version of step-ca to install
+      step_cli_version:
+        type: str
+        default: latest
+        description: Version of step-cli to install
+      step_ca_user:
+        type: str
+        default: step-ca
+        description: User under which the step-ca server will run
+      step_ca_path:
+        type: path
+        default: /etc/step-ca
+        description: Directory under which to place step-ca configuration files
+      # CA Init options
+      step_ca_name:
+        type: str
+        required: yes
+        description: The name of the new PKI
+      step_ca_root_password:
+        type: str
+        required: yes
+        description: Password used to encrypt the root key
+      step_ca_intermediate_password:
+        type: str
+        description: Password used to encrypt the intermediate key. If unset, uses the root password for both
+      step_ca_dns:
+        type: str
+        default: "{{ ansible_fqdn}},{{ ansible_default_ipv4.address }}"
+        description: The comma separated DNS names or IP addresses of the new CA
+      step_ca_address:
+        type: str
+        default: :443
+        description: The address that the new CA will listen at
+      step_ca_url:
+        type: str
+        description: URI of the Step Certificate Authority to write in defaults.json
+      step_ca_ssh:
+        type: bool
+        default: no
+        description: Create keys to sign SSH certificates
+      # Existing cert options
+      step_ca_existing_root_file:
+        type: path
+        description: The path of an existing PEM file to be used as the root certificate authority
+      step_ca_existing_key_file:
+        type: path
+        description: The path of an existing key file of the root certificate authority
+      # RA options
+      step_ca_ra:
+        type: str
+        description: The registration authority name to use
+      step_ca_ra_issuer:
+        type: str
+        description: The registration authority issuer name to use
+      step_ca_ra_credentials_file:
+        type: path
+        description: he registration authority credentials file to use
+      step_cli_executable:
+        type: path
+        description: Path or name of the step-cli executable to use for executing commands in this role
+        default: step-cli

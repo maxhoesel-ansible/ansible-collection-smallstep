@@ -7,6 +7,7 @@
       - step_ca_root_password is defined
       - step_ca_root_password | length > 0
     fail_msg: step_ca_name and step_ca_root_password must both be set
+  when: ansible_version.string is version('2.11.1', '<')
 
 - name: Verify existing root cert/key
   assert:

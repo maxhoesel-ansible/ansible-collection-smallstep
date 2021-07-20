@@ -1,0 +1,28 @@
+argument_specs:
+  main:
+    short_description: Main entrypoint
+    options:
+      step_cli_executable:
+        type: path
+        description: Path or name of the step-cli executable to use for executing commands in this role
+        default: step-cli
+      step_cli_version:
+        type: str
+        default: latest
+        description: Version of step-cli to install
+      step_bootstrap_ca_url:
+        type: str
+        required: yes
+        description: URL of the step-ca CA
+      step_bootstrap_fingerprint:
+        type: str
+        required: yes
+        description: Fingerprint of the CA root cert
+      step_bootstrap_install_cert:
+        type: bool
+        default: yes
+        description: Whether to install the CA cert into the system root trust store(s)
+      step_bootstrap_force:
+        type: bool
+        default: no
+        description: Whether to force bootstrapping of the CA configuration.
