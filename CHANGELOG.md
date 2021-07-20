@@ -1,4 +1,26 @@
 
+<a name="v0.4.7"></a>
+## [v0.4.7] - 2021-07-20
+### Bug Fixes
+- **step_bootstrap_host:** support STEPPATH ENV VAR ([#89](https://github.com/maxhoesel/ansible-collection-smallstep/issues/89)) ([371041a](https://github.com/maxhoesel/ansible-collection-smallstep/commit/371041a))
+- **step_bootstrap_host:** properly support non-default STEPPATH  ([#87](https://github.com/maxhoesel/ansible-collection-smallstep/issues/87)) ([3252c66](https://github.com/maxhoesel/ansible-collection-smallstep/commit/3252c66))
+- **step_ca:** make unset defaults actually undefined instead of "" ([02176ca](https://github.com/maxhoesel/ansible-collection-smallstep/commit/02176ca))
+- **step_ca:** eliminate spurious Ansible "password" warnings ([#86](https://github.com/maxhoesel/ansible-collection-smallstep/issues/86)) ([c66a9f4](https://github.com/maxhoesel/ansible-collection-smallstep/commit/c66a9f4))
+- **utils:** capture step_cli attempt to open tty ([#77](https://github.com/maxhoesel/ansible-collection-smallstep/issues/77)) ([cc9f5a1](https://github.com/maxhoesel/ansible-collection-smallstep/commit/cc9f5a1))
+
+### Documentation
+- fix link in readme ([2788028](https://github.com/maxhoesel/ansible-collection-smallstep/commit/2788028))
+- rework docs and add STEPPATH info ([368e592](https://github.com/maxhoesel/ansible-collection-smallstep/commit/368e592))
+- update main README and module doc strings ([#80](https://github.com/maxhoesel/ansible-collection-smallstep/issues/80)) ([3203563](https://github.com/maxhoesel/ansible-collection-smallstep/commit/3203563))
+- **step_acme_cert:** fix outdated readme ([8c9143e](https://github.com/maxhoesel/ansible-collection-smallstep/commit/8c9143e))
+
+### Features
+- add STEPPATH support to bootstrap_host and acme_cert ([4e4e0a3](https://github.com/maxhoesel/ansible-collection-smallstep/commit/4e4e0a3))
+- **step_acme_cert:** better default value support for cert gen ([#81](https://github.com/maxhoesel/ansible-collection-smallstep/issues/81)) ([#82](https://github.com/maxhoesel/ansible-collection-smallstep/issues/82)) ([b448272](https://github.com/maxhoesel/ansible-collection-smallstep/commit/b448272))
+- **step_boostrap_host:** pass `force` to underlying module ([#73](https://github.com/maxhoesel/ansible-collection-smallstep/issues/73)) ([#79](https://github.com/maxhoesel/ansible-collection-smallstep/issues/79)) ([86b8470](https://github.com/maxhoesel/ansible-collection-smallstep/commit/86b8470))
+- **step_ca_bootstrap:** fail bootstrap if fingerprint mismatch ([#78](https://github.com/maxhoesel/ansible-collection-smallstep/issues/78)) ([8534061](https://github.com/maxhoesel/ansible-collection-smallstep/commit/8534061))
+
+
 <a name="v0.4.6"></a>
 ## [v0.4.6] - 2021-06-22
 
@@ -164,6 +186,7 @@
 <a name="v0.1.0"></a>
 ## v0.1.0 - 2020-11-13
 
+[v0.4.7]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.6...v0.4.7
 [v0.4.6]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.5...v0.4.6
 [v0.4.5]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.4...v0.4.5
 [v0.4.4]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.3...v0.4.4
