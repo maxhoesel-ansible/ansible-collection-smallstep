@@ -5,6 +5,7 @@
       - step_bootstrap_ca_url | length > 0
       - step_bootstrap_fingerprint is defined
       - step_bootstrap_fingerprint | length > 0
+  when: ansible_version.string is version('2.11.1', '<')
 
 - name: Look for step_cli_executable
   command: "{{ step_cli_executable }} version"

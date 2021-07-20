@@ -1,0 +1,86 @@
+argument_specs:
+  main:
+    short_description: Main entrypoint
+    options:
+      step_cli_executable:
+        type: path
+        description: Path or name of the step-cli executable to use for executing commands in this role
+        default: step-cli
+      step_acme_cert_ca_provisioner:
+        type: str
+        required: yes
+        description: Name of the provisioner on the CA that will issue the ACME cert
+      step_acme_cert_webroot_path:
+        type: str
+        default: ""
+        description: Path to the webroot for ACME, or empty for standalone mode
+      # Certificate Options
+      step_acme_cert_name:
+        type: str
+        default: '{{ ansible_fqdn }}'
+        description: The subject name that the certificate will be issued for
+      step_acme_cert_san:
+        type: list
+        elements: str
+        default: []
+        description: Subject Alternate Names to add to the cert
+      step_acme_cert_duration:
+        type: str
+        description: Valid duration of the certificate
+      step_acme_cert_contact:
+        type: str
+        default: root@localhost
+        description: Contact email for the CA for important notifications
+      step_acme_cert_certfile:
+        type: dict
+        description: Details about the cert file on disk
+        options:
+          path:
+            type: path
+            default: /etc/ssl/step.crt
+            description: Absolute path to the cert file
+          mode:
+            type: str
+            default: '644'
+            description: File mode for the cert file
+          owner:
+            type: str
+            default: root
+            description: Owner of the file
+          group:
+            type: str
+            default: root
+            description: Group of the file
+      step_acme_cert_keyfile:
+        type: dict
+        description: Details about the key file on disk
+        options:
+          path:
+            type: path
+            default: /etc/ssl/step.key
+            description: Absolute path to the key file
+          mode:
+            type: str
+            default: '600'
+            description: File mode for the key file
+          owner:
+            type: str
+            default: root
+            description: Owner of the file
+          group:
+            type: str
+            default: root
+            description: Group of the file
+      # Renewal Options
+      step_acme_cert_renewal_service:
+        type: str
+        default: step-renew
+        description: Name of the systemd service that will handle cert renewals
+      step_acme_cert_renewal_when:
+        type: str
+        description: Renew the cert when its remaining valid time crosses this threshold
+      step_acme_cert_renewal_reload_services:
+        type: list
+        elements: str
+        default: []
+        description: Reload or restart these systemd services after a cert renewal
