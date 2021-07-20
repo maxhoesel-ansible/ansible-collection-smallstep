@@ -17,15 +17,15 @@
         - "--password-file='{{ step_ca_root_password_file }}'"
         - "--provisioner-password-file='{{ step_ca_root_password_file }}'"
         # Optional parameters simply pass an empty string as an argument if they're not defined
-        - "{% if step_ca_url %}--with-ca-url='{{ step_ca_url }}'{% else %}''{% endif %}"
+        - "{% if step_ca_url is defined %}--with-ca-url='{{ step_ca_url }}'{% else %}''{% endif %}"
         - "{% if step_ca_ssh %}--ssh{% else %}''{% endif %}"
         # Existing keychain
-        - "{% if step_ca_existing_root_file %}--root='{{ step_ca_existing_root_file }}'{% else %}''{% endif %}"
-        - "{% if step_ca_existing_key_file %}--key='{{ step_ca_existing_key_file }}'{% else %}''{% endif %}"
+        - "{% if step_ca_existing_root_file is defined %}--root='{{ step_ca_existing_root_file }}'{% else %}''{% endif %}"
+        - "{% if step_ca_existing_key_file is defined %}--key='{{ step_ca_existing_key_file }}'{% else %}''{% endif %}"
         # RA variables
-        - "{% if step_ca_ra %}--ra='{{ step_ca_ra }}'{% else %}''{% endif %}"
-        - "{% if step_ca_ra_issuer %}--issuer='{{ step_ca_ra_issuer }}'{% else %}''{% endif %}"
-        - "{% if step_ca_ra_credentials_file %}--credentials-file='{{ step_ca_ra_credentials_file }}'{% else %}''{% endif %}"
+        - "{% if step_ca_ra is defined %}--ra='{{ step_ca_ra }}'{% else %}''{% endif %}"
+        - "{% if step_ca_ra_issuer is defined %}--issuer='{{ step_ca_ra_issuer }}'{% else %}''{% endif %}"
+        - "{% if step_ca_ra_credentials_file is defined %}--credentials-file='{{ step_ca_ra_credentials_file }}'{% else %}''{% endif %}"
 
     - name: Create root and intermediate password files
       copy:
