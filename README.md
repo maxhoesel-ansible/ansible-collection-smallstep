@@ -43,7 +43,7 @@ None so far
 ---
 **NOTE**
 
-To learn more about the differences between Online/Offline/Local-Only Modules, see [this section](module-usage)
+To learn more about the differences between Online/Offline/Local-Only Modules, see [this section](#module-usage)
 
 ---
 
