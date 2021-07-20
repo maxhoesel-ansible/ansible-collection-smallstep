@@ -95,7 +95,7 @@ See the [step docs](https://smallstep.com/docs/step-cli/reference/ca/init) for m
 
 ##### `step_ca_url`
 - URI of the Step Certificate Authority to write in defaults.json
-- Default: `""`
+- Default: Not set
 
 ##### `step_ca_ssh`
 - Create keys to sign SSH certificates
@@ -110,13 +110,13 @@ These variables need to be set as a group.
 ##### `step_ca_existing_root_file`
 - The path of an existing PEM file to be used as the root certificate authority
 - The file must already exist on the remote host
-- Default: `""`
+- Default: Not set
 
 ##### `step_ca_existing_key_file`
 - The path of an existing key file of the root certificate authority
 - The key file must not be password-protected
 - The file must already exist on the remote host
-- Default: `""`
+- Default: Not set
 
 
 #### RA Variables
@@ -126,15 +126,15 @@ These variables need to be set as a group
 
 ##### `step_ca_ra`
 - The registration authority name to use. Currently only "CloudCAS" is supported
-- Default: `""`
+- Default: Not set
 
 ##### `step_ca_ra_issuer`
 - The registration authority issuer name to use
-- Default: `""`
+- Default: Not set
 
 ##### `step_ca_ra_credentials_file`
 - The registration authority credentials file to use
-- Default: `""`
+- Default: Not set
 
 
 ### step-cli

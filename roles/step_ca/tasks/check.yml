@@ -15,8 +15,8 @@
       - step_ca_existing_key_file | length > 0
     fail_msg: Existing root cert/key variables must be passed as a group
   when: >
-    step_ca_existing_root_file | length > 0 or
-    step_ca_existing_key_file | length > 0
+    step_ca_existing_root_file is defined or
+    step_ca_existing_key_file is defined
 
 - name: Verify RA variables
   assert:
@@ -26,9 +26,9 @@
       - step_ca_ra_credentials_file | length > 0
     fail_msg: RA variables must be passed as a group
   when: >
-    step_ca_ra | length > 0 or
-    step_ca_ra_issuer | length > 0 or
-    step_ca_ra_credentials_file | length > 0
+    step_ca_ra is defined or
+    step_ca_ra_issuer is defined or
+    step_ca_ra_credentials_file is defined
 
 - name: set step_ca_intermediate_password
   set_fact:
