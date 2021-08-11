@@ -2,8 +2,8 @@
   maxhoesel.smallstep.step_ca_certificate:
     provisioner: "{{ step_acme_cert_ca_provisioner }}"
     contact: "{{ step_acme_cert_contact }}"
-    crt_file: "{{ step_acme_cert_certfile.path }}"
-    key_file: "{{ step_acme_cert_keyfile.path }}"
+    crt_file: "{{ step_acme_cert_certfile_full.path }}"
+    key_file: "{{ step_acme_cert_keyfile_full.path }}"
     force: yes
     name: "{{ step_acme_cert_name }}"
     not_after: "{{ step_acme_cert_duration|default(omit) }}"
@@ -22,5 +22,5 @@
     owner: "{{ item.owner }}"
     group: "{{ item.group }}"
   loop:
-    - "{{ step_acme_cert_keyfile_defaults | combine(step_acme_cert_keyfile) }}"
-    - "{{ step_acme_cert_certfile_defaults | combine(step_acme_cert_certfile) }}"
+    - "{{ step_acme_cert_keyfile_full }}"
+    - "{{ step_acme_cert_certfile_full }}"
