@@ -19,6 +19,7 @@ platforms:
     privileged: true
     override_command: false
     pre_build_image: true
+
   - name: step-cli-ubuntu-18
     image: "geerlingguy/docker-ubuntu1804-ansible"
     groups:
@@ -28,6 +29,17 @@ platforms:
     privileged: true
     override_command: false
     pre_build_image: true
+
+  - name: step-cli-debian-11
+    image: "geerlingguy/docker-debian11-ansible"
+    groups:
+      - debian
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+
   - name: step-cli-debian-10
     image: "geerlingguy/docker-debian10-ansible"
     groups:
@@ -37,6 +49,7 @@ platforms:
     privileged: true
     override_command: false
     pre_build_image: true
+
   - name: step-cli-centos-8
     image: "geerlingguy/docker-centos8-ansible"
     groups:

@@ -32,6 +32,17 @@ platforms:
     override_command: false
     pre_build_image: true
 
+  - name: step-ca-debian-11
+    groups:
+      - debian
+      - ca
+    image: "geerlingguy/docker-debian11-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+
   - name: step-ca-debian-10
     groups:
       - debian
