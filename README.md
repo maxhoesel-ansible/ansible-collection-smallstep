@@ -132,7 +132,7 @@ See the `step_ca` documentation for more details on how private keys are handled
     # The CA root cert fingerprint is used by clients to verify the authenticity of your CA.
     # You can save the output of this task and then pass it on to any client that you want to trust the CA.
     - name: Get root CA fingerprint
-      command: `step-cli certificate fingerprint /etc/step-ca/certs/root_ca.crt`
+      command: 'step-cli certificate fingerprint /etc/step-ca/certs/root_ca.crt'
       register: root_ca_fp
     - name: Show root CA fingerprint
       debug:
