@@ -21,4 +21,3 @@
   check_mode: no
 
 - include: "install.yml"
-- include: "capabilities.yml"
