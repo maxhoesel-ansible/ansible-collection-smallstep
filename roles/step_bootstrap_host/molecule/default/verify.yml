@@ -12,8 +12,5 @@
     - name: Attempt to access CA URL
       uri:
         url: https://step-ca.localdomain
-      ignore_errors: yes
+      failed_when: ca_query.status != 404
       register: ca_query
-    - name: Verify that SSL handshake was successful
-      assert:
-        that: not ca_query.failed or ca_query.status == 404
