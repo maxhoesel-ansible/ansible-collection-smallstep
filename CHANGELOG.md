@@ -1,4 +1,17 @@
 
+<a name="v0.4.8"></a>
+## [v0.4.8] - 2021-08-18
+### Bug Fixes
+- eliminate "expected errors" when looking for step-cli/certs ([#103](https://github.com/maxhoesel/ansible-collection-smallstep/issues/103)) ([d488e6e](https://github.com/maxhoesel/ansible-collection-smallstep/commit/d488e6e))
+- **step_acme_cert:** don't fail when the user doesn't proide a path ([#104](https://github.com/maxhoesel/ansible-collection-smallstep/issues/104)) ([4fc153e](https://github.com/maxhoesel/ansible-collection-smallstep/commit/4fc153e))
+
+### Documentation
+- fix incorrect backticks in README.md ([#101](https://github.com/maxhoesel/ansible-collection-smallstep/issues/101)) ([3820904](https://github.com/maxhoesel/ansible-collection-smallstep/commit/3820904))
+
+### Features
+- add support for debian 11 ([250dca0](https://github.com/maxhoesel/ansible-collection-smallstep/commit/250dca0))
+
+
 <a name="v0.4.7"></a>
 ## [v0.4.7] - 2021-07-20
 ### Bug Fixes
@@ -186,6 +199,7 @@
 <a name="v0.1.0"></a>
 ## v0.1.0 - 2020-11-13
 
+[v0.4.8]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.7...v0.4.8
 [v0.4.7]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.6...v0.4.7
 [v0.4.6]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.5...v0.4.6
 [v0.4.5]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.4...v0.4.5
