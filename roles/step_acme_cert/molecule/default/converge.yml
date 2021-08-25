@@ -28,12 +28,13 @@
         step_acme_cert_webroot_path: "{{ webroots[ansible_os_family] }}"
         step_acme_cert_duration: 1h
         step_acme_cert_certfile:
-          path: /etc/ssl/step.crt
+          # Lazy evaluation testing
+          #path: /etc/ssl/step.crt
           mode: "644"
           owner: root
           group: "{{ webgroup[ansible_os_family] }}"
         step_acme_cert_keyfile:
-          path: /etc/ssl/step.key
+          #path: /etc/ssl/step.key
           mode: "640"
           owner: root
           group: "{{ webgroup[ansible_os_family] }}"
