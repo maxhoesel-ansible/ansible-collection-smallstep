@@ -1,5 +1,5 @@
 [general]
-ignore=body-is-missing,title-max-length,title-trailing-punctuation,body-max-line-length
+ignore=body-is-missing,title-max-length,title-trailing-punctuation,body-max-line-length,body-min-length
 
 # Enable community contributed rules
 # See http://jorisroovers.github.io/gitlint/contrib_rules for details
