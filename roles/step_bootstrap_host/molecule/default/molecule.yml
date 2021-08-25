@@ -7,24 +7,15 @@ driver:
     - name: smallstep_bootstrap_host
       driver: bridge
 platforms:
-  # Note on containers:
-  # - We use the images provided by geerlingguy, as they provide out-of-the-box
-  #   support for Ansible and systemd (needed to test service management).
-  # - The containers run as privileged containers so that we can
-  #   use systemd functionality. This *should* be possible with unpriliged
-  #   containers as well, but is quite the headache.
-  # - they are connected to a shared network to allow simulating a remote CA
   - name: step-ca
     hostname: step-ca.localdomain
     groups:
       - ca
       - ubuntu
     image: "geerlingguy/docker-ubuntu2004-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true
-    override_command: false
     pre_build_image: true
+    override_command: false
     networks:
       - name: smallstep_bootstrap_host
 
@@ -34,11 +25,9 @@ platforms:
       - clients
       - ubuntu
     image: "geerlingguy/docker-ubuntu2004-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true
-    override_command: false
     pre_build_image: true
+    override_command: false
     networks:
       - name: smallstep_bootstrap_host
 
@@ -48,11 +37,9 @@ platforms:
       - clients
       - ubuntu
     image: "geerlingguy/docker-ubuntu1804-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true
-    override_command: false
     pre_build_image: true
+    override_command: false
     networks:
       - name: smallstep_bootstrap_host
 
@@ -62,11 +49,9 @@ platforms:
       - clients
       - debian
     image: "geerlingguy/docker-debian10-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true
-    override_command: false
     pre_build_image: true
+    override_command: false
     networks:
       - name: smallstep_bootstrap_host
 
@@ -76,11 +61,9 @@ platforms:
       - clients
       - centos
     image: "geerlingguy/docker-centos8-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true
-    override_command: false
     pre_build_image: true
+    override_command: false
     networks:
       - name: smallstep_bootstrap_host
 
