@@ -29,6 +29,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install --upgrade ansible
 
+      - name: Get last release version
+        run: echo "RELEASE_VERSION=$(git describe --tags --abbrev=0)" >> $GITHUB_ENV
+      - name: Ensure that new version number is larger than the previous release
+        run: python3 -c 'from packaging import version; import sys; sys.exit("New version number is not higher than previous") if version.parse("${{ env.RELEASE_VERSION }}") >= version.parse("${{ github.event.inputs.version }}") else sys.exit()'
+
       - name: Configure git
         run: |
           git config --global user.name "GitHub Actions"
