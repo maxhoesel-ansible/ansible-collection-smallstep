@@ -20,15 +20,29 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: "3.6"
-      - name: Set up pip
-        run: pip3 install --upgrade pip
 
-      - name: Install tox
-        run: sudo apt update && sudo apt install -y tox
+      - name: Set up pip and install requirements
+        run: |
+          pip3 install --upgrade pip
+          pip3 install 'gitlint>=0.15.0,<0.16.0' 'ansible>=4,<5' 'ansible-lint>=5,<6'
+          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s
 
-      - name: Lint collection
-        run: tox -e lint
+      - name: Build and install collection
+        run: |
+          ansible-galaxy collection build
+          ansible-galaxy collection install maxhoesel-smallstep-*.tar.gz
 
+      - name: ansible-lint
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ansible-lint -p | ./bin/reviewdog -efm="%f:%l: %m" -name="ansible-lint" -level=error -filter-mode="nofilter" -fail-on-error -reporter=github-check
+
+      - name: gitlint
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gitlint --commits=2a4983a71af8687effdf076cc9b54ef9ede2fffd..HEAD 2>&1 | ./bin/reviewdog -efm="%m" -reporter=github-pr-check -filter-mode=nofilter -fail-on-error -name="gitlint"
 
   modules:
     name: "Modules"
