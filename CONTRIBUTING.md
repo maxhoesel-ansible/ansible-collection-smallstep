@@ -1,27 +1,10 @@
 # Contribution Guide
 
-So you want to contribute something to this collection? Awesome! This guide should give you all the information needed to get started.
+Below you will find the information needed to contribute to this project.
 
 Note that by contributing to this collection, you agree with the code of conduct you can find [here.](https://github.com/maxhoesel/ansible-collection-smallstep/blob/main/CODE_OF_CONDUCT.md)
 
-## Contribution Workflow
-
-To successfully submit your changes to this collection, please make sure to follow the steps below:
-
-1. Open an issue and discuss your proposal
-2. Fork and setup your local environment
-3. Make your changes
-4. Update tests and documentation.
-5. Test your changes locally.
-6. Push and open a PR
-7. Respond to any feedback/CI failures
-
-### Suggesting your changes
-
-Start off any major contribution by opening an issue. Not only is it a good idea to bounce off your ideas against other people first,
-it also leaves a trail in the repo for other people to follow in the future.
-
-### Fork and setup your local environment
+## Requirements
 
 To begin development on this collection, you need to have the following dependencies installed:
 
@@ -29,27 +12,39 @@ To begin development on this collection, you need to have the following dependen
 - Python 3.6 or higher. CI tets run specifically against 3.6, but to make things easier we just use whatever version is available locally
 - [Tox](https://tox.readthedocs.io/en/latest/)
 
-Fork the repo and clone it to your local machine, then run `tox -l`.
-You should see a list of environments as created by tox, including an env for every molecule scenario.
+## Quick Start
 
-### Make your changes
+1. Fork the repository and clone it to your local machine
+2. Run `./scripts/setup.sh` to configure a local dev environment (virtualenv) with a commit hook
+3. Make your changes and commit them to a new branch
+4. Run the tests locally with `./scripts/test.sh`. This will run the full test suite that also runs in the CI
+5. Once you're done, push your changes and open a PR
 
-Please make sure to put each change in an independent, clear and readable commit.
-Follow best practices when it comes to creating and naming commits.
-All commits **must** follow the [conventional-commits standard](https://www.conventionalcommits.org/en/v1.0.0/):
 
-`<type>(optional scope): <description>`
 
-- Valid scopes are all components of this collection, such as modules or roles
-- The description must be lower-case
+## About commit messages and structure
 
-Example: `fix(step_ca): clean up files on EL8`
+Follow the guidelines below when committing your changes
 
-The `lint` environment automatically checks previous commit messages for any errors, so as long as you haven't pushed anything yet,
-there is no harm in renaming your commit. Note that the CI will also fail if an invalid commit name is present.
+- All commits **must** follow the [conventional-commits standard](https://www.conventionalcommits.org/en/v1.0.0/):
+  `<type>(optional scope): <description>`
+  - Valid scopes are all components of this collection, such as modules or roles
+- Structure your changes so that they are separated into logical and independent commits whenever possible.
+- The commit message should clearly state **what** your change does. The "why" and "how" belong into the commit body.
 
-#### Hints for module development
+Some good examples:
+- `fix(step_ca): don't install unneeded packages`
+- `feat(step_ca_certificate): add support for RA flags`
 
+Don't be afraid to rename/amend/rewrite your branch history to achieve these goals!
+Take a look at the `git rebase -i` and `git commit --amend` commands if you are not sure how to do so.
+As long as your make these changes on your feature branch, there is no harm in doing so.
+
+
+
+## Hints for Development
+
+For Modules:
 - Make sure that you have read the [Ansible module conventions](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_best_practices.html)
 - Each module should typically wrap around one step-cli command or a set of closely related commands.
   The modules name should reflect this. For example, step_ca_provisioner performs the same functionality as "step ca provisioner add/remove".
@@ -60,16 +55,10 @@ there is no harm in renaming your commit. Note that the CI will also fail if an 
 - If you need to troubleshoot inside the ansible-test container, add `--docker-terminate never` to the
   call inside the hacking script. The container will then persist even on failure, and you can debug it
 
-#### Hints for role development
+## Testing Framework
 
-None so far
-
-### Update Tests and Documentation
-
-We use `molecule` to test all roles and the `ansible-test` suite to rest modules. In addition to local tests,
-CI jobs are also run on Github
-
-To run the full test suite, run `./test.sh`. You can inspect the file to see the individual test steps.
+We use `molecule` to test all roles and the `ansible-test` suite to test modules. Calls to these are handled by `tox` and the [`tox-ansible` extension]( https://github.com/ansible-community/tox-ansible).
+You can run all the required tests for this project with `./scripts/test.sh`. You can also open that file to view the individual test stages.
 
 Note that you **can't** just run `tox`, as the `sanity` and `integration` environments need extra parameters passed to
 `ansible-test`. Without these, they will fail. In addition, the `tox-ansible` plugin (which automatically generate scenario envs)
@@ -84,27 +73,18 @@ and adjust the test tasks for your module.
 Some additional hints:
 
 - All targets are run sequentially on the same host. Make sure to clean up after yourself! You don't need to handle failures gracefully however,
-  as the testing environment is destroyed on the first error anyways.
+  as the testing environment is destroyed on the first error.
 - All targets call the `setup_smallstep` target via the dependency declared in `meta/main.yml`. This target performs basic setup
-  of both step-cli and step-ca using, so you don't need to install them in your target
+  of both step-cli and step-ca, so you don't need to install them in your target
 - See `targets/setup_smallstep/defaults/main.yml` for some variables you can use in your tests
 - You can run modules from this collection with `environment: {"STEPPATH": "{{ STEP_CA_PATH }}"}` if you don't want to specify ca_config/ca_url for every module call
 
-#### Updating test versions
+### Updating test versions
 
 To update the smallstep cli/ca versions that are used to run the tests, the following files need to be modified:
 
 - `tests/integration/targets/setup_smallstep/vars/versions.yml`: Versions for module integration test
 - `tests/molecule/group_vars/all/versions.yml`: Versions for molecule tests
-
-### Submitting your Changes
-
-The "Before-opening-a-PR-Checklist":
-
-- Your commit history is clean
-- The documentation is up-to-date
-- Your local branch is up-to-date with the remote repo main (if not, rebasing may be required)
-- All local tests succeed
 
 ## Release Workflow
 
