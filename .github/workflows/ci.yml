@@ -2,9 +2,12 @@
 name: CI
 on:
   push:
+    branches:
+      - main
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   lint:
@@ -64,7 +67,7 @@ jobs:
         # Temporary fix for: https://github.com/maxhoesel/ansible-collection-smallstep/issues/100
       - name: Install tox-ansible manually
         run: pip3 install git+https://github.com/ansible-community/tox-ansible@8d0e3cfe31899b9d735f1b879deb1abdfb3673e9#egg=tox-ansible
-        
+
       - name: Run sanity tests
         run: tox -e sanity -- --docker --color -v --python 3.6
       - name: Run integration tests
