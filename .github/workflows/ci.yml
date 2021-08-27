@@ -52,7 +52,7 @@ jobs:
         run: tox -e integration -- --docker --color -v --python 3.6
 
 
-  discover-roles:
+  discover-scenarios:
     runs-on: ubuntu-latest
     outputs:
       roles: ${{ steps.set-roles.outputs.roles }}
@@ -63,21 +63,25 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: "3.6"
+      - name: Install tox and initialize workdir
+        run: |
+          sudo apt update && sudo apt install -y tox
+          tox -l
       - name: Discover roles
         id: set-roles
+        # Convert the tox scenario listing into a JSON/YAML list, filtering out any non-molecule/lint scenarios
         run: |
-          export roles=$(python3 -c "import os; import json; print(json.dumps(os.listdir('roles')));")
+          export roles="[`for l in $(tox -l); do echo "'$l'"; done | grep ansible | grep -v "lint" | tr '\n' ',' | sed '$s/,$//'`]"
           echo "::set-output name=roles::$roles"
 
   roles:
     name: "${{ matrix.role }}"
     runs-on: ubuntu-latest
-    needs: discover-roles
+    needs: discover-scenarios
     strategy:
       fail-fast: false
-      max-parallel: 50
       matrix:
-        role: ${{ fromJson(needs.discover-roles.outputs.roles) }}
+        role: ${{ fromJson(needs.discover-scenarios.outputs.roles) }}
     steps:
       - name: Check out codebase
         uses: actions/checkout@v2
@@ -102,4 +106,4 @@ jobs:
       - name: Initialize tox
         run: tox -l
       - name: Run role tests
-        run: tox -e "$(tox -l | grep ansible | grep ${{ matrix.role }} | tr '\n' ',')"
+        run: tox -e ${{ matrix.role }}
