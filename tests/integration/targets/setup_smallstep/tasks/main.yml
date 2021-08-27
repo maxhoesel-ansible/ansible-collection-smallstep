@@ -4,6 +4,16 @@
   register: install_finished
 
 - block:
+    # Ensure that we have ansible network facts like ansible_default_ipv4 available
+    - name: Make sure iproute2 is installed
+      package:
+        name: iproute2
+        state: present
+      register: iproute2_installed
+    - name: Re-Gather facts
+      setup:
+      when: iproute2_installed.changed
+
     - name: Load smallstep test version numbers
       include_vars: vars/versions.yml
 
