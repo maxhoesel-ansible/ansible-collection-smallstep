@@ -1,4 +1,14 @@
 
+<a name="v0.4.9"></a>
+## [v0.4.9] - 2021-08-27
+### Bug Fixes
+- **step_ca_provisioner:** catch non-existent authority ([#118](https://github.com/maxhoesel/ansible-collection-smallstep/issues/118)) ([3f0d41c](https://github.com/maxhoesel/ansible-collection-smallstep/commit/3f0d41c)) [Max Hösel]
+
+### Documentation
+- update contribution docs ([21e19d0](https://github.com/maxhoesel/ansible-collection-smallstep/commit/21e19d0)) [Max Hösel]
+- add author names to changelog ([#112](https://github.com/maxhoesel/ansible-collection-smallstep/issues/112)) ([fe33240](https://github.com/maxhoesel/ansible-collection-smallstep/commit/fe33240)) [Max Hösel]
+
+
 <a name="v0.4.8"></a>
 ## [v0.4.8] - 2021-08-25
 ### Bug Fixes
@@ -199,6 +209,7 @@
 <a name="v0.1.0"></a>
 ## v0.1.0 - 2020-11-13
 
+[v0.4.9]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.8...v0.4.9
 [v0.4.8]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.7...v0.4.8
 [v0.4.7]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.6...v0.4.7
 [v0.4.6]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.5...v0.4.6
