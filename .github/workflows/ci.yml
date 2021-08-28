@@ -77,7 +77,7 @@ jobs:
   discover-scenarios:
     runs-on: ubuntu-latest
     outputs:
-      roles: ${{ steps.set-roles.outputs.roles }}
+      scenarios: ${{ steps.set-scenarios.outputs.scenarios }}
     steps:
       - name: Check out codebase
         uses: actions/checkout@v2
@@ -89,12 +89,12 @@ jobs:
         run: |
           sudo apt update && sudo apt install -y tox
           tox -l
-      - name: Discover roles
-        id: set-roles
+      - name: Discover scenarios
+        id: set-scenarios
         # Convert the tox scenario listing into a JSON/YAML list, filtering out any non-molecule/lint scenarios
         run: |
-          export roles="[`for l in $(tox -l); do echo "'$l'"; done | grep ansible | grep -v "lint" | tr '\n' ',' | sed '$s/,$//'`]"
-          echo "::set-output name=roles::$roles"
+          export scenarios="[`for l in $(tox -l); do echo "'$l'"; done | grep ansible | grep -v "lint" | tr '\n' ',' | sed '$s/,$//'`]"
+          echo "::set-output name=scenarios::$scenarios"
 
   roles:
     name: "${{ matrix.role }}"
@@ -103,7 +103,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        role: ${{ fromJson(needs.discover-scenarios.outputs.roles) }}
+        role: ${{ fromJson(needs.discover-scenarios.outputs.scenarios) }}
     steps:
       - name: Check out codebase
         uses: actions/checkout@v2
