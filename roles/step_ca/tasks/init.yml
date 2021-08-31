@@ -4,6 +4,16 @@
     path: "{{ step_ca_path }}/config/ca.json"
   register: step_ca_config
 
+# Always create the intermediate password file as it is needed for CA operation
+- name: Intermediate password file is present
+  copy:
+    content: "{{ step_ca_intermediate_password }}"
+    dest: "{{ step_ca_intermediate_password_file }}"
+    owner: "{{ step_ca_user }}"
+    mode: 0600
+    group: "{{ step_ca_user }}"
+  no_log: yes
+
 - block:
     - name: Generate arguments for `step ca init`
       set_fact:
@@ -27,18 +37,13 @@
         - "{% if step_ca_ra_issuer is defined %}--issuer='{{ step_ca_ra_issuer }}'{% else %}''{% endif %}"
         - "{% if step_ca_ra_credentials_file is defined %}--credentials-file='{{ step_ca_ra_credentials_file }}'{% else %}''{% endif %}"
 
-    - name: Create root and intermediate password files
+    - name: Create root and password file
       copy:
-        content: "{{ item.password }}"
-        dest: "{{ item.file }}"
+        content: "{{ step_ca_root_password }}"
+        dest: "{{ step_ca_root_password_file }}"
         owner: "{{ step_ca_user }}"
         mode: 0600
         group: "{{ step_ca_user }}"
-      loop:
-        - password: "{{ step_ca_root_password }}"
-          file: "{{ step_ca_root_password_file }}"
-        - password: "{{ step_ca_intermediate_password }}"
-          file: "{{ step_ca_intermediate_password_file }}"
       no_log: yes
     - name: Initialize CA
       command: "{{ step_cli_executable }} ca init {{ step_ca_init_args | join(' ') }}"
