@@ -85,7 +85,10 @@
       when: step_ca_ssh
 
     - name: Remove initial provisioner
-      command: "{{ step_cli_executable }} ca provisioner remove {{ step_ca_tmp_provisioner }} --type JWK"
+      maxhoesel.smallstep.step_ca_provisioner:
+        name: "{{ step_ca_tmp_provisioner }}"
+        type: JWK
+        state: absent
       environment:
         STEPPATH: "{{ step_ca_path }}"
       become: yes
