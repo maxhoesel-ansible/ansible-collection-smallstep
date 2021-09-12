@@ -1,8 +1,7 @@
 # maxhoesel.smallstep - Ansible Collection for Smallstep CA/CLI
 
 ![Release](https://img.shields.io/github/v/release/maxhoesel/ansible-collection-smallstep)
-![CI Status (Roles)](https://img.shields.io/github/workflow/status/maxhoesel/ansible-collection-smallstep/CI%20Roles/main)
-![CI Status (Modules)](https://img.shields.io/github/workflow/status/maxhoesel/ansible-collection-smallstep/CI%20Modules/main)
+![CI Status](https://img.shields.io/github/workflow/status/maxhoesel/ansible-collection-smallstep/CI/main)
 ![License](https://img.shields.io/github/license/maxhoesel/ansible-collection-smallstep)
 
 ---
