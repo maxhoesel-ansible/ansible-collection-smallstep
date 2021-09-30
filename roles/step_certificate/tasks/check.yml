@@ -1,0 +1,19 @@
+- name: Verify that required parameters are set
+  assert:
+    that:
+      - step_acme_cert_ca_provisioner is defined
+      - step_acme_cert_ca_provisioner | length > 0
+  when: ansible_version.string is version('2.11.1', '<')
+
+- name: Look for step_cli_executable # noqa command-instead-of-shell
+  #"command" is a shell builtin, hence the need for the shell module
+  shell: "command -v {{ step_cli_executable }}"
+  register: step_cli_install
+  # dash (Debian sh shell) uses 127 instead of 1 for not found errors
+  failed_when: step_cli_install.rc not in [0,1,127]
+  changed_when: no
+  check_mode: no
+- name: Verify that `step-cli` is installed
+  assert:
+    that: step_cli_install.rc == 0
+    fail_msg: "Could not find step-cli at path '{{ step_cli_executable }}'. Please install step-cli via maxhoesel.smallstep.step_cli or step_bootstrap_host"

@@ -1,0 +1,27 @@
+---
+# tasks file for step_acme_cert
+- include: check.yml
+
+- name: Update cert/keyfile dicts with defaults
+  set_fact:
+    # Role params take precedence over set_fact, so we need to declare a new private variable
+    step_acme_cert_keyfile_full: "{{ step_acme_cert_keyfile_defaults | combine(step_acme_cert_keyfile) }}"
+    step_acme_cert_certfile_full: "{{ step_acme_cert_certfile_defaults | combine(step_acme_cert_certfile) }}"
+
+- name: Look for existing certificate
+  stat:
+    path: "{{ step_acme_cert_certfile_full.path }}"
+  register: step_acme_cert_current_cert
+
+- name: Check if certificate is valid
+  command: "step-cli certificate verify {{ step_acme_cert_certfile_full.path }}"
+  changed_when: no
+  check_mode: no
+  ignore_errors: true
+  register: _step_acme_cert_validity
+  when: step_acme_cert_current_cert.stat.exists
+
+- include: get_cert.yml
+  when: 'not step_acme_cert_current_cert.stat.exists or "failed to verify certificate" in _step_acme_cert_validity.stderr'
+
+- include: renewal.yml

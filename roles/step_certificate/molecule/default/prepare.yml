@@ -1,0 +1,52 @@
+- hosts: ubuntu:debian
+  tasks:
+    - name: Update apt
+      apt:
+        update_cache: yes
+
+- hosts: ca
+  tasks:
+    - name: Copy existing ca cert/key to nodes
+      copy:
+        src: "{{ item }}"
+        dest: /tmp/
+        owner: root
+        group: root
+        mode: 0755
+      loop:
+        - "existing.crt"
+        - "existing.key"
+
+    - name: Install step-ca
+      include_role:
+        name: step_ca
+
+    - name: Add ACME provisioner
+      maxhoesel.smallstep.step_ca_provisioner:
+        name: ACME
+        type: ACME
+      become: yes
+      become_user: "{{ step_ca_user }}"
+
+    - name: Reload step-ca
+      systemd:
+        name: step-ca
+        state: reloaded
+
+- hosts: clients
+  tasks:
+    - name: Install nginx
+      package:
+        name: nginx
+    - name: Stop nginx
+      systemd:
+        name: nginx
+        state: stopped
+        enabled: no
+    - name: Bootstrap host
+      include_role:
+        name: maxhoesel.smallstep.step_bootstrap_host
+      vars:
+        step_bootstrap_ca_url: https://step-ca.localdomain
+        step_bootstrap_fingerprint: 345bf77397642dc9211a3820af0b1816c4afa430ad249ae705f1456b4bafa046
+        step_cli_steppath: /etc/step-cli-molecule

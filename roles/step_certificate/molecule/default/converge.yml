@@ -1,0 +1,68 @@
+---
+- name: Converge
+  hosts: clients
+  vars:
+    webroots:
+      Debian: /var/www/html
+      RedHat: /usr/share/nginx/html
+    webgroup:
+      Debian: www-data
+      RedHat: nginx
+  tasks:
+    - name: Get standalone cert
+      include_role:
+        name: "step_acme_cert"
+      vars:
+        step_cli_steppath: /etc/step-cli-molecule
+
+    - name: Start nginx
+      systemd:
+        name: nginx
+        state: started
+
+    - name: Get cert via webroot
+      include_role:
+        name: "step_acme_cert"
+      vars:
+        step_service_user: step
+        step_acme_cert_webroot_path: "{{ webroots[ansible_os_family] }}"
+        step_acme_cert_duration: 1h
+        step_acme_cert_certfile:
+          # Lazy evaluation testing
+          #path: /etc/ssl/step.crt
+          mode: "644"
+          owner: root
+          group: "{{ webgroup[ansible_os_family] }}"
+        step_acme_cert_keyfile:
+          #path: /etc/ssl/step.key
+          mode: "640"
+          owner: root
+          group: "{{ webgroup[ansible_os_family] }}"
+        step_acme_cert_renewal_service: step-renew-webroot
+        step_acme_cert_renewal_when: 59m # force renewal to happen every minute
+        step_acme_cert_renewal_reload_services: [nginx]
+        step_cli_steppath: /etc/step-cli-molecule
+
+    - name: Install Nginx site [Debian]
+      copy:
+        src: nginx_site.conf
+        dest: /etc/nginx/sites-enabled/default
+        owner: root
+        group: root
+        mode: "644"
+      notify: restart nginx
+      when: ansible_os_family == "Debian"
+    - name: Install Nginx config [RedHat]
+      copy:
+        src: nginx.conf
+        dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: "644"
+      notify: restart nginx
+      when: ansible_os_family == "RedHat"
+  handlers:
+    - name: restart nginx
+      systemd:
+        name: nginx
+        state: restarted

@@ -1,0 +1,14 @@
+[Unit]
+Description=Step TLS Renewer
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+Environment=STEPPATH={{ step_cli_steppath }}
+ExecStart={{ step_cli_executable_absolute.stdout }} ca renew {{ step_acme_cert_certfile_full.path }} {{ step_acme_cert_keyfile_full.path }} --daemon --force{% if step_acme_cert_renewal_when is defined %} --expires-in {{ step_acme_cert_renewal_when }}{% endif %}{% if step_acme_cert_renewal_reload_services %} --exec "systemctl try-reload-or-restart {{ step_acme_cert_renewal_reload_services | join(' ') }}"{% endif %}
+
+[Install]
+WantedBy=multi-user.target
