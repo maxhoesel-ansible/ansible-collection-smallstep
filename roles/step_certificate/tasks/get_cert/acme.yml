@@ -1,0 +1,18 @@
+---
+- name: Get certificate from CA via ACME provisioner
+  maxhoesel.smallstep.step_ca_certificate:
+    provisioner: "{{ step_cert_ca_provisioner_name }}"
+    name: "{{ step_cert_name }}"
+    san: "{{ step_cert_san }}"
+    contact: "{{ step_cert_contact }}"
+    not_after: "{{ step_cert_duration|default(omit) }}"
+    crt_file: "{{ step_cert_certfile_full.path }}"
+    key_file: "{{ step_cert_keyfile_full.path }}"
+    webroot: "{{ step_cert_acme_webroot_path }}"
+    standalone: "{{ step_cert_acme_webroot_path | bool }}"
+    force: yes
+    step_cli_executable: "{{ step_cli_executable }}"
+  become: yes
+  environment:
+    STEPPATH: "{{ step_cli_steppath }}"
+  register: _step_certificate

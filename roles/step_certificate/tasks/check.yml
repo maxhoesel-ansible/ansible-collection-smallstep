@@ -1,9 +1,23 @@
+---
 - name: Verify that required parameters are set
   assert:
     that:
-      - step_acme_cert_ca_provisioner is defined
-      - step_acme_cert_ca_provisioner | length > 0
+      - step_cert_ca_provisioner_type is defined
+      - step_cert_ca_provisioner_type | length > 0
+      - step_cert_ca_provisioner_name is defined
+      - step_cert_ca_provisioner_name | length > 0
   when: ansible_version.string is version('2.11.1', '<')
+
+- name: Ensure that we know how to handle the requested provisioner type
+  vars:
+    # Add to this list when adding a new provisioner type, with corresponding `get_cert/XXX.yml`.
+    _allowed_provisioner_types:
+      - ACME
+      - JWK
+  assert:
+    that:
+      - step_cert_ca_provisioner_type in _allowed_provisioner_types
+    fail_msg: No known or no support (yet) for type '{{ step_cert_ca_provisioner_type }}' provisioners
 
 - name: Look for step_cli_executable # noqa command-instead-of-shell
   #"command" is a shell builtin, hence the need for the shell module
@@ -13,6 +27,7 @@
   failed_when: step_cli_install.rc not in [0,1,127]
   changed_when: no
   check_mode: no
+
 - name: Verify that `step-cli` is installed
   assert:
     that: step_cli_install.rc == 0

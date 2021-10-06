@@ -1,6 +1,6 @@
-# maxhoesel.smallstep.step_acme_cert
+# maxhoesel.smallstep.step_certificate
 
-Get a certificate from a CA with ACME and setup automatic renewal using `step-cli renew`.
+Get a certificate from a CA, using a specified provisioner, and setup automatic renewal using `step-cli renew`.
 
 This role uses `step-cli` to request and save a certificate from the configured CA,
 before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
@@ -30,36 +30,55 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 
 ### CA
 
-##### `step_acme_cert_ca_provisioner`
-- Name of the provisioner on the CA that will issue the ACME cert
+##### `step_cert_ca_provisioner_type`
+- Type of provisioner on the CA that will issue the certificate
 - Required: Yes
 
-##### `step_acme_cert_webroot_path`
-- If set, this role will use `step-cli`s webroot mode to get a new certificate.
-- If empty, this role will use the standalone mode instead, causing `step-cli` to bind itself to port 80. Make sure that no other services are listening on this port.
+##### `step_cert_ca_provisioner_name`
+- Name of the provisioner on the CA that will issue the certificate
+- Required: Yes
+
+
+### Provisioner
+
+#### ACME
+
+##### `step_cert_acme_webroot_path`
+- If set, the ACME provisioner will use `step-cli`s webroot mode to get a new certificate.
+- If empty, the ACME provisioner will use the standalone mode instead, causing `step-cli` to bind itself to port 80. Make sure that no other services are listening on this port.
   Note that `step-cli` only needs to bind to this port when getting a *new* certificate. It does not need to bind if it is only *renewing* a certificate.
 - Default: ""
 
+#### JWK
+
+##### `step_cert_ca_jwk_password`
+- The password used to decrypt the one-time token generating key from a JWK provisioner on the CA.
+- Required: If using a JWK provisioner, either this or `step_cert_ca_jwk_password_file` is required.
+
+##### `step_cert_ca_jwk_password_file`
+- Path to the file on the client system containing the password used to decrypt the one-time token generating key from a JWK provisioner on the CA.
+- Required: If using a JWK provisioner, either this or `step_cert_ca_jwk_password` is required.
+
 ### Certificate
 
-##### `step_acme_cert_name`
+##### `step_cert_name`
 - The subject name that the certificate will be issued for
 - Default: `{{ ansible_fqdn }}`
 
-##### `step_acme_cert_san`
+##### `step_cert_san`
 - Subject Alternate Names to add to the cert
 - Must be a list of valid SANs
 - Default: `[]`
 
-##### `step_acme_cert_duration`
+##### `step_cert_duration`
 - Valid duration of the certificate
 - Default: undefined (uses the default for the given provisioner, typically 24h)
 
-##### `step_acme_cert_contact`
+##### `step_cert_contact`
 - Contact email for the CA for important notifications
 - Default: `root@localhost`
 
-##### `step_acme_cert_certfile`/`step_acme_cert_keyfile`
+##### `step_cert_certfile`/`step_cert_keyfile`
 - Details about the cert/key files on disk
 - Is a dict with the following elements:
   - `path`: Absolute path to the cert/key file. Defaults to `/etc/ssl/step.crt|step.key`. The directory must already exist.
@@ -68,30 +87,26 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 
 ### Renewal
 
-##### `step_acme_cert_renewal_service`
-- Name of the systemd service that will handle cert renewals
-- If you have multiple cert/key pairs on one system, you will have to set a unique service name for each pair. If you only have one, then you can leave this as is.
+##### `step_cert_renewal_service`
+- Name of the `systemd` service that will handle cert renewals
+- If you have multiple cert/key pairs on one system, you will have to set a unique service name for each pair.
 - Default: `step-renew`
 
-##### `step_acme_cert_renewal_when`
+##### `step_cert_renewal_when`
 - Renew the cert when its remaining valid time crosses this threshold
-- Default: undefined (uses the smallstep default: 1/3 of the certificates valid duration, i.e. 8 hours for a 24h cert)
+- Default: undefined (uses the smallstep default: 1/3 of the certificates valid duration, e.g. 8 hours for a 24h cert)
 
-##### `step_acme_cert_renewal_reload_services`
-- Reload or restart these systemd services after a cert renewal
-- Must be a list of systemd units
+##### `step_cert_renewal_reload_services`
+- Reload or restart these `systemd` services after a cert renewal
+- Must be a list of `systemd` units
 - Example: `["nginx", "mysqld"]`
 - Default: `[]`
 
 ## Example Playbooks
 
----
-**NOTE**
+### ACME
 
-Make sure that you are familiar with the way ACME works. You will need a functioning DNS environment at the very least
-to make use of ACME certs.
-
----
+Make sure that you are familiar with the way ACME certificate generation works.  Minimally, to make use of the ACME provisioners, you will need open network ports (e.g. `:80`) between the client and the server, and a functioning DNS environment.
 
 ```yaml
 # Configure your CA to include an ACME provisioner
@@ -110,7 +125,8 @@ to make use of ACME certs.
         name: step-ca
         state: reloaded
 
-- hosts: clients
+# Create a certificate using an ACME provisioner
+- hosts: step_clients
   tasks:
     # Bootstrap the host to trust the CA
     - role: maxhoesel.smallstep.step_bootstrap_host
@@ -119,13 +135,61 @@ to make use of ACME certs.
         step_bootstrap_fingerprint: your CAs fingerprint
       become: yes
 
-    # This will download a certificate to /etc/step/ that you can then use in other applications.
-    # See the step_acme_cert README for more options
-    - name: Configure an ACME cert + renewal
-      include_role:
-        name: maxhoesel.smallstep.step_acme_cert
-        vars:
-          step_acme_cert_ca_provisioner: ACME
+    # Configure an ACME provisioned cert + renewal in /etc/step
+    - role: maxhoesel.smallstep.step_certificate
+      vars:
+        step_cert_ca_provisioner_type: ACME
+        step_cert_ca_provisioner_name: ACME
+      become: yes
+```
+
+### JWK
+
+When using a JWK provisioner, you will need a shared secret between the CA server and the CA clients.  This file must be placed on the system before you attempt to generate a certificate.
+
+```yaml
+# Configure your CA to include a JWK provisioner
+- hosts: step_ca
+  become: yes
+  tasks:
+    - name: step-ca | deploy CA JWK provisioner password
+      copy:
+        dest: "{{ step_ca_jwk_provisioner_password_file }}"
+        content: "SUPER SECRET JWK Provisioner Password"
+        owner: step-ca
+        group: step-ca
+        mode: 0600
+
+    - name: step-ca | configure JWK provisioner on the CA
+      maxhoesel.smallstep.step_ca_provisioner:
+        type: JWK
+        name: "JWK@{{ ansible_domain }}"
+        jwk_password_file: "{{ step_ca_jwk_provisioner_password_file }}"
+      become_user: step-ca
+      notify: reload step-ca
+
+  handlers:
+    - name: reload step-ca
+      systemd:
+        name: step-ca
+        state: reloaded
+
+# Create a certificate using a JWK provisioner
+- hosts: step_clients
+  tasks:
+    # Bootstrap the host to trust the CA
+    - role: maxhoesel.smallstep.step_bootstrap_host
+      vars:
+        step_bootstrap_ca_url: https://myca.localdomain
+        step_bootstrap_fingerprint: your CAs fingerprint
       become: yes
 
+    # Configure a JWK provisioned cert + renewal in /etc/step
+    - role: maxhoesel.smallstep.step_certificate
+      vars:
+        step_cert_ca_provisioner_type: JWK
+        step_cert_ca_provisioner_name: "JWK@{{ ansible_domain }}"
+        step_cert_ca_jwk_password: "SUPER SECRET JWK Provisioner Password"
+        # or:
+        # step_cert_ca_jwk_password_file: "/path/to/file/containing/jwk/provisioner/password/on/step/client/host"
 ```

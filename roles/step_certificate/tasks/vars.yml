@@ -1,0 +1,6 @@
+---
+- name: Update cert/keyfile dicts with defaults
+  set_fact:
+    # Role params take precedence over set_fact, so we need to declare a new private variable
+    step_cert_keyfile_full: "{{ step_cert_keyfile_defaults | combine(step_cert_keyfile) }}"
+    step_cert_certfile_full: "{{ step_cert_certfile_defaults | combine(step_cert_certfile) }}"

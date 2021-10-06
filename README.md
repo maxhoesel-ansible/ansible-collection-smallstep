@@ -7,8 +7,8 @@
 ---
 **NOTE**
 
-This collection is stil under active development. While we try to preserve compatibility with previous versions,
-breaking changes may ocurr between minor releases (such as 0.3, 0.4, etc.) if required.
+This collection is still under active development. While we try to preserve compatibility with previous versions,
+breaking changes may occur between minor releases (such as 0.3, 0.4, etc.) if required.
 
 ---
 
@@ -18,7 +18,7 @@ and the [CLI tool](https://github.com/smallstep/cli). Possible uses for this col
 - Managing your `step-ca` server install (installation, configuration, provisioners)
 - Automated bootstrapping of hosts to trust your CA
 - Token or certificate creation from within your Ansible playbooks
-- [Complete configuration of client certificates via ACME, including automatic renewal](roles/step_acme_cert/README.md)
+- [Complete configuration of client certificates, including automatic renewal](roles/step_certificate/README.md)
 
 
 ## Components
@@ -29,9 +29,9 @@ and the [CLI tool](https://github.com/smallstep/cli). Possible uses for this col
 |------|-------------|
 | [`step_ca`](roles/step_ca/README.md) | Install step-ca as an internal CA.
 | [`step_bootstrap_host`](roles/step_bootstrap_host/README.md) | Configure a client host to trust your CA using step-cli.
-| [`step_acme_cert`](roles/step_acme_cert/README.md) | Set up a Let's Encrypt-style certificate on a host using your ca, including automatic renewal.
 | [`step_cli`](roles/step_cli/README.md) | Install step-cli and nothing else. Used by bootstrap_host and step_ca under the hood.
-
+| [`step_certificate`](roles/step_certificate/README.md) | Create a new host certificate from a CA, including automatic renewal.  Supports multiple provisioners.
+| [`step_acme_cert`](roles/step_acme_cert/README.md) | (**DEPRECATED**) Create a host certificate from a CA, including automatic renewal, via ACME provisioner.
 
 ### Standalone Modules
 
@@ -48,10 +48,10 @@ To learn more about the differences between Online/Offline/Local-Only Modules, s
 
 | Module  | Description | Online | Offline/Local |
 |---------|-------------|--------|---------------|
-| `step_ca_bootstrap` | Initialize `step-cli` to trust a step-ca server | X | |
+| `step_ca_bootstrap` | Initialize `step-cli` to trust a `step-ca` server | X | |
 | `step_ca_certificate` | Generate a new private key and certificate signed by the CA root certificate | X | `offline` parameter |
 | `step_ca_provisioner` | Manage provisioners on a `step-ca` server | | X |
-| `step_ca_provisioner_claims` | Manage default or provisioner claims on a `step-ca server | | X |
+| `step_ca_provisioner_claims` | Manage default or provisioner claims on a `step-ca` server | | X |
 | `step_ca_renew` | Renew a valid certificate | X | `offline` parameter |
 | `step_ca_revoke` | Revoke a Certificate | X | `offline` parameter |
 | `step_ca_token` | Generate an OTT granting access to the CA | X | `offline` parameter |
@@ -169,7 +169,7 @@ You can take a look at the available modules to further configure your CA and ho
 
 ## Module Usage
 
-This collection contains several modules for mamaging your smallstep environment.
+This collection contains several modules for managing your smallstep environment.
 Most of them wrap around `step-cli` commands, so they usually support all the features of the respective command.
 
 If you'd like to know more about an individual module, you can view its documentation using `ansible-doc maxhoesel.smallstep.<step_module_name>`.
@@ -187,7 +187,7 @@ See [this table](#ca-modules) for details.
 
 In order to talk to your CA in online mode, `step-cli` needs to already trust it. You can achieve this by:
 - Running the module on a host that was configured with `step_bootstrap_host` as root (recommended).
-- Pasing the `ca_url` and `root` parameters to the module.
+- Passing the `ca_url` and `root` parameters to the module.
 
 For offline mode, you need to:
   - Provide `step-cli` with the path to your CA config (`$STEPPATH/config/ca.json` by default).
