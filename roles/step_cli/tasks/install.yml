@@ -21,7 +21,7 @@
         remote_src: yes
       retries: 3
       delay: 3
-    - name: Install step-cli binary
+    - name: Install step-cli binary # noqa no-changed-when
       shell: >
         set -o pipefail &&
         cp /tmp/step_{{ step_cli_version }}/bin/step {{ step_cli_executable }}
