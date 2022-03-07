@@ -1,5 +1,5 @@
 # Configuration for CA instances created during molecule runs
-step_ca_name: molecule
+step_ca_name: Max Hösel's intentionally-difficult-to-parse CA name
 step_ca_user: step-ca-molecule
 step_ca_root_password: molecule
 step_ca_intermediate_password: molecule-intermediate
