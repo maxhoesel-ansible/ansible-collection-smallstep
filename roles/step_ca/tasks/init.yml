@@ -15,7 +15,7 @@
   no_log: yes
 
 - block:
-    - name: Create root and password file
+    - name: Create root and password file # noqa no-changed-when
       copy:
         content: "{{ step_ca_root_password }}"
         dest: "{{ step_ca_root_password_file }}"
@@ -23,7 +23,7 @@
         mode: 0600
         group: "{{ step_ca_user }}"
       no_log: yes
-    - name: Initialize CA
+    - name: Initialize CA # noqa no-changed-when
       command: >-
         {{ step_cli_executable }} ca init
         --name={{ step_ca_name | quote }}
@@ -44,7 +44,7 @@
       become: yes
       become_user: "{{ step_ca_user }}"
 
-    - name: Change password for intermediate key
+    - name: Change password for intermediate key # noqa no-changed-when
       shell: |
         set timeout 300
         spawn {{ step_cli_executable }} crypto change-pass {{ step_ca_path }}/secrets/intermediate_ca_key -f

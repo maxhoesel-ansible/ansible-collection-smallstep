@@ -32,7 +32,7 @@
         name: step-ca
         state: stopped
       when: step_ca_present.stat.exists
-    - name: Install step-ca binary
+    - name: Install step-ca binary # noqa no-changed-when
       shell: >
         set -o pipefail &&
         cp /tmp/step-ca_{{ step_ca_version }}/bin/* {{ step_ca_executable | dirname }}
