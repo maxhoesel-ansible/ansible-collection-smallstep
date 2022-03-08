@@ -1,4 +1,14 @@
 
+<a name="v0.4.10"></a>
+## [v0.4.10] - 2022-03-08
+### Bug Fixes
+- **step_ca:** properly escape params during init ([36861f2](https://github.com/maxhoesel/ansible-collection-smallstep/commit/36861f2)) [Max Hösel]
+- **step_ca:** always create intermediate password file ([13cbf10](https://github.com/maxhoesel/ansible-collection-smallstep/commit/13cbf10)) [Max Hösel]
+
+### Documentation
+- update README shields ([0902c65](https://github.com/maxhoesel/ansible-collection-smallstep/commit/0902c65)) [Max Hösel]
+
+
 <a name="v0.4.9"></a>
 ## [v0.4.9] - 2021-08-27
 ### Bug Fixes
@@ -209,6 +219,7 @@
 <a name="v0.1.0"></a>
 ## v0.1.0 - 2020-11-13
 
+[v0.4.10]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.9...v0.4.10
 [v0.4.9]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.8...v0.4.9
 [v0.4.8]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.7...v0.4.8
 [v0.4.7]: https://github.com/maxhoesel/ansible-collection-smallstep/compare/v0.4.6...v0.4.7
