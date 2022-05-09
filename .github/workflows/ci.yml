@@ -11,6 +11,7 @@ jobs:
   lint:
     name: "Lint"
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' || github.event_name == 'pull_request'
     steps:
       - name: Check out codebase
         uses: actions/checkout@v2
