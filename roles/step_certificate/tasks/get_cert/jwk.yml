@@ -1,0 +1,57 @@
+---
+- name: JWK Certificate Creation (Block)
+  block:
+
+    - name: Create temproary file for JWK password
+      ansible.builtin.tempfile:
+        state: file
+        suffix: jwk
+      register: _jwk_password_file
+      when:
+        - step_cert_ca_jwk_password is defined
+        - step_cert_ca_jwk_password | length > 0
+
+    - name: Deploy JWK provisioner password to temporary file
+      copy:
+        dest: "{{ _jwk_password_file.path }}"
+        content: "{{ step_cert_ca_jwk_password }}"
+        mode: 0600
+      no_log: true
+      when: _jwk_password_file.path is defined
+
+    - name: Generate JWK certificate token
+      maxhoesel.smallstep.step_ca_token:
+        name: '{{ step_cert_name }}'
+        san: "{{ step_cert_san }}"
+        provisioner: "{{ step_cert_ca_provisioner_name }}"
+        provisioner_password_file: "{{ _jwk_password_file.path | d(step_cert_ca_jwk_password_file) | mandatory }}"
+        return_token: true
+        step_cli_executable: "{{ step_cli_executable }}"
+      register: _step_cert_token
+
+    - name: Get certificate from CA via JWK provisioner
+      maxhoesel.smallstep.step_ca_certificate:
+        provisioner: "{{ step_cert_ca_provisioner_name }}"
+        token: "{{ _step_cert_token.token }}"
+        name: '{{ step_cert_name }}'
+        san: "{{ step_cert_san }}"
+        contact: "{{ step_cert_contact }}"
+        not_after: "{{ step_cert_duration | d(omit) }}"
+        crt_file: "{{ step_cert_certfile_full.path }}"
+        key_file: "{{ step_cert_keyfile_full.path }}"
+        force: yes  # stupid, but required flag to allow overwriting existing files
+        step_cli_executable: "{{ step_cli_executable }}"
+      become: yes
+      environment:
+        STEPPATH: "{{ step_cli_steppath }}"
+      register: _step_certificate
+
+  # BLOCK Handling: cleanup temporary files
+  always:
+    - name: Remove temporary JWK password file
+      ansible.builtin.file:
+        path: "{{ _jwk_password_file.path }}"
+        state: absent
+      when: _jwk_password_file.path is defined
+
+# END BLOCK: JWK Certificate Creation (Block)

@@ -1,0 +1,128 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+  network:
+    - name: smallstep_acme_cert
+      driver: bridge
+platforms:
+  # Note on containers:
+  # - We use the images provided by geerlingguy, as they provide out-of-the-box
+  #   support for Ansible and systemd (needed to test service management).
+  # - The containers run as privileged containers so that we can
+  #   use systemd functionality. This *should* be possible with unpriliged
+  #   containers as well, but is quite the headache.
+  # - they are connected to a shared network to allow simulating a remote CA
+  - name: step-ca
+    hostname: step-ca.localdomain
+    groups:
+      - ca
+      - ubuntu
+    image: "geerlingguy/docker-ubuntu2004-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+    networks:
+      - name: smallstep_acme_cert
+
+  - name: step-cert-ubuntu-20
+    hostname: step-cert-ubuntu-20.localdomain
+    groups:
+      - clients
+      - ubuntu
+    image: "geerlingguy/docker-ubuntu2004-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+    networks:
+      - name: smallstep_acme_cert
+
+  - name: step-cert-ubuntu-18
+    hostname: step-cert-ubuntu-18.localdomain
+    groups:
+      - clients
+      - ubuntu
+    image: "geerlingguy/docker-ubuntu1804-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+    networks:
+      - name: smallstep_acme_cert
+
+  - name: step-cert-debian-11
+    hostname: step-cert-debian-11.localdomain
+    groups:
+      - clients
+      - debian
+    image: "geerlingguy/docker-debian11-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+    networks:
+      - name: smallstep_acme_cert
+
+  - name: step-cert-debian-10
+    hostname: step-cert-debian-10.localdomain
+    groups:
+      - clients
+      - debian
+    image: "geerlingguy/docker-debian10-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+    networks:
+      - name: smallstep_acme_cert
+
+  - name: step-cert-centos-8
+    hostname: step-cert-centos-8.localdomain
+    groups:
+      - clients
+      - centos
+    image: "geerlingguy/docker-centos8-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+    networks:
+      - name: smallstep_acme_cert
+
+provisioner:
+  name: ansible
+  config_options:
+    ssh_connection:
+      pipelining: yes
+    defaults:
+      forks: 15
+  inventory:
+    links:
+      group_vars: ../../../../tests/molecule/group_vars
+
+scenario:
+  test_sequence:
+    - lint
+    - destroy
+    - dependency
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - check # also run check mode in regular tests
+    - side_effect
+    - verify
+    - destroy
+
+verifier:
+  name: ansible

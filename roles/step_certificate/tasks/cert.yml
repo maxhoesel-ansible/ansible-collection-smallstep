@@ -1,0 +1,31 @@
+# create, if needed, a new certificate
+---
+# This will fail with non-zero r.c. certificate does not exist,
+# or if the cert validity check fails.
+- name: Check if expected certificate file is valid
+  command: "{{ step_cli_executable }} certificate verify {{ step_cert_certfile_full.path }}"
+  check_mode: no    # Always run, even in --check mode
+  changed_when: no
+  failed_when: no
+  ignore_errors: true
+  register: _step_cert_check
+
+- name: Include certificate generation tasks, by certificate type
+  include_tasks: "get_cert/{{ step_cert_ca_provisioner_type }}.yml"
+  when: (_step_cert_check.rc | d(1)) != 0
+
+- name: Look for existing certificate file
+  stat:
+    path: "{{ step_cert_certfile_full.path }}"
+  register: _step_cert_stat
+
+- name: Cert and key permissions are set
+  file:
+    path: "{{ item.path }}"
+    mode: "{{ item.mode }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+  loop:
+    - "{{ step_cert_keyfile_full }}"
+    - "{{ step_cert_certfile_full }}"
+  when: _step_cert_stat.stat.exists

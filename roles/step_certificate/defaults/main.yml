@@ -1,0 +1,32 @@
+---
+step_cli_executable: step-cli
+step_cli_steppath: /root/.step
+
+# Required parameters - role will error if either is not provided
+#step_cert_ca_provisioner_type:
+#step_cert_ca_provisioner_name:
+
+# path to ACME provisioner web root for HTTP-01 challenge.
+step_cert_acme_webroot_path: ""
+
+step_cert_name: "{{ ansible_fqdn }}"
+step_cert_san: []
+step_cert_contact: "root@{{ ansible_fqdn }}"
+#step_cert_duration: 24h
+
+step_cert_certfile: "{{ step_cert_certfile_defaults }}"
+step_cert_certfile_defaults:
+  path: /etc/ssl/step.crt
+  mode: "644"
+  owner: root
+  group: root
+step_cert_keyfile: "{{ step_cert_keyfile_defaults }}"
+step_cert_keyfile_defaults:
+  path: /etc/ssl/step.key
+  mode: "600"
+  owner: root
+  group: root
+
+step_cert_renewal_service: step-renew
+#step_cert_renewal_when: 8h
+step_cert_renewal_reload_services: []

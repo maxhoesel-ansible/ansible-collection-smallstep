@@ -1,0 +1,23 @@
+# shell is required due to "command" being a shell builtin
+- name: Get absolute step command path # noqa command-instead-of-shell
+  shell: "command -v {{ step_cli_executable }}"
+  become: yes
+  check_mode: no
+  changed_when: no
+  register: _step_cli_executable_absolute
+
+- name: Configure certificate renewal service
+  template:
+    src: step-renew.service.j2
+    dest: "/etc/systemd/system/{{ step_cert_renewal_service }}.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart renewal service
+
+- name: Ensure certificate renewal service is enabled and running
+  systemd:
+    daemon_reload: yes
+    name: "{{ step_cert_renewal_service }}"
+    state: started
+    enabled: yes
