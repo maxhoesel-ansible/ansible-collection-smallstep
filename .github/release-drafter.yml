@@ -1,0 +1,55 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+categories:
+  - title: '⚠️ BREAKING CHANGES ⚠️'
+    labels:
+      - 'pr-breaking'
+  - title: 'Features/Enhancements'
+    labels:
+      - 'pr-feature'
+      - 'enhancement'
+  - title: 'Bug Fixes'
+    labels:
+      - 'fix'
+      - 'pr-bugfix'
+      - 'bug'
+  - title: 'Documentation'
+    labels:
+      - 'docs'
+
+include-labels:
+  - pr-breaking
+  - pr-feature
+  - enhancement
+  - fix
+  - pr-bugfix
+  - bug
+  - docs
+exclude-labels:
+  - pr-nochangelog
+exclude-contributors:
+  - github-actions
+  - github-actions[bot]
+
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-title-escapes: '\<*_&'
+
+version-resolver:
+  major:
+    labels:
+      - 'pr-breaking'
+  minor:
+    labels:
+      - 'pr-feature'
+      - 'enhancement'
+  patch:
+    labels:
+      - 'fix'
+      - 'pr-bugfix'
+      - 'bug'
+  default: patch
+
+template: |
+  ## Changes
+
+  $CHANGES

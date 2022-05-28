@@ -2,50 +2,30 @@
 
 Below you will find the information needed to contribute to this project.
 
-Note that by contributing to this collection, you agree with the code of conduct you can find [here.](https://github.com/maxhoesel/ansible-collection-smallstep/blob/main/CODE_OF_CONDUCT.md)
+Note that by contributing to this collection, you agree with the code of conduct you can find [here.](https://github.com/maxhoesel-ansible/ansible-collection-caddy/blob/main/CODE_OF_CONDUCT.md)
 
 ## Requirements
 
 To begin development on this collection, you need to have the following dependencies installed:
 
 - Docker, accessible by your local user account
-- Python 3.6 or higher. CI tets run specifically against 3.6, but to make things easier we just use whatever version is available locally
-- [Tox](https://tox.readthedocs.io/en/latest/)
+- Python 2.7 or 3.6+. CI tests run specifically against either 2.7 or 3.6, but to make things easier we just use whatever version is available locally
 
 ## Quick Start
 
 1. Fork the repository and clone it to your local machine
-2. Run `./scripts/setup.sh` to configure a local dev environment (virtualenv) with a commit hook
-3. Make your changes and commit them to a new branch
-4. Run the tests locally with `./scripts/test.sh`. This will run the full test suite that also runs in the CI
-5. Once you're done, push your changes and open a PR
-
-
-
-## About commit messages and structure
-
-Follow the guidelines below when committing your changes
-
-- All commits **must** follow the [conventional-commits standard](https://www.conventionalcommits.org/en/v1.0.0/):
-  `<type>(optional scope): <description>`
-  - Valid scopes are all components of this collection, such as modules or roles
-- Structure your changes so that they are separated into logical and independent commits whenever possible.
-- The commit message should clearly state **what** your change does. The "why" and "how" belong into the commit body.
-
-Some good examples:
-- `fix(step_ca): don't install unneeded packages`
-- `feat(step_ca_certificate): add support for RA flags`
-
-Don't be afraid to rename/amend/rewrite your branch history to achieve these goals!
-Take a look at the `git rebase -i` and `git commit --amend` commands if you are not sure how to do so.
-As long as your make these changes on your feature branch, there is no harm in doing so.
-
-
+2. Run `./scripts/setup.sh` to configure a local dev environment (virtualenv) with all required dependencies
+3. Activate the virtualenv with `source .venv/bin/activate`
+4. Make your changes and commit them to a new branch
+5. Run the tests locally with `./scripts/test.sh`. This will run the full test suite that also runs in the CI
+6. Once you're done, commit your changes (make sure that you are in the venv).
+   Pre-commit will format your code and check for any obvious errors when you do so.
 
 ## Hints for Development
 
 For Modules:
 - Make sure that you have read the [Ansible module conventions](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_best_practices.html)
+- Make sure to use the doc fragment and utils already present when possible.
 - Each module should typically wrap around one step-cli command or a set of closely related commands.
   The modules name should reflect this. For example, step_ca_provisioner performs the same functionality as "step ca provisioner add/remove".
 - Make sure to use the doc fragment and utils already present, specifically the connection fragments used for parameters like --ca-url and --offline.
@@ -54,6 +34,13 @@ For Modules:
   need to do is provide it with a simple dict of module parameters mapped to their CLI equivalent. It also handles errors and check mode for you
 - If you need to troubleshoot inside the ansible-test container, add `--docker-terminate never` to the
   call inside the hacking script. The container will then persist even on failure, and you can debug it
+
+For Roles:
+- None so far
+
+In general:
+- Don't be afraid to rewrite your local branch history to clean up your commit messages!
+  You should familiarize yourself with `git rebase -i` if you haven't done so already.
 
 ## Testing Framework
 
@@ -86,17 +73,11 @@ To update the smallstep cli/ca versions that are used to run the tests, the foll
 - `tests/integration/targets/setup_smallstep/vars/versions.yml`: Versions for module integration test
 - `tests/molecule/group_vars/all/versions.yml`: Versions for molecule tests
 
-## Release Workflow
+## Information for maintainers
 
-This project uses sematic versioning. Name versions accordingly.
+This project uses sematic versioning. Version numbers and  releases/changelogs are automatically generated using [release-drafter](https://github.com/release-drafter/release-drafter), utilizing pull request labels.
 
-For now, releases are simply tags on the main branch, with no separate release branch currently in use.
+When merging a pull request, make sure to select an appropriate label (pr-bugfix, pr-feature, etc.).
+release-drafter will automatically update the draft release changelog and the galaxy.yml version will be bumped if needed.
 
-To create a release, simply run the "Create Release" GitHub Action with the desired version number (e.g. "0.3.0").
-This action will:
-
-1. Bump the version number in `galaxy.yml`
-2. Update the changelog
-3. Commit the changes in a "Release" commit and push it
-4. Create a GitHub release (which will also create a tag at that commit)
-5. Build the collection and publish the new release on galaxy
+Once a draft release is published, collection packages will be added to the release and ansible-galaxy automatically.

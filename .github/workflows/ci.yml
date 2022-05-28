@@ -4,70 +4,69 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+  release:
+    types:
+      - published
+      - created
   schedule:
-    - cron: "0 4 * * 1"
+    - cron: "0 4 * * 1,4"
 
 jobs:
   lint:
     name: "Lint"
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
     steps:
       - name: Check out codebase
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-
       - name: Set up Python 3
         uses: actions/setup-python@v2
-        with:
-          python-version: "3.6"
-
       - name: Set up pip and install requirements
         run: |
-          pip3 install --upgrade pip
-          pip3 install 'gitlint>=0.15.0,<0.16.0' 'ansible>=4,<5' 'ansible-lint>=5,<6'
-          curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.sh | sh -s
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      - name: Run pre-commit checks
+        uses: pre-commit/action@v2.0.0
 
-      - name: Build and install collection
-        run: |
-          ansible-galaxy collection build
-          ansible-galaxy collection install maxhoesel-smallstep-*.tar.gz
-
-      - name: ansible-lint
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          ansible-lint -p | ./bin/reviewdog -efm="%f:%l: %m" -name="ansible-lint" -level=error -filter-mode="nofilter" -fail-on-error -reporter=github-check
-
-      - name: gitlint
-        env:
-          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gitlint --commits=2a4983a71af8687effdf076cc9b54ef9ede2fffd..HEAD 2>&1 | ./bin/reviewdog -efm="%m" -reporter=github-pr-check -filter-mode=nofilter -fail-on-error -name="gitlint"
-
-  modules:
-    name: "Modules"
+  modules-sanity:
+    name: "Modules Sanity"
     runs-on: ubuntu-latest
     steps:
       - name: Check out codebase
         uses: actions/checkout@v2
-
       - name: Set up Python 3
         uses: actions/setup-python@v2
-        with:
-          python-version: "3.6"
-      - name: Set up pip
-        run: pip3 install --upgrade pip
-
-      - name: Install tox
-        run: sudo apt update && sudo apt install -y tox
+      - name: Set up pip and install requirements
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
 
       - name: Run sanity tests
-        run: tox -e sanity -- --docker --color -v --python 3.6
-      - name: Run integration tests
-        run: tox -e integration -- --docker --color -v --python 3.6
+        run: tox -e sanity -- --docker --color -v --python 3.6 --skip-test metaclass-boilerplate --skip-test future-import-boilerplate
 
+  modules-integration:
+    needs: modules-sanity
+    name: "Modules Integration"
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        target:
+          - docker:centos7
+          - docker:default,python=3.6
+    steps:
+      - name: Check out codebase
+        uses: actions/checkout@v2
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+      - name: Set up pip and install requirements
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Run integration tests
+        run: tox -e integration -- --color -v --controller docker:default --target ${{ matrix.target }}
 
   discover-scenarios:
     runs-on: ubuntu-latest
@@ -78,12 +77,14 @@ jobs:
         uses: actions/checkout@v2
       - name: Set up Python 3
         uses: actions/setup-python@v2
-        with:
-          python-version: "3.6"
-      - name: Install tox and initialize workdir
+      - name: Set up pip and install requirements
         run: |
-          sudo apt update && sudo apt install -y tox
-          tox -l
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Initialize tox
+        run: tox -l
+
       - name: Discover scenarios
         id: set-scenarios
         # Convert the tox scenario listing into a JSON/YAML list, filtering out any non-molecule/lint scenarios
@@ -102,25 +103,63 @@ jobs:
     steps:
       - name: Check out codebase
         uses: actions/checkout@v2
-
       - name: Set up Python 3
         uses: actions/setup-python@v2
-        with:
-          python-version: "3.6"
-      - name: Install ansible-base
+      - name: Set up pip and install requirements
         run: |
-          pip3 install --upgrade pip
-          pip3 install ansible-base
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
 
       - name: Build and install collection
         run: |
           ansible-galaxy collection build --force
           ansible-galaxy collection install *.tar.gz --force
 
-      - name: Install tox
-        run: sudo apt update && sudo apt install -y tox
-
       - name: Initialize tox
         run: tox -l
       - name: Run role tests
         run: tox -e ${{ matrix.role }}
+
+  publish:
+    name: "Publish to Ansible Galaxy"
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    needs:
+      - lint
+      - roles
+      - modules-integration
+    steps:
+      - name: Check out codebase
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+      - name: Set up pip and install requirements
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Build collection and get tarball filename
+        id: collection_build
+        run: |
+          ansible-galaxy collection build --force
+          echo "::set-output name=collection-tarball::$(ls | grep ".tar.gz")"
+
+      - name: Get current release
+        id: get_release
+        uses: bruceadams/get-release@v1.2.3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload collection release asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.get_release.outputs.upload_url }}
+          asset_path: ${{ steps.collection_build.outputs.collection-tarball }}
+          asset_name: ${{ github.event.repository.name }}-${{ steps.get_release.outputs.tag_name }}.tar.gz
+          asset_content_type: application/tar+gzip
+
+      - name: Deploy Ansible collection to Galaxy
+        run: ansible-galaxy collection publish ${{ steps.collection_build.outputs.collection-tarball }} --api-key ${{ secrets.GALAXY_API_KEY }}

@@ -2,14 +2,12 @@
 set -eu
 set -o pipefail
 
-# Lint ansible roles and git commits
-tox -e lint
-
 # Sanity checks for our modules
-tox -e sanity -- --docker --color -v --python 3.6
+# We explicitly only support Python 3.6, so the boilerplate isn't required and is automatically removed by pyupgrade
+tox -e sanity -- --docker --color -v --python 3.6 --skip-test metaclass-boilerplate --skip-test future-import-boilerplate
 
-# Integration tests for modules - we don't have an unit tests as of now
-tox -e integration -- --docker --color -v --python 3.6 --docker-terminate success
+# Integration tests for modules
+tox -e integration -- --color -v --controller docker:default --target docker:default,python=3.6
 
 # Molecule tests - this grabs all molecule scenarios and executes them.
 # Note that to run this command, you need to have
