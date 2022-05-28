@@ -16,7 +16,7 @@ disable=[
     "too-many-boolean-expressions",
     "too-few-public-methods",
     'wrong-import-position', # Ansible module best practices
-    "I"
+    "I",
 ]
 
 [tool.pylint.'FORMAT']

@@ -2,7 +2,8 @@
 - name: Load Distribution-specific vars
   include_vars: "{{ ansible_os_family }}.yml"
 
-- block:
+- name: Get step-cli install information
+  block:
     - name: Get latest step-cli release information
       uri:
         url: https://api.github.com/repos/smallstep/cli/releases/latest

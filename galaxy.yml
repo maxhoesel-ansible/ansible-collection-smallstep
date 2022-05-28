@@ -53,5 +53,7 @@ issues: https://github.com/maxhoesel-ansible/ansible-collection-smallstep/issues
 # and '.git' are always filtered
 build_ignore:
     - "*.tar.gz"
+    - ".venv"
     - ".github"
-    - ".chglog"
+    - ".tox"
+    - ".pytest_cache"

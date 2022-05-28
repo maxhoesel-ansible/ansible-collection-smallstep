@@ -2,7 +2,7 @@
 
 Below you will find the information needed to contribute to this project.
 
-Note that by contributing to this collection, you agree with the code of conduct you can find [here.](https://github.com/maxhoesel-ansible/ansible-collection-caddy/blob/main/CODE_OF_CONDUCT.md)
+Note that by contributing to this collection, you agree with the code of conduct you can find [here.](https://github.com/maxhoesel-ansible/ansible-collection-smallstep/blob/main/CODE_OF_CONDUCT.md)
 
 ## Requirements
 

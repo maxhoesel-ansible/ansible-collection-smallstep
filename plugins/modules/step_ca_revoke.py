@@ -1,10 +1,7 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright: (c) 2021, Max Hösel <ansible@maxhoesel.de>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
@@ -61,10 +58,11 @@ EXAMPLES = r"""
     token: "{{ ca_token }}"
 """
 
+from ansible.module_utils.basic import AnsibleModule
+
 from ..module_utils.ca_connection_hybrid import connection_run_args, connection_argspec
 from ..module_utils.run import run_step_cli_command
 from ..module_utils.validation import check_step_cli_install
-from ansible.module_utils.basic import AnsibleModule
 
 
 def run_module():
@@ -91,7 +89,7 @@ def run_module():
     args = ["cert", "key", "reason", "reason_code",
             "token"]
     # All parameters can be converted to a mapping by just appending -- and replacing the underscores
-    args = {arg: "--{a}".format(a=arg.replace("_", "-")) for arg in args}
+    args = {arg: f"--{arg.replace('_', '-')}" for arg in args}
     # This step-cli argument uses camelCase for some reason
     args["reason_code"] = "--reasonCode"
 

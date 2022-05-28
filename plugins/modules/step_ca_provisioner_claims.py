@@ -1,10 +1,7 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright: (c) 2020, Max Hösel <ansible@maxhoesel.de>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
@@ -126,7 +123,6 @@ claims:
 """
 
 import json
-import os
 import copy
 from ansible.module_utils.basic import AnsibleModule
 from ..module_utils.ca_connection_local_only import connection_argspec
@@ -158,8 +154,7 @@ def get_current_claims(module, config, result):
                 if p["name"] == p_name and p["type"] == p_type
             ][0]
         except IndexError:
-            result["msg"] = "Could not find provisioner with name {name} and type {type}".format(
-                name=p_name, type=p_type)
+            result["msg"] = f"Could not find provisioner with name {p_name} and type {p_type}"
             module.fail_json(**result)
     else:
         # If type is not specified and multiple provisioners share the same name, we will
@@ -171,8 +166,7 @@ def get_current_claims(module, config, result):
             if p["name"] == module.params["name"]
         }
         if not current_claims:
-            result["msg"] = "Could not find any provisioner with name {name}".format(
-                name=p_name)
+            result["msg"] = f"Could not find any provisioner with name {p_name}"
             module.fail_json(**result)
     return current_claims
 
@@ -187,12 +181,11 @@ def write_config(module, config, result):
     """
     tmpfile = module.params["ca_config"] + ".ansible-tmp"
     try:
-        with open(tmpfile, "w") as f:
-            json.dump(config, f)
+        with open(tmpfile, "w", encoding="utf-8") as f:
+            json.dump(config, f,)
             module.atomic_move(tmpfile, module.params["ca_config"])
-    except Exception as e:
-        result["msg"] = "Could not write ca.json file. Exception: {err}".format(
-            err=e)
+    except OSError as e:
+        result["msg"] = f"Could not write ca.json file. Exception: {e}"
         module.fail_json(**result)
     return result
 
@@ -223,7 +216,7 @@ def update_claims(module, current_config, result):
     }
     current_claims = get_current_claims(module, current_config, result)
     module_claims = {claims[c]: module.params[c]
-                     for c in claims.keys() if module.params[c]}
+                     for c in claims if module.params[c]}
     # We need a truly separate dict for the new config so that we
     # can compare both to set changed= appropriately when we're done.
     new_config = copy.deepcopy(current_config)
@@ -300,11 +293,10 @@ def run_module():
     module = AnsibleModule(argument_spec={**module_args, **connection_argspec}, supports_check_mode=True)
 
     try:
-        with open(module.params["ca_config"]) as f:
+        with open(module.params["ca_config"], encoding="utf-8") as f:
             config = json.load(f)
-    except Exception as e:
-        result["msg"] = "Error when loading ca.json config: {err}".format(
-            err=e)
+    except (json.JSONDecodeError, OSError) as e:
+        result["msg"] = f"Error when loading ca.json config: {e}"
         module.fail_json(**result)
 
     result = update_claims(module, config, result)

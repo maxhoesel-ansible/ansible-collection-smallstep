@@ -14,7 +14,8 @@
     group: "{{ step_ca_user }}"
   no_log: yes
 
-- block:
+- name: Initialize CA
+  block:
     - name: Create root and password file # noqa no-changed-when
       copy:
         content: "{{ step_ca_root_password }}"
