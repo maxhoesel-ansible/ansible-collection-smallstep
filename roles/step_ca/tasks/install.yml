@@ -18,7 +18,8 @@
   register: step_ca_installed_version
   when: step_ca_present.stat.exists
 
-- block:
+- name: Download and install step-ca
+  block:
     - name: Download and extract step-ca archive
       unarchive:
         src: "https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-ca_linux_{{ step_ca_version }}_{{ step_ca_arch[ansible_architecture] }}.tar.gz"

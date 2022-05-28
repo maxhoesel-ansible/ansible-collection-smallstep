@@ -1,10 +1,7 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright: (c) 2021, Max Hösel <ansible@maxhoesel.de>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
@@ -61,8 +58,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ..module_utils.validation import check_step_cli_install
 from ..module_utils.run import run_step_cli_command
 
-DEFAULTS_FILE = "{steppath}/config/defaults.json".format(
-    steppath=os.environ.get("STEPPATH", os.environ["HOME"] + "/.step"))
+DEFAULTS_FILE = f"{os.environ.get('STEPPATH', os.environ['HOME'] + '/.step')}/config/defaults.json"
 
 
 def run_module():
@@ -85,7 +81,7 @@ def run_module():
         try:
             with open(DEFAULTS_FILE, "rb") as f:
                 config = json.load(f)
-        except (OSError, IOError):
+        except OSError:
             # The file probably doesn't exist yet, continue for now
             config = {}
         current_fingerprint = config.get("fingerprint", "")

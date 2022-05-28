@@ -1,10 +1,7 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*-
 
 # Copyright: (c) 2021, Max Hösel <ansible@maxhoesel.de>
 # GNU General Public License v3.0+ (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt)
-from __future__ import absolute_import, division, print_function
-__metaclass__ = type
 
 DOCUMENTATION = r"""
 ---
@@ -222,12 +219,13 @@ EXAMPLES = r"""
     state: absent
 """
 
+import json
+
+from ansible.module_utils.basic import AnsibleModule
+
 from ..module_utils.ca_connection_local_only import connection_argspec, connection_run_args
 from ..module_utils.run import run_step_cli_command
 from ..module_utils.validation import check_step_cli_install
-from ansible.module_utils.basic import AnsibleModule
-import os
-import json
 
 
 def add_provisioner(module, result):
@@ -322,8 +320,8 @@ def run_module():
     try:
         with open(module.params["ca_config"], "rb") as f:
             provisioners = json.load(f).get("authority", {}).get("provisioners", [])
-    except Exception as e:
-        result["msg"] = "Error reading ca.json config: {err}".format(err=e)
+    except (json.JSONDecodeError, OSError) as e:
+        result["msg"] = f"Error reading ca.json config: {e}"
         module.fail_json(**result)
 
     for p in provisioners:

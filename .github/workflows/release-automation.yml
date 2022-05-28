@@ -1,0 +1,68 @@
+name: Release Automation
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  update-release-draft:
+    name: Update Release Draft
+    runs-on: ubuntu-latest
+    outputs:
+      version-tag: ${{ steps.drafter.outputs.tag_name }}
+    steps:
+      - uses: release-drafter/release-drafter@v5
+        id: drafter
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+  bump-galaxy-version:
+    name: Update galaxy.yml version
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - update-release-draft
+    steps:
+      - name: Check out codebase
+        uses: actions/checkout@v2
+      - name: Set up Python 3
+        uses: actions/setup-python@v2
+      - name: Set up pip and install requirements
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyyaml packaging
+
+      - name: Update galaxy.yml if required
+        run: |
+          python3 - <<ENDDOC
+          from packaging import version
+          import yaml
+
+          NEXT_VERSION = "${{ needs.update-release-draft.outputs.version-tag }}".strip("v")
+
+          with open("galaxy.yml", encoding="utf-8") as f:
+              galaxy = yaml.safe_load(f)
+
+          if version.parse(galaxy["version"]) < version.parse(NEXT_VERSION):
+              galaxy["version"] = NEXT_VERSION
+              with open("galaxy.yml", "w", encoding="utf-8") as f:
+                  yaml.dump(galaxy, f, allow_unicode=True)
+          ENDDOC
+
+      - name: Open PR for galaxy.yml update
+        uses: peter-evans/create-pull-request@v4
+        with:
+          add-paths: |
+            galaxy.yml
+          title: Update version to ${{ needs.update-release-draft.outputs.version-tag }}
+          body: |
+            This PR updates the galaxy.yml version number to keep up with recently merged changes.
+
+            This PR was created automatically by the release-automation workflow.
+          commit-message: "Update version to ${{ needs.update-release-draft.outputs.version-tag }}"
+          branch: maintenance/version-bump
+          labels: pr-nochangelog
+          delete-branch: true

@@ -1,7 +1,8 @@
 ---
 - include: check.yml
 
-- block:
+- name: Get ca installation information
+  block:
     - name: Get latest step-ca release information
       uri:
         url: https://api.github.com/repos/smallstep/certificates/releases/latest
