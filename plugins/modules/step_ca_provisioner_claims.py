@@ -9,12 +9,22 @@ module: step_ca_provisioner_claims
 author: Max Hösel (@maxhoesel)
 short_description: Manage default or provisioner claims on a C(step-ca) server
 version_added: '0.2.1'
+deprecated:
+    removed_in: "0.23.0"
+    why: >
+      These features are now available in step_ca_provisioner.
+      This module directly edits the CA.json config, which is not recommended.
+    alternative: Use M(maxhoesel.smallstep.step_ca_provisioner)s ssh_/x509_ flags instead.
 description: |
   This module can add, update or remove claims (such as certificate duration) on a step-ca server.
   You can either modify the claims of an individual provisioner, or change the default global claims.
 notes:
   - Check mode is supported.
 options:
+  ca_config:
+    description: The path to the certificate authority configuration file on the host.
+    type: path
+    default: CI($STEPPATH)/config/ca.json
   exclusive:
     description: Replace all existing claims for the selected scope with the ones defined in the module parameters.
     type: bool
@@ -82,9 +92,6 @@ options:
   default_user_ssh_duration:
     description: If no certificate validity period is specified, use this value.
     type: str
-
-extends_documentation_fragment:
-  - maxhoesel.smallstep.ca_connection_local_only
 """
 
 EXAMPLES = r"""
@@ -122,10 +129,10 @@ claims:
   type: dict
 """
 
+import os
 import json
 import copy
 from ansible.module_utils.basic import AnsibleModule
-from ..module_utils.ca_connection_local_only import connection_argspec
 
 
 def get_current_claims(module, config, result):
@@ -269,6 +276,8 @@ def update_claims(module, current_config, result):
 
 def run_module():
     module_args = dict(
+        ca_config=dict(
+            type="path", default=f"{os.environ.get('STEPPATH', os.environ['HOME'] + '/.step')}/config/ca.json"),
         exclusive=dict(type="bool", default=False),
         global_claims=dict(type="bool", default=False),
         min_tls_cert_duration=dict(),
@@ -290,7 +299,7 @@ def run_module():
         ),
     )
     result = dict(changed=False, msg="", claims=dict())
-    module = AnsibleModule(argument_spec={**module_args, **connection_argspec}, supports_check_mode=True)
+    module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
 
     try:
         with open(module.params["ca_config"], encoding="utf-8") as f:

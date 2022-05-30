@@ -39,7 +39,7 @@ options:
 
 extends_documentation_fragment:
   - maxhoesel.smallstep.step_cli
-  - maxhoesel.smallstep.ca_connection_hybrid
+  - maxhoesel.smallstep.connection
 """
 
 EXAMPLES = r"""
@@ -60,9 +60,8 @@ EXAMPLES = r"""
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ..module_utils.ca_connection_hybrid import connection_run_args, connection_argspec
-from ..module_utils.run import run_step_cli_command
-from ..module_utils.validation import check_step_cli_install
+from ..module_utils.step_cli_wrapper import CLIWrapper
+from ..module_utils import connection
 
 
 def run_module():
@@ -76,10 +75,11 @@ def run_module():
         step_cli_executable=dict(type="path", default="step-cli"),
     )
     result = dict(changed=False, stdout="", stderr="", msg="")
-    module = AnsibleModule(argument_spec={**module_args, **connection_argspec}, supports_check_mode=True)
+    module = AnsibleModule(argument_spec={**connection.args, **module_args}, supports_check_mode=True)
 
-    check_step_cli_install(
-        module, module.params["step_cli_executable"], result)
+    connection.check_argspec(module, result)
+
+    cli = CLIWrapper(module, result, module.params["step_cli_executable"])
 
     # Positional Parameters
     params = ["ca", "revoke"]
@@ -93,10 +93,7 @@ def run_module():
     # This step-cli argument uses camelCase for some reason
     args["reason_code"] = "--reasonCode"
 
-    result = run_step_cli_command(
-        module.params["step_cli_executable"], params,
-        module, result, {**args, **connection_run_args}
-    )
+    result["stdout"], result["stderr"] = cli.run_command(params, {**args, **connection.param_spec})[1:3]
     result["changed"] = True
     module.exit_json(**result)
 

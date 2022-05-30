@@ -55,8 +55,7 @@ import json
 import os
 
 from ansible.module_utils.basic import AnsibleModule
-from ..module_utils.validation import check_step_cli_install
-from ..module_utils.run import run_step_cli_command
+from ..module_utils.step_cli_wrapper import CLIWrapper
 
 DEFAULTS_FILE = f"{os.environ.get('STEPPATH', os.environ['HOME'] + '/.step')}/config/defaults.json"
 
@@ -75,7 +74,7 @@ def run_module():
 
     force = module.params["force"]
 
-    check_step_cli_install(module, module.params["step_cli_executable"], result)
+    cli = CLIWrapper(module, result, module.params["step_cli_executable"])
 
     if not force:
         try:
@@ -100,10 +99,7 @@ def run_module():
         "install": "--install",
         "redirect_url": "--redirect-url",
     }
-    result = run_step_cli_command(
-        module.params["step_cli_executable"], ["ca", "bootstrap"],
-        module, result, args
-    )
+    result["stdout"], result["stderr"] = cli.run_command(["ca", "bootstrap"], args)[1:3]
     result["changed"] = True
     module.exit_json(**result)
 

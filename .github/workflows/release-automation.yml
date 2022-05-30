@@ -20,7 +20,7 @@ jobs:
 
 
   bump-galaxy-version:
-    name: Update galaxy.yml version
+    name: Update collection version
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     needs:
@@ -33,33 +33,19 @@ jobs:
       - name: Set up pip and install requirements
         run: |
           python -m pip install --upgrade pip
-          python -m pip install pyyaml packaging
+          python -m pip install -r requirements.txt
 
-      - name: Update galaxy.yml if required
-        run: |
-          python3 - <<ENDDOC
-          from packaging import version
-          import yaml
+      - name: Run updater script
+        run: scripts/update-version "${{ needs.update-release-draft.outputs.version-tag }}"
 
-          NEXT_VERSION = "${{ needs.update-release-draft.outputs.version-tag }}".strip("v")
-
-          with open("galaxy.yml", encoding="utf-8") as f:
-              galaxy = yaml.safe_load(f)
-
-          if version.parse(galaxy["version"]) < version.parse(NEXT_VERSION):
-              galaxy["version"] = NEXT_VERSION
-              with open("galaxy.yml", "w", encoding="utf-8") as f:
-                  yaml.dump(galaxy, f, allow_unicode=True)
-          ENDDOC
-
-      - name: Open PR for galaxy.yml update
+      - name: Open PR for collection version update
         uses: peter-evans/create-pull-request@v4
         with:
           add-paths: |
             galaxy.yml
           title: Update version to ${{ needs.update-release-draft.outputs.version-tag }}
           body: |
-            This PR updates the galaxy.yml version number to keep up with recently merged changes.
+            This PR updates the galaxy.yml (and eventual other files) version to keep up with recently merged changes.
 
             This PR was created automatically by the release-automation workflow.
           commit-message: "Update version to ${{ needs.update-release-draft.outputs.version-tag }}"

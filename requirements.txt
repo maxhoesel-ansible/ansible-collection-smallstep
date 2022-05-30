@@ -9,3 +9,7 @@ pre-commit
 
 # Testing
 tox
+
+# Utility packages needed for scripts
+pyyaml
+packaging

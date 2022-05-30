@@ -50,6 +50,16 @@ version-resolver:
   default: patch
 
 template: |
+  ---
+  **⚠️ Compatibility Warning ⚠️**
+
+  This release is only designed to work with `step-cli` version $RESOLVED_VERSION.
+  Other versions may work, but are not supported.
+
+  Please make sure to use the appropiate collection version for your version of `step-cli`.
+
+  Breaking changes may happen between minor releases (e.g. 0.20 -> 0.21).
+
   ## Changes
 
   $CHANGES

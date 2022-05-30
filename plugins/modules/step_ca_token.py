@@ -119,7 +119,7 @@ options:
 
 extends_documentation_fragment:
   - maxhoesel.smallstep.step_cli
-  - maxhoesel.smallstep.ca_connection_hybrid
+  - maxhoesel.smallstep.connection
 """
 
 EXAMPLES = r"""
@@ -140,9 +140,8 @@ from ansible.module_utils.common.validation import check_required_one_of
 from ansible.module_utils.common.validation import check_mutually_exclusive
 from ansible.module_utils.basic import AnsibleModule
 
-from ..module_utils.ca_connection_hybrid import connection_run_args, connection_argspec
-from ..module_utils.run import run_step_cli_command
-from ..module_utils.validation import check_step_cli_install
+from ..module_utils.step_cli_wrapper import CLIWrapper
+from ..module_utils import connection
 
 
 def run_module():
@@ -175,13 +174,22 @@ def run_module():
     )
 
     result = dict(changed=False, stdout="", stderr="", msg="")
-    module = AnsibleModule(argument_spec={**module_args, **connection_argspec}, supports_check_mode=True)
+    module = AnsibleModule(argument_spec={**connection.args, **module_args}, supports_check_mode=True)
 
-    check_mutually_exclusive(["return_token", "output_file"], module.params)
-    check_required_one_of(["return_token", "output_file"], module.params)
+    connection.check_argspec(module, result)
 
-    check_step_cli_install(
-        module, module.params["step_cli_executable"], result)
+    try:
+        check_mutually_exclusive(["return_token", "output_file"], module.params)
+    except TypeError:
+        result["msg"] = "return_token and output_file cannot be specified at the same time"
+        module.fail_json(**result)
+    try:
+        check_required_one_of(["return_token", "output_file"], module.params)
+    except TypeError:
+        result["msg"] = "At least one of return_token and output_file must be specified"
+        module.fail_json(**result)
+
+    cli = CLIWrapper(module, result, module.params["step_cli_executable"])
 
     # Positional Parameters
     params = ["ca", "token", module.params["name"]]
@@ -193,15 +201,13 @@ def run_module():
     # All parameters can be converted to a mapping by just appending -- and replacing the underscores
     args = {arg: f"--{arg.replace('_', '-')}" for arg in args}
 
-    result = run_step_cli_command(
-        module.params["step_cli_executable"], params,
-        module, result, {**args, **connection_run_args}
-    )
+    # pylint: disable=unbalanced-tuple-unpacking
+    result["stdout"], result["stderr"] = cli.run_command(params, {**args, **connection.param_spec})[1:3]
     result["changed"] = True
     if module.params["return_token"]:
         result["token"] = result["stdout"]
-        result["stdout"] = ""
-        result["stdout_lines"] = ""
+    result["stdout"] = ""
+    result["stdout_lines"] = ""
     module.exit_json(**result)
 
 

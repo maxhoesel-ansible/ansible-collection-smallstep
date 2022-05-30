@@ -1,16 +1,8 @@
 # maxhoesel.smallstep - Ansible Collection for Smallstep CA/CLI
 
-![Release](https://img.shields.io/github/v/release/maxhoesel/ansible-collection-smallstep)
-![CI Status](https://img.shields.io/github/workflow/status/maxhoesel/ansible-collection-smallstep/CI/main)
-![License](https://img.shields.io/github/license/maxhoesel/ansible-collection-smallstep)
-
----
-**NOTE**
-
-This collection is stil under active development. While we try to preserve compatibility with previous versions,
-breaking changes may ocurr between minor releases (such as 0.3, 0.4, etc.) if required.
-
----
+![Release](https://img.shields.io/github/v/release/maxhoesel-ansible/ansible-collection-smallstep)
+![CI Status](https://img.shields.io/github/workflow/status/maxhoesel-ansible/ansible-collection-smallstep/CI/main)
+![License](https://img.shields.io/github/license/maxhoesel-ansible/ansible-collection-smallstep)
 
 An Ansible collection containing roles/modules to install, configure and interact with the [Smallstep certificate server](https://github.com/smallstep/certificates)
 and the [CLI tool](https://github.com/smallstep/cli). Possible uses for this collection include:
@@ -19,6 +11,20 @@ and the [CLI tool](https://github.com/smallstep/cli). Possible uses for this col
 - Automated bootstrapping of hosts to trust your CA
 - Token or certificate creation from within your Ansible playbooks
 - [Complete configuration of client certificates via ACME, including automatic renewal](roles/step_acme_cert/README.md)
+
+---
+**⚠️ SUPPORTED SMALLSTEP VERSION NOTICE ⚠️**
+
+The smallstep tools (and this collection) are constantly changing and breaking changes may be introduced in each minor version (e.g. from `0.20` to `0.21`).
+To help maintain compatibility, you should use the version of this collection that corresponds to your `step-cli` version.
+
+For example, if you are using `step-cli==0.20`, you should use the collection version `>=0.20,<0.21`.
+Newer and older collection versions *may* work, but are not supported.
+
+**For step-cli versions `<0.20`:** Use the collection version `>=0.4,<0.5`.
+This was the last collection version released under the old versioning scheme.
+
+---
 
 
 ## Components
@@ -46,15 +52,15 @@ To learn more about the differences between Online/Offline/Local-Only Modules, s
 
 ---
 
-| Module  | Description | Online | Offline/Local |
+| Module  | Description | Remote (Online mode) | Local (Offline mode) |
 |---------|-------------|--------|---------------|
-| `step_ca_bootstrap` | Initialize `step-cli` to trust a step-ca server | X | |
-| `step_ca_certificate` | Generate a new private key and certificate signed by the CA root certificate | X | `offline` parameter |
-| `step_ca_provisioner` | Manage provisioners on a `step-ca` server | | X |
-| `step_ca_provisioner_claims` | Manage default or provisioner claims on a `step-ca server | | X |
-| `step_ca_renew` | Renew a valid certificate | X | `offline` parameter |
-| `step_ca_revoke` | Revoke a Certificate | X | `offline` parameter |
-| `step_ca_token` | Generate an OTT granting access to the CA | X | `offline` parameter |
+| `step_ca_bootstrap` | Initialize `step-cli` to trust a step-ca server | ✅ | ❌ |
+| `step_ca_certificate` | Generate a new private key and certificate signed by the CA root certificate | ✅ | `offline` parameter |
+| `step_ca_provisioner` | Manage provisioners on a `step-ca` server | `admin` parameters, [if configured](https://smallstep.com/docs/step-ca/provisioners/#remote-provisioner-management) | ✅ |
+| `step_ca_renew` | Renew a valid certificate | ✅ | `offline` parameter |
+| `step_ca_provisioner_claims` | **DECREPATED!** (use `step_ca_provisioner` instead) Manage provisioner claims | ❌ | ✅ |
+| `step_ca_revoke` | Revoke a Certificate | ✅ | `offline` parameter |
+| `step_ca_token` | Generate an OTT granting access to the CA | ✅ | `offline` parameter |
 
 ## Installation
 
@@ -70,13 +76,15 @@ Individual roles or modules may have additional dependencies, please check their
 
 Via ansible-galaxy (recommended):
 
-`ansible-galaxy collection install maxhoesel.smallstep`
+`ansible-galaxy collection install maxhoesel.smallstep>=your-step-cli-version,<next-major-version`
 
-Alternatively, you can download a collection archive from a [previous release](hhttps://github.com/maxhoesel/ansible-collection-smallstep/releases).
+For more information about supported step-cli versions, see the support notice at the beginning of this file.
+
+Alternatively, you can download a collection archive from a [previous release](hhttps://github.com/maxhoesel-ansible/ansible-collection-smallstep/releases).
 
 You can also clone this repository directly if you want a slightly more up-to-date (and potentially buggy) version.
 
-`ansible-galaxy collection install git+https://github.com/maxhoesel/ansible-collection-smallstep`
+`ansible-galaxy collection install git+https://github.com/maxhoesel-ansible/ansible-collection-smallstep`
 
 ## Getting started (Step-By-Step)
 

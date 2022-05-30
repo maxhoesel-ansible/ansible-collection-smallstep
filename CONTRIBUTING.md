@@ -81,3 +81,5 @@ When merging a pull request, make sure to select an appropriate label (pr-bugfix
 release-drafter will automatically update the draft release changelog and the galaxy.yml version will be bumped if needed.
 
 Once a draft release is published, collection packages will be added to the release and ansible-galaxy automatically.
+
+If you need to manually bump the collection version, run the `update-version` script and adjust the test versions if required.
