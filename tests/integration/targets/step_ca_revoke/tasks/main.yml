@@ -20,6 +20,7 @@
   loop:
     - name: tests-JWK
       type: JWK
+      create: yes
       jwk_password_file: "/tmp/tests_passfile"
   become: yes
   become_user: "{{ step_ca_user }}"

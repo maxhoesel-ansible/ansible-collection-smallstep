@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+
+# update the version number of this collection to the specified value.
+# Usage: ./update-version x.y.z
+
+import argparse
+from packaging import version
+import yaml
+
+
+def update_galaxy_yml(ver):
+    with open("galaxy.yml", encoding="utf-8") as f:
+        galaxy = yaml.safe_load(f)
+
+    galaxy["version"] = str(ver)
+
+    with open("galaxy.yml", "w", encoding="utf-8") as f:
+        yaml.dump(galaxy, f, allow_unicode=True)
+
+
+def update_util_collection_version(ver):
+    with open("plugins/module_utils/constants.py", encoding="utf-8") as f:
+        data = f.readlines()
+
+    data = map(lambda line: f'COLLECTION_VERSION = "{ver}"' if line.startswith("COLLECTION_VERSION") else line, data)
+
+    with open("plugins/module_utils/constants.py", "w", encoding="utf-8") as f:
+        f.write("{}\n".format('\n'.join(data)))
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("version", help="Version number to set")
+    args = parser.parse_args()
+
+    ver = version.parse(args.version.strip("v"))
+
+    update_galaxy_yml(ver)
+    update_util_collection_version(ver)
+
+
+if __name__ == "__main__":
+    main()

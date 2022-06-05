@@ -21,6 +21,7 @@
     - name: tests-JWK
       type: JWK
       jwk_password_file: "/tmp/tests_passfile"
+      create: yes
   become: yes
   become_user: "{{ step_ca_user }}"
 

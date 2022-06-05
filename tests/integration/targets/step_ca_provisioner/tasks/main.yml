@@ -27,6 +27,7 @@
       - name: tests-JWK
         type: JWK
         jwk_password_file: "/tmp/tests_passfile"
+        create: yes
       - name: tests-OIDC
         type: OIDC
         oidc_client_id: 1087160488420-8qt7bavg3qesdhs6it824mhnfgcfe8il.apps.googleusercontent.com
@@ -34,7 +35,6 @@
         oidc_admin_email:
           - mariano@smallstep.com
           - max@smallstep.com
-        oidc_domain: smallstep.com
       - name: tests-Amazon
         type: AWS
         aws_account: 123456789
@@ -47,26 +47,21 @@
         gcp_project:
           - identity
           - accounting
-      - name: tests-Azure
-        type: Azure
-        azure_tenant: bc9043e2-b645-4c1c-a87a-78f8644bfe57
-        azure_resource_group:
-          - identity
-          - accounting
       - name: tests-ACME
         type: ACME
       - name: tests-x5c
         type: X5C
         x5c_root_file: "/tmp/tests_crt"
       - name: tests-k8s
-        type: K8sSA
+        type: K8SSA
         k8s_pem_keys_file: "/tmp/tests_crt"
 
-  - name: Create test provisioners again
+  - name: Test creation idempotency
     maxhoesel.smallstep.step_ca_provisioner: "{{ item }}"
     loop:
       - name: tests-JWK
         type: JWK
+        create: yes
         jwk_password_file: "/tmp/tests_passfile"
       - name: tests-OIDC
         type: OIDC
@@ -75,7 +70,6 @@
         oidc_admin_email:
           - mariano@smallstep.com
           - max@smallstep.com
-        oidc_domain: smallstep.com
       - name: tests-Amazon
         type: AWS
         aws_account: 123456789
@@ -88,25 +82,36 @@
         gcp_project:
           - identity
           - accounting
-      - name: tests-Azure
-        type: Azure
-        azure_tenant: bc9043e2-b645-4c1c-a87a-78f8644bfe57
-        azure_resource_group:
-          - identity
-          - accounting
       - name: tests-ACME
         type: ACME
       - name: tests-x5c
         type: X5C
         x5c_root_file: "/tmp/tests_crt"
       - name: tests-k8s
-        type: K8sSA
+        type: K8SSA
         k8s_pem_keys_file: "/tmp/tests_crt"
     register: second_run
 
   - name: Verify that nothing changed on the second run
     assert:
       that: not second_run.changed
+
+  - name: Test updating provisioners
+    maxhoesel.smallstep.step_ca_provisioner:
+      name: tests-OIDC
+      type: OIDC
+      oidc_client_id: 1087160488420-8qt7bavg3qesdhs6it824mhnfgcfe8il.apps.googleusercontent.com
+      oidc_configuration_endpoint: https://accounts.google.com/.well-known/openid-configuration
+      oidc_admin_email:
+        - mariano@smallstep.com
+        - max@smallstep.com
+        - new@admin.com
+      state: "updated"
+    register: update_test
+  - name: Verify that provisioner got updated
+    ansible.builtin.assert:
+      that:
+        update_test.changed
 
   # Remove the online provisioners before restarting as they may imapct server
   # functionality
@@ -119,7 +124,6 @@
       - ["tests-OIDC", "OIDC"]
       - ["tests-Amazon", "AWS"]
       - ["tests-Google", "GCP"]
-      - ["tests-Azure", "Azure"]
   become: yes
   become_user: "{{ step_ca_user }}"
 
@@ -136,14 +140,13 @@
 
   - name: Remove test provisioners
     maxhoesel.smallstep.step_ca_provisioner:
-      name: "{{ item.0 }}"
-      type: "{{ item.1 }}"
+      name: "{{ item }}"
       state: absent
     loop:
-      - ["tests-JWK", "JWK"]
-      - ["tests-ACME", "ACME"]
-      - ["tests-x5c", "X5C"]
-      - ["tests-k8s", "K8sSA"]
+      - "tests-JWK"
+      - "tests-ACME"
+      - "tests-x5c"
+      - "tests-k8s"
 
   - name: Get step-ca config
     command: "cat {{ step_ca_path }}/config/ca.json"
