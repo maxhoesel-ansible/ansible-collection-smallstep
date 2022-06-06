@@ -45,6 +45,8 @@ It is thus **very** important that you **back up your root key and password** in
 ##### `step_ca_version`
 - Set the version of step-ca to install
 - Can be a version tag (e.g. `0.15.3`), or `latest` to always install the most recent version
+- It is **highly** recommended that your ca version matches the collection version
+  (e.g. if you are using the collection version 0.20.x you should be installing step-ca version 0.20.x as well)
 - Note that the role will query the GitHub API if this value is set to `latest`. Try setting
   a specific version if you are running into rate limiting issues
 - Default: `latest`
@@ -52,6 +54,8 @@ It is thus **very** important that you **back up your root key and password** in
 ##### `step_cli_version`
 - Set the version of step to install
 - Can be a version tag (e.g. `0.15.3`), or `latest` to always install the most recent version
+- It is **highly** recommended that your cli version matches the collection version
+  (e.g. if you are using the collection version 0.20.x you should be installing step-cli version 0.20.x as well)
 - Note that the role will query the GitHub API if this value is set to `latest`. Try setting
   a specific version if you are running into rate limiting issues
 - Default: `latest`
