@@ -84,12 +84,12 @@ platforms:
     networks:
       - name: smallstep_acme_cert
 
-  - name: step-cert-centos-8
-    hostname: step-cert-centos-8.localdomain
+  - name: step-cert-rockylinux-8
+    hostname: step-cert-rockylinux-8.localdomain
     groups:
       - clients
-      - centos
-    image: "geerlingguy/docker-centos8-ansible"
+      - rockylinux
+    image: "geerlingguy/docker-rockylinux8-ansible"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true

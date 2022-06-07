@@ -32,7 +32,7 @@ It is thus **very** important that you **back up your root key and password** in
 - The following distributions are currently supported:
   - Ubuntu 18.04 LTS or newer
   - Debian 10 or newer
-  - CentOS 8 or newer
+  - A CentOS 8-compatible distribution like RockyLinux or AlmaLinux. RockyLinux is used for testing
 - Supported architectures: amd64, arm64
 - This role requires root access. Make sure to run this role with `become: yes` or equivalent
 - This role requires `expect` to answer some interactive prompts. It will automatically install

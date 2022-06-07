@@ -50,10 +50,10 @@ platforms:
     override_command: false
     pre_build_image: true
 
-  - name: step-cli-centos-8
-    image: "geerlingguy/docker-centos8-ansible"
+  - name: step-cli-rockylinux-8
+    image: "geerlingguy/docker-rockylinux8-ansible"
     groups:
-      - centos
+      - rockylinux
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true

@@ -84,12 +84,12 @@ platforms:
     networks:
       - name: smallstep_bootstrap_host
 
-  - name: step-host-centos-8
-    hostname: step-host-centos-8.localdomain
+  - name: step-host-rockylinux-8
+    hostname: step-host-rockylinux-8.localdomain
     groups:
       - clients
-      - centos
-    image: "geerlingguy/docker-centos8-ansible"
+      - rockylinux
+    image: "geerlingguy/docker-rockylinux8-ansible"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true

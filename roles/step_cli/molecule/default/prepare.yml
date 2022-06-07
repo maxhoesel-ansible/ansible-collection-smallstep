@@ -3,3 +3,10 @@
     - name: Update apt cache
       apt:
         update_cache: yes
+
+- hosts: rockylinux
+  tasks:
+    # Required to prevent issues with ansible_default_ipv4 missing
+    - name: Install iproute
+      package:
+        name: iproute
