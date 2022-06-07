@@ -1,10 +1,10 @@
 ---
-- include: check.yml
+- include_tasks: check.yml
 
 - name: Get ca installation information
   block:
     - name: Get latest step-ca release information
-      uri:
+      ansible.builtin.uri:
         url: https://api.github.com/repos/smallstep/certificates/releases/latest
         body_format: json
         return_content: yes
@@ -15,15 +15,15 @@
       retries: 3
       delay: 5
     - name: Set latest release version
-      set_fact:
+      ansible.builtin.set_fact:
         step_ca_version: "{{ (step_ca_latest_release.json.tag_name)[1:] }}"
   when: step_ca_version == 'latest'
   check_mode: no
 
-- include: "install.yml"
+- ansible.builtin.include_tasks: "install.yml"
 
 - name: step_ca_user is present
-  user:
+  ansible.builtin.user:
     name: "{{ step_ca_user }}"
     password: "*"
     home: "{{ step_ca_path }}"
@@ -31,7 +31,7 @@
     system: yes
   no_log: true
 - name: Paths are present
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: "{{ step_ca_user }}"
@@ -43,7 +43,7 @@
 # This symlink is needed so that step-cli can find
 # the ca configuration files without needing to set STEPPATH
 - name: .step symlink is present
-  file:
+  ansible.builtin.file:
     src: "{{ step_ca_path }}"
     dest: "{{ step_ca_path }}/.step"
     state: link
@@ -51,6 +51,6 @@
     group: "{{ step_ca_user }}"
     mode: 0700
 
-- include: init.yml
+- ansible.builtin.include_tasks: init.yml
 
-- include: service.yml
+- ansible.builtin.include_tasks: service.yml
