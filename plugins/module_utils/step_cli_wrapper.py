@@ -1,4 +1,4 @@
-from .constants import COLLECTION_VERSION
+from .constants import COLLECTION_VERSION, COLLECTION_REPO
 
 
 class CLIWrapper():
@@ -79,8 +79,9 @@ class CLIWrapper():
         Performs a basic version check, as packaging may not be available on target systems
         """
         warn_msg = (f"This version of step-cli ({cli_version}) is not "
-                    f"supported by this collection version ({COLLECTION_VERSION})."
-                    "See the collection documentation for which collection versions supports which step-cli version.")
+                    f"supported by this collection version ({COLLECTION_VERSION}). "
+                    "Collection and step-cli major version should match. "
+                    f"See {COLLECTION_REPO} for more details.")
         coll_segments = COLLECTION_VERSION.split(".")
         cli_segments = cli_version.split(".")
 
