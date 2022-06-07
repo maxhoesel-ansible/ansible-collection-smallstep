@@ -60,6 +60,8 @@ template: |
 
   Breaking changes may happen between minor releases (e.g. 0.20 -> 0.21).
 
+  ---
+
   ## Changes
 
   $CHANGES
