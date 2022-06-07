@@ -4,6 +4,7 @@
 # Usage: ./update-version x.y.z
 
 import argparse
+import copy
 from packaging import version
 import yaml
 
@@ -12,10 +13,12 @@ def update_galaxy_yml(ver):
     with open("galaxy.yml", encoding="utf-8") as f:
         galaxy = yaml.safe_load(f)
 
-    galaxy["version"] = str(ver)
+    new_galaxy = copy.deepcopy(galaxy)
+    new_galaxy["version"] = str(ver)
 
-    with open("galaxy.yml", "w", encoding="utf-8") as f:
-        yaml.dump(galaxy, f, allow_unicode=True)
+    if new_galaxy != galaxy:
+        with open("galaxy.yml", "w", encoding="utf-8") as f:
+            yaml.dump(new_galaxy, f, allow_unicode=True)
 
 
 def update_util_collection_version(ver):
