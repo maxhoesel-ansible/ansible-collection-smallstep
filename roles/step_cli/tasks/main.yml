@@ -1,11 +1,11 @@
 ---
 - name: Load Distribution-specific vars
-  include_vars: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
 
 - name: Get step-cli install information
   block:
     - name: Get latest step-cli release information
-      uri:
+      ansible.builtin.uri:
         url: https://api.github.com/repos/smallstep/cli/releases/latest
         body_format: json
         return_content: yes
@@ -16,9 +16,9 @@
       retries: 3
       delay: 5
     - name: Set latest release version
-      set_fact:
+      ansible.builtin.set_fact:
         step_cli_version: "{{ (step_cli_latest_release.json.tag_name)[1:] }}"
   when: step_cli_version == 'latest'
   check_mode: no
 
-- include: "install.yml"
+- ansible.builtin.include_tasks: "install.yml"
