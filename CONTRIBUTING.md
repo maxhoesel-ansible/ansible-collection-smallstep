@@ -9,7 +9,7 @@ Note that by contributing to this collection, you agree with the code of conduct
 To begin development on this collection, you need to have the following dependencies installed:
 
 - Docker, accessible by your local user account
-- Python 2.7 or 3.6+. CI tests run specifically against either 2.7 or 3.6, but to make things easier we just use whatever version is available locally
+- Python 3.8 or newer (for running ansible-core 2.13+)
 
 ## Quick Start
 
