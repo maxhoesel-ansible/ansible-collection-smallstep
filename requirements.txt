@@ -1,15 +1,15 @@
 # Module deps, useful for editor intellisense, etc.
-ansible-core
+ansible-core==2.13.0
 
 # Linting & Formatting
-ansible-lint
-pylint
-autopep8
-pre-commit
+ansible-lint==6.2.2
+pylint==2.14.1
+autopep8==1.6.0
+pre-commit==2.19.0
 
 # Testing
-tox
+tox==3.25.0
 
 # Utility packages needed for scripts
-pyyaml
-packaging
+pyyaml==6.0.0
+packaging==21.3
