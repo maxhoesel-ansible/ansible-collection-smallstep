@@ -53,12 +53,13 @@ template: |
   ---
   **⚠️ Compatibility Warning ⚠️**
 
-  This release is designed to work with `step-cli` (and `step-ca`) version $RESOLVED_VERSION.
+  Releases of this collection are compatible with their corresponding `step-cli/ca` minor version.
+  In particular, this release (`$RESOLVED_VERSION`) is compatible with `step-cli/ca` `$NEXT_MINOR_VERSION`.
   Other versions may work, but are not supported.
 
   Please make sure to use the appropriate collection version for your version of the step tools.
 
-  Breaking changes may happen between minor releases (e.g. 0.20 -> 0.21).
+  Breaking changes may happen between minor development releases (e.g. 0.20 -> 0.21).
 
   ---
 
