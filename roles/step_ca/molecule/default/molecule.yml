@@ -54,11 +54,11 @@ platforms:
     override_command: false
     pre_build_image: true
 
-  - name: step-ca-centos-8
+  - name: step-ca-rockylinux-8
     groups:
-      - centos
+      - rockylinux
       - ca
-    image: "geerlingguy/docker-centos8-ansible"
+    image: "geerlingguy/docker-rockylinux8-ansible"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true

@@ -4,6 +4,13 @@
       apt:
         update_cache: yes
 
+- hosts: rockylinux
+  tasks:
+    # Required to prevent issues with ansible_default_ipv4 missing
+    - name: Install iproute
+      package:
+        name: iproute
+
 - hosts: ca
   tasks:
     - name: Copy existing ca cert/key to nodes
