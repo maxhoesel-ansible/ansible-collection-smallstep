@@ -6,7 +6,7 @@
     key_file: "{{ step_acme_cert_keyfile_full.path }}"
     force: yes
     name: "{{ step_acme_cert_name }}"
-    not_after: "{{ step_acme_cert_duration|default(omit) }}"
+    not_after: "{{ step_acme_cert_duration | default(omit) }}"
     san: "{{ step_acme_cert_san }}"
     standalone: "{{ step_acme_cert_webroot_path | bool }}"
     step_cli_executable: "{{ step_cli_executable }}"
