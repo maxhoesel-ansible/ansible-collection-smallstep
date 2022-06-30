@@ -1,7 +1,8 @@
 [Unit]
 Description=Step TLS Renewer
 After=network.target
-StartLimitIntervalSec=0
+StartLimitInterval=600
+StartLimitBurst=5
 
 [Service]
 Type=simple
