@@ -63,6 +63,6 @@ template: |
 
   ---
 
-  ## Changes
+  # Changes
 
   $CHANGES
