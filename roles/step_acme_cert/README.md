@@ -26,7 +26,7 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 ##### `step_cli_steppath`
 - Optionally set a custom `$STEPPATH` from which to read the step config
 - Example: `/etc/step-cli`
-- Default: `/root/.step/`
+- Default: `$HOME/.step/`
 
 ### CA
 
@@ -111,21 +111,21 @@ to make use of ACME certs.
         state: reloaded
 
 - hosts: clients
+  become: yes
   tasks:
     # Bootstrap the host to trust the CA
-    - role: maxhoesel.smallstep.step_bootstrap_host
+    - include_role:
+        name: maxhoesel.smallstep.step_bootstrap_host
       vars:
         step_bootstrap_ca_url: https://myca.localdomain
         step_bootstrap_fingerprint: your CAs fingerprint
-      become: yes
 
     # This will download a certificate to /etc/step/ that you can then use in other applications.
     # See the step_acme_cert README for more options
     - name: Configure an ACME cert + renewal
       include_role:
         name: maxhoesel.smallstep.step_acme_cert
-        vars:
-          step_acme_cert_ca_provisioner: ACME
-      become: yes
+      vars:
+        step_acme_cert_ca_provisioner: ACME
 
 ```
