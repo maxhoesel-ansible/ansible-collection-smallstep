@@ -7,4 +7,4 @@ step_cli_executable: step-cli
 step_bootstrap_install_cert: yes
 step_bootstrap_force: no
 
-step_cli_steppath: /root/.step
+step_cli_steppath: "{{ ansible_env.HOME }}/.step"

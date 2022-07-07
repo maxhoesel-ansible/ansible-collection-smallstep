@@ -29,7 +29,7 @@ This role is intended to be run on regular hosts in your network that you want t
   All step configuration will be saved in this path instead of the default `$HOME/.step/`
 - **NOTE**: If set, you will have to supply your custom `$STEPPATH` in all future role/module/`step-cli` calls on this host that use the step config
 - Example: `/etc/step-cli`
-- Default: `/root/.step/`
+- Default: `$HOME/.step/`
 
 ##### `step_cli_version`
 - Set the version of step to install
