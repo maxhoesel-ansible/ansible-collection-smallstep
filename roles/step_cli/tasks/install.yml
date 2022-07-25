@@ -25,7 +25,7 @@
     - name: Install step-cli binary # noqa no-changed-when
       shell: >
         set -o pipefail &&
-        cp /tmp/step_{{ step_cli_version }}/bin/step {{ step_cli_executable }}
+        mv /tmp/step_{{ step_cli_version }}/bin/step {{ step_cli_executable }}
       args:
         executable: /bin/bash
   always:

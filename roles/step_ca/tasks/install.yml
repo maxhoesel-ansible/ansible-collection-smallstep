@@ -27,18 +27,13 @@
         remote_src: yes
       retries: 3
       delay: 3
-    # step-ca needs to be stopped in order to overwrite the executable
-    - name: Stop step-ca process
-      systemd:
-        name: step-ca
-        state: stopped
-      when: step_ca_present.stat.exists
     - name: Install step-ca binary # noqa no-changed-when
       shell: >
         set -o pipefail &&
-        cp /tmp/step-ca_{{ step_ca_version }}/bin/* {{ step_ca_executable | dirname }}
+        mv /tmp/step-ca_{{ step_ca_version }}/bin/* {{ step_ca_executable | dirname }}
       args:
         executable: /bin/bash
+      notify: restart step-ca
   always:
     - name: Remove step release archive
       file:
