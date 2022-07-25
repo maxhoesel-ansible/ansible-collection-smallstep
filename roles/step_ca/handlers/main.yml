@@ -1,0 +1,4 @@
+- name: restart step-ca
+  systemd:
+    name: step-ca.service
+    state: restarted
