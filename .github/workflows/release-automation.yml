@@ -45,6 +45,7 @@ jobs:
         with:
           add-paths: |
             galaxy.yml
+            plugins/module_utils/constants.py
           title: Update version to ${{ needs.update-release-draft.outputs.version-tag }}
           body: |
             This PR updates the galaxy.yml (and eventual other files) version to keep up with recently merged changes.
