@@ -28,7 +28,7 @@ def update_util_collection_version(ver):
     data = map(lambda line: f'COLLECTION_VERSION = "{ver}"' if line.startswith("COLLECTION_VERSION") else line, data)
 
     with open("plugins/module_utils/constants.py", "w", encoding="utf-8") as f:
-        f.write("{}\n".format('\n'.join(data)))
+        f.write("{}\n".format('\n'.join(data).rstrip()))
 
 
 def main():
