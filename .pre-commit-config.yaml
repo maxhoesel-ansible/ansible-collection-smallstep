@@ -12,13 +12,13 @@ repos:
       - id: check-executables-have-shebangs
       - id: debug-statements
   - repo: https://github.com/asottile/pyupgrade
-    rev: v2.37.2
+    rev: v2.37.3
     hooks:
       - id: pyupgrade
         args:
           - --py36-plus
   - repo: https://github.com/ansible/ansible-lint
-    rev: v6.3.0
+    rev: v6.4.0
     hooks:
       - id: ansible-lint
   - repo: local
