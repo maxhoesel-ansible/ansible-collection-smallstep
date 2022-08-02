@@ -1,5 +1,5 @@
 # Module deps, useful for editor intellisense, etc.
-ansible-core==2.13.1
+ansible-core==2.13.2
 
 # Linting & Formatting
 ansible-lint==6.3.0
