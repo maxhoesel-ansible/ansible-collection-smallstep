@@ -28,6 +28,20 @@ platforms:
     networks:
       - name: smallstep_bootstrap_host
 
+  - name: step-host-ubuntu-22
+    hostname: step-host-ubuntu-22.localdomain
+    groups:
+      - clients
+      - ubuntu
+    image: "geerlingguy/docker-ubuntu2204-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+    networks:
+      - name: smallstep_bootstrap_host
+
   - name: step-host-ubuntu-20
     hostname: step-host-ubuntu-20.localdomain
     groups:
@@ -76,6 +90,20 @@ platforms:
       - clients
       - debian
     image: "geerlingguy/docker-debian10-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+    networks:
+      - name: smallstep_bootstrap_host
+
+  - name: step-host-rockylinux-9
+    hostname: step-host-rockylinux-9.localdomain
+    groups:
+      - clients
+      - rockylinux
+    image: "geerlingguy/docker-rockylinux9-ansible"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true
