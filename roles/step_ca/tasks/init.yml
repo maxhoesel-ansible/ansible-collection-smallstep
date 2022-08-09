@@ -24,6 +24,46 @@
         mode: 0600
         group: "{{ step_ca_user }}"
       no_log: yes
+    - name: Copy root cert from controller
+      copy:
+        src: "{{ step_ca_existing_root }}"
+        dest: "{{ step_ca_existing_root_file }}"
+        owner: "{{ step_ca_user }}"
+        mode: 0600
+        group: "{{ step_ca_user }}"
+    - name: Copy root key from controller
+      copy:
+        src: "{{ step_ca_existing_key }}"
+        dest: "{{ step_ca_existing_key_temp_file }}"
+        owner: "{{ step_ca_user }}"
+        mode: 0600
+        group: "{{ step_ca_user }}"
+      when: step_ca_existing_key is defined
+    - name: Decrypt root key
+      block:
+        - name: Copy existing encrypted key
+          copy:
+            src: "{{ step_ca_existing_key_file }}"
+            dest: "{{ step_ca_existing_key_temp_file }}"
+            owner: "{{ step_ca_user }}"
+            mode: 0600
+            group: "{{ step_ca_user }}"
+          when: step_ca_existing_key_file is defined
+        - name: Copy password to temporary file
+          copy:
+            content: "{{ step_ca_existing_key_password }}"
+            dest: "{{ step_ca_existing_key_password_file }}"
+            owner: "{{ step_ca_user }}"
+            mode: 0600
+            group: "{{ step_ca_user }}"
+          no_log: yes
+        - name: Decrypt temporary root key
+          command: >-
+            {{ step_cli_executable }} crypto change-pass
+            {{ step_ca_existing_key_temp_file }}
+            --password-file={{ step_ca_existing_key_password_file }}
+            --insecure --no-password --force
+      when: step_ca_existing_key_password is defined
     - name: Initialize CA # noqa no-changed-when
       command: >-
         {{ step_cli_executable }} ca init
@@ -36,7 +76,7 @@
         {% if step_ca_url is defined %} --with-ca-url={{ step_ca_url | quote }}{% endif %}
         {% if step_ca_ssh %} --ssh{% endif %}
         {% if step_ca_existing_root_file is defined %} --root={{ step_ca_existing_root_file | quote }}{% endif %}
-        {% if step_ca_existing_key_file is defined %} --key={{ step_ca_existing_key_file | quote }}{% endif %}
+        {% if step_ca_existing_key_temp_file is defined %} --key={{step_ca_existing_key_temp_file | quote}}{% elif step_ca_existing_key_file is defined %} --key={{ step_ca_existing_key_file | quote }}{% endif %}
         {% if step_ca_ra is defined %} --ra={{ step_ca_ra | quote }}{% endif %}
         {% if step_ca_ra_issuer is defined %} --issuer={{ step_ca_ra_issuer | quote }}{% endif %}
         {% if step_ca_ra_credentials_file is defined %} --credentials-file={{ step_ca_ra_credentials_file | quote }}{% endif %}
@@ -70,4 +110,18 @@
       file:
         path: "{{ step_ca_root_password_file }}"
         state: absent
+    - name: Existing root password file is absent
+      file:
+        path: "{{ step_ca_existing_key_password_file }}"
+        state: absent
+    - name: Delete temporary root cert file
+      file:
+        path: "{{ step_ca_existing_root_file }}"
+        state: absent
+      when: step_ca_delete_temp_root|bool == True
+    - name: Delete temporary root key file
+      file:
+        path: "{{ step_ca_existing_key_temp_file }}"
+        state: absent
+      when: step_ca_existing_key_temp_file is defined
   when: not step_ca_config.stat.exists

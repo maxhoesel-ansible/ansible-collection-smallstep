@@ -138,8 +138,19 @@ These variables need to be set as a group.
 
 ##### `step_ca_existing_key_file`
 - The path of an existing key file of the root certificate authority
-- The key file must not be password-protected
 - The file must already exist on the remote host
+- Default: Not set
+
+##### `step_ca_existing_root`
+- Equivalent to `step_ca_existing_root_file` but file is on the controller
+- Default: Not set
+
+##### `step_ca_existing_key`
+- Equivalent to `step_ca_existing_key_file` but file is on the controller
+- Default: Not set
+
+##### `step_ca_existing_key_password`
+- Password to decrypt the existing key file
 - Default: Not set
 
 
