@@ -1,7 +1,12 @@
-- name: Look for existing step-cli binary
-  stat:
-    path: "{{ step_cli_executable }}"
-  register: step_cli_present
+- name: Look for step_cli_executable # noqa command-instead-of-shell
+  #"command" is a shell builtin, hence the need for the shell module
+  shell: "command -v {{ step_cli_executable }}"
+  register: step_cli_install
+  # dash (Debian sh shell) uses 127 instead of 1 for not found errors
+  failed_when: step_cli_install.rc not in [0,1,127]
+  changed_when: no
+  check_mode: no
+
 - name: Get currently installed step-cli version
   shell: >
     set -o pipefail &&
@@ -11,10 +16,14 @@
   changed_when: no
   check_mode: no
   register: step_cli_installed_version
-  when: step_cli_present.stat.exists
+  when: step_cli_install.rc == 0
 
 - name: Install step-cli
   block:
+    - name: Set step-cli install path
+      ansible.builtin.set_fact:
+        _step_cli_install_path: "{{ step_cli_install_dir }}/{{ step_cli_executable }}"
+      when: "'/' not in step_cli_executable"
     - name: Download and extract step-cli archive
       unarchive:
         src: "https://github.com/smallstep/cli/releases/download/v{{ step_cli_version }}/step_linux_{{ step_cli_version }}_{{ step_cli_arch[ansible_architecture] }}.tar.gz"
@@ -25,7 +34,7 @@
     - name: Install step-cli binary # noqa no-changed-when
       shell: >
         set -o pipefail &&
-        mv /tmp/step_{{ step_cli_version }}/bin/step {{ step_cli_executable }}
+        mv /tmp/step_{{ step_cli_version }}/bin/step {{ _step_cli_install_path | d(step_cli_executable) }}
       args:
         executable: /bin/bash
   always:

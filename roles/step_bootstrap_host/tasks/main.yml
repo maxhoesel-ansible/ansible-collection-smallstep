@@ -29,7 +29,7 @@
   when: step_bootstrap_install_cert
 
 - name: Install CA cert into trust stores
-  ansible.builtin.command: "step-cli certificate install {{ step_cli_steppath }}/certs/root_ca.crt --all"
+  ansible.builtin.command: "{{ step_cli_executable }} certificate install {{ step_cli_steppath }}/certs/root_ca.crt --all"
   when:
     - step_bootstrap_install_cert
     - step_bootstrap_force or step_bootstrap_installed.rc != 0

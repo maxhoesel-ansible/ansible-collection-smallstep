@@ -40,22 +40,43 @@ It is thus **very** important that you **back up your root key and password** in
 
 ## Role Variables
 
-### Installation
+### Installation (step-cli)
 
-##### `step_ca_version`
-- Set the version of step-ca to install
-- Can be a version tag (e.g. `0.15.3`), or `latest` to always install the most recent version
-- It is **highly** recommended that your ca version matches the collection version
-  (e.g. if you are using the collection version 0.20.x you should be installing step-ca version 0.20.x as well)
-- Note that the role will query the GitHub API if this value is set to `latest`. Try setting
-  a specific version if you are running into rate limiting issues
-- Default: `latest`
+##### `step_cli_executable`
+- What to name and where to put the `step-cli` executable that will be installed by this role
+- Can be an absolute path (make sure that the parent directory is in $PATH) or a filename
+- If this executable is not found and `step_cli_executable` is a **path**, the executable will be installed there
+- If this executable is not found and  `step_cli_executable` is a **name**, the executable will be installed at `step_cli_install_dir` with the given name
+- Default: `step-cli`
 
 ##### `step_cli_version`
 - Set the version of step to install
 - Can be a version tag (e.g. `0.15.3`), or `latest` to always install the most recent version
 - It is **highly** recommended that your cli version matches the collection version
   (e.g. if you are using the collection version 0.20.x you should be installing step-cli version 0.20.x as well)
+- Note that the role will query the GitHub API if this value is set to `latest`. Try setting
+  a specific version if you are running into rate limiting issues
+- Default: `latest` (same as the upstream step-cli packages)
+
+##### `step_cli_install_dir`
+- Used if `step_cli_executable` is not found and contains a executable name
+- Sets the directory to install `step_cli_executable` into
+- The directory must already exist
+- Ignored if `step_cli_executable` contains a path already
+- Default: `/usr/bin`
+
+### Installation (step-ca)
+
+##### `step_ca_executable`
+- Where to put the `step-ca` executable that will be installed by this role
+- Must be an absolute path
+- Default: `/usr/bin/step-ca`
+
+##### `step_ca_version`
+- Set the version of step-ca to install
+- Can be a version tag (e.g. `0.15.3`), or `latest` to always install the most recent version
+- It is **highly** recommended that your ca version matches the collection version
+  (e.g. if you are using the collection version 0.20.x you should be installing step-ca version 0.20.x as well)
 - Note that the role will query the GitHub API if this value is set to `latest`. Try setting
   a specific version if you are running into rate limiting issues
 - Default: `latest`
@@ -139,14 +160,6 @@ These variables need to be set as a group
 ##### `step_ca_ra_credentials_file`
 - The registration authority credentials file to use
 - Default: Not set
-
-
-### step-cli
-
-##### `step_cli_executable`
-- Path or name of the step-cli executable to use for executing commands in this role
-- Can be an absolute path or a command (make sure the executable is in $PATH) for all users
-- Default: `step-cli`
 
 
 ## Example Playbooks

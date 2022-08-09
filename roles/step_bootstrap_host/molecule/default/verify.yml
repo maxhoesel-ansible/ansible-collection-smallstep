@@ -3,7 +3,7 @@
   hosts: clients
   tasks:
     - name: Verify that root is able to access ca
-      command: step-cli ca health
+      command: /tmp/this-is-step-cli ca health
       become: yes
       changed_when: no
       environment:

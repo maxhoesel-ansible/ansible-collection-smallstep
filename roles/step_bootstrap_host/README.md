@@ -1,10 +1,10 @@
 # maxhoesel.smallstep.step_bootstrap_host
 
-Configure a host to trust your CA and install `step-cli` to access it.
+Install `step-cli` on a host and configure it to trust your CA.
+This is intended as a one-stop role that sets up all the components neccessary for using `step-cli` on a given host.
+It will:
 
-This role is intended to be run on regular hosts in your network that you want to cooperate with your existing CA. It will:
-
-1. Install `step-cli` if required
+1. Install `step-cli` if required (using the `step_cli` role)
 2. Install the CA root cert into the system trust store
 3. Configure the root user to automatically connect to your CA when running `step-cli`.
 
@@ -19,17 +19,14 @@ This role is intended to be run on regular hosts in your network that you want t
 
 ## Role Variables
 
-##### `step_cli_executable`
-- Path or name of the step-cli executable to use for executing commands in this role
-- Can be an absolute path or a command (make sure the executable is in $PATH) for all users
-- Default: `step-cli`
+### Install
 
-##### `step_cli_steppath`
-- Optionally set a custom `$STEPPATH` for bootstrapping.
-  All step configuration will be saved in this path instead of the default `$HOME/.step/`
-- **NOTE**: If set, you will have to supply your custom `$STEPPATH` in all future role/module/`step-cli` calls on this host that use the step config
-- Example: `/etc/step-cli`
-- Default: `$HOME/.step/`
+##### `step_cli_executable`
+- What to name and where to put the `step-cli` executable that will be installed by this role
+- Can be an absolute path (make sure that the parent directory is in $PATH) or a filename
+- If this executable is not found and `step_cli_executable` is a **path**, the executable will be installed there
+- If this executable is not found and  `step_cli_executable` is a **name**, the executable will be installed at `step_cli_install_dir` with the given name
+- Default: `step-cli`
 
 ##### `step_cli_version`
 - Set the version of step to install
@@ -38,7 +35,23 @@ This role is intended to be run on regular hosts in your network that you want t
   (e.g. if you are using the collection version 0.20.x you should be installing step-cli version 0.20.x as well)
 - Note that the role will query the GitHub API if this value is set to `latest`. Try setting
   a specific version if you are running into rate limiting issues
-- Default: `latest`
+- Default: `latest` (same as the upstream step-cli packages)
+
+##### `step_cli_install_dir`
+- Used if `step_cli_executable` is not found and contains a executable name
+- Sets the directory to install `step_cli_executable` into
+- The directory must already exist
+- Ignored if `step_cli_executable` contains a path already
+- Default: `/usr/bin`
+
+### Bootstrap
+
+##### `step_cli_steppath`
+- Optionally set a custom `$STEPPATH` for bootstrapping.
+  All step configuration will be saved in this path instead of the default `$HOME/.step/`
+- **NOTE**: If set, you will have to supply your custom `$STEPPATH` in all future role/module/`step-cli` calls on this host that use the step config
+- Example: `/etc/step-cli`
+- Default: `$HOME/.step/`
 
 ##### `step_bootstrap_ca_url`
 - URL of the `step-ca` CA
@@ -52,15 +65,18 @@ This role is intended to be run on regular hosts in your network that you want t
 
 ##### `step_bootstrap_install_cert`
 - Whether to install the CA cert into the system root trust store(s)
-- If set to false, this role only installs `step-cli` and configures the root user to run `step-cli` against your CA
+- If set to false, this role only installs `step-cli` and configures the root user to run `step-cli` against your CA.
+  Other applications on your system will **not** trust the CA, as the certificate won't be in the system trust store.
 - Default: Yes
 
 ##### `step_bootstrap_force`
 - Whether to force bootstrapping of the CA configuration.
-- If true, will cause an overwrite of any existing CA configuration, including root certificate.  Useful to change the CA URL, or even change to a new CA entirely.
+- If true, will cause an overwrite of any existing CA configuration, including root certificate. Useful to change the CA URL, or even change to a new CA entirely.
 - Default: No
 
 ## Example Playbook
+
+See the [step-cli role docs](/roles/step_cli/README.md) for more details on the install options
 
 ```
 - name: Configure the host to trust the CA and setup the step service user

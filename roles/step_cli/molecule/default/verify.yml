@@ -4,5 +4,5 @@
   gather_facts: false
   tasks:
     - name: Verify that step-cli is installed
-      command: /usr/bin/step-cli version
+      command: /opt/step-cli version
       changed_when: no

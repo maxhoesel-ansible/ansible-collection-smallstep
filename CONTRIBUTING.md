@@ -2,7 +2,7 @@
 
 Below you will find the information needed to contribute to this project.
 
-Note that by contributing to this collection, you agree with the code of conduct you can find [here.](CODE_OF_CONDUCT.md)
+Note that by contributing to this collection, you agree with the code of conduct you can find [here.](/CODE_OF_CONDUCT.md)
 
 ## Requirements
 
