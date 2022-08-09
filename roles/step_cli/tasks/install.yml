@@ -34,9 +34,13 @@
     - name: Install step-cli binary # noqa no-changed-when
       shell: >
         set -o pipefail &&
-        mv /tmp/step_{{ step_cli_version }}/bin/step {{ _step_cli_install_path | d(step_cli_executable) }}
+        mv -Z /tmp/step_{{ step_cli_version }}/bin/step {{ _step_cli_install_path | d(step_cli_executable) }}
       args:
         executable: /bin/bash
+    # mv does not automatically set selinux labels, so we have to do it ourselves
+    - name: Restore SELinux context for binary
+      command: "restorecon -v {{ _step_cli_install_path }}"
+      when: ansible_selinux is defined and ansible_selinux and ansible_selinux.status == 'enabled'
   always:
     - name: Remove step release archive
       file:
