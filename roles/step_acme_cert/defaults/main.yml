@@ -25,4 +25,6 @@ step_acme_cert_keyfile_defaults:
 
 step_acme_cert_renewal_service: step-renew
 #step_acme_cert_renewal_when: 8h
+step_acme_cert_post_renewal_shell: "/bin/sh"
+step_acme_cert_post_renewal_commands: []
 step_acme_cert_renewal_reload_services: []

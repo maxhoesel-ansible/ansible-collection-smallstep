@@ -111,6 +111,21 @@ argument_specs:
         description:
           - Renew the cert when its remaining valid time crosses this threshold
           - Uses the smallstep default (1/3 of the certs valid duration) if left undefined
+      step_acme_cert_post_renewal_shell:
+        type: str
+        default: /bin/sh
+        description:
+          - Shell with which to run commands specified in "step_acme_cert_post_renewal_commands"
+          - Must be a valid shell
+      step_acme_cert_post_renewal_commands:
+        type: list
+        elements: str
+        default: []
+        description:
+          - Run these commands after a cert renewal
+          - Must be a list of commands executable with the shell specified in "step_acme_cert_post_renewal_shell"
+          - "${STEP_CLI}, ${CERT_FILE} and ${KEY_FILE} are available for use. All will be absolute paths to files."
+          - "Example: C(['cp ${CERT_FILE} /path/to/somewhere/', 'chmod 400 ${KEY_FILE}'])"
       step_acme_cert_renewal_reload_services:
         type: list
         elements: str

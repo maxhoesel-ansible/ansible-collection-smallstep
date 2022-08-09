@@ -6,6 +6,14 @@
   changed_when: no
   check_mode: no
 
+- name: Post renewal hook script is present
+  template:
+    src: step-post-renew-hook.sh.j2
+    dest: "{{step_cli_steppath}}/{{ step_acme_cert_renewal_service }}_post.sh"
+    owner: root
+    group: root
+    mode: 0744
+
 - name: Renewal service is installed
   template:
     src: step-renew.service.j2

@@ -9,7 +9,7 @@ Type=simple
 Restart=always
 RestartSec=1
 Environment=STEPPATH={{ step_cli_steppath }}
-ExecStart={{ step_cli_executable_absolute.stdout }} ca renew {{ step_acme_cert_certfile_full.path }} {{ step_acme_cert_keyfile_full.path }} --daemon --force{% if step_acme_cert_renewal_when is defined %} --expires-in {{ step_acme_cert_renewal_when }}{% endif %}{% if step_acme_cert_renewal_reload_services %} --exec "systemctl try-reload-or-restart {{ step_acme_cert_renewal_reload_services | join(' ') }}"{% endif %}
+ExecStart={{ step_cli_executable_absolute.stdout }} ca renew {{ step_acme_cert_certfile_full.path }} {{ step_acme_cert_keyfile_full.path }} --daemon --force{% if step_acme_cert_renewal_when is defined %} --expires-in {{ step_acme_cert_renewal_when }}{% endif %}{% if step_acme_cert_post_renewal_commands or step_acme_cert_renewal_reload_services %} --exec "{{ step_acme_cert_post_renewal_shell }} {{ step_cli_steppath }}/{{ step_acme_cert_renewal_service }}_post.sh"{% endif %}
 
 [Install]
 WantedBy=multi-user.target
