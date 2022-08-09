@@ -4,7 +4,7 @@
       apt:
         update_cache: yes
 
-- hosts: rockylinux
+- hosts: rockylinux:fedora
   tasks:
     # Required to prevent issues with ansible_default_ipv4 missing
     - name: Install iproute

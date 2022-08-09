@@ -126,6 +126,20 @@ platforms:
     networks:
       - name: smallstep_acme_cert
 
+  - name: step-cert-fedora-36
+    hostname: step-cert-fedora-36.localdomain
+    groups:
+      - clients
+      - fedora
+    image: "geerlingguy/docker-fedora36-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+    networks:
+      - name: smallstep_acme_cert
+
 provisioner:
   name: ansible
   config_options:
