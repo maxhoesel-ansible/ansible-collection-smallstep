@@ -1,8 +1,4 @@
 ---
-- name: Requirements are installed
-  package:
-    name: expect
-
 - name: Look for existing step-ca binary
   stat:
     path: "{{ step_ca_executable }}"
