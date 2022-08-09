@@ -5,3 +5,5 @@
     - name: "Include step_cli"
       include_role:
         name: "step_cli"
+      vars:
+        step_cli_executable: /opt/step-cli

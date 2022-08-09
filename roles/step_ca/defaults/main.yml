@@ -1,5 +1,6 @@
 ---
 # Installation vars
+step_ca_executable: /usr/bin/step-ca
 step_ca_version: latest
 step_ca_user: step-ca
 step_ca_path: /etc/step-ca
