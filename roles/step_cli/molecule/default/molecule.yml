@@ -10,6 +10,17 @@ platforms:
   # - The containers run as privileged containers so that we can
   #   use systemd functionality. This *should* be possible with unpriliged
   #   containers as well, but is quite the headache.
+  # - they are connected to a shared network to allow simulating a remote CA
+  - name: step-cli-ubuntu-22
+    image: "geerlingguy/docker-ubuntu2204-ansible"
+    groups:
+      - ubuntu
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+
   - name: step-cli-ubuntu-20
     image: "geerlingguy/docker-ubuntu2004-ansible"
     groups:
@@ -44,6 +55,16 @@ platforms:
     image: "geerlingguy/docker-debian10-ansible"
     groups:
       - debian
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+
+  - name: step-cli-rockylinux-9
+    image: "geerlingguy/docker-rockylinux9-ansible"
+    groups:
+      - rockylinux
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
     privileged: true

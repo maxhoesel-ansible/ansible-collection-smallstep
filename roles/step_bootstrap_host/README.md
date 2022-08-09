@@ -13,7 +13,7 @@ This role is intended to be run on regular hosts in your network that you want t
 - The following distributions are currently supported:
   - Ubuntu 18.04 LTS or newer
   - Debian 10 or newer
-  - A CentOS 8-compatible distribution like RockyLinux or AlmaLinux. RockyLinux is used for testing
+  - A CentOS-compatible distribution like RockyLinux/AlmaLinux 8 or newer. RockyLinux is used for testing
 - This role requires root access. Make sure to run this role with `become: yes` or equivalent
 - `step-cli` will be automatically installed, if not already present
 

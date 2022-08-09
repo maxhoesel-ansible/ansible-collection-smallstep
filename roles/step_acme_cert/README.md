@@ -10,7 +10,7 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 - The following distributions are currently supported:
   - Ubuntu 18.04 LTS or newer
   - Debian 10 or newer
-  - A CentOS 8-compatible distribution like RockyLinux or AlmaLinux. RockyLinux is used for testing
+  - A CentOS-compatible distribution like RockyLinux/AlmaLinux 8 or newer. RockyLinux is used for testing
 - This role requires root access. Make sure to run this role with `become: yes` or equivalent
 - The host must be bootstrapped with `step_bootstrap_host` and the root user must be able to access the CA.
 
