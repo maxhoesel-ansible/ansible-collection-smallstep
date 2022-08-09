@@ -35,8 +35,6 @@ It is thus **very** important that you **back up your root key and password** in
   - A CentOS-compatible distribution like RockyLinux/AlmaLinux 8 or newer. RockyLinux is used for testing
 - Supported architectures: amd64, arm64
 - This role requires root access. Make sure to run this role with `become: yes` or equivalent
-- This role requires `expect` to answer some interactive prompts. It will automatically install
-  `expect` if it is not present
 
 ## Role Variables
 

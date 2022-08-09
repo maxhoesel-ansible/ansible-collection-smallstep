@@ -16,7 +16,7 @@
 
 - name: Initialize CA
   block:
-    - name: Create root and password file # noqa no-changed-when
+    - name: Create root cert password file # noqa no-changed-when
       copy:
         content: "{{ step_ca_root_password }}"
         dest: "{{ step_ca_root_password_file }}"
@@ -45,37 +45,16 @@
       become: yes
       become_user: "{{ step_ca_user }}"
 
-    - name: Change password for intermediate key # noqa no-changed-when
-      shell: |
-        set timeout 300
-        spawn {{ step_cli_executable }} crypto change-pass {{ step_ca_path }}/secrets/intermediate_ca_key -f
-        expect "Please enter the password to decrypt"
-        send -- "{{ step_ca_root_password }}\r"
-        expect "Please enter the password to encrypt"
-        send -- "{{ step_ca_intermediate_password }}\r"
-        expect
-      args:
-        executable: expect
+    - name: Change password for intermediate and ssh keys # noqa no-changed-when
+      command: "{{ step_cli_executable }} crypto change-pass {{ step_ca_path }}/secrets/{{ item }} -f --password-file={{ step_ca_root_password_file }} -new-password-file={{ step_ca_intermediate_password_file }}"
       become: yes
       become_user: "{{ step_ca_user }}"
-
-    - name: Change password for SSH keys
-      shell: |
-        set timeout 300
-        spawn {{ step_cli_executable }} crypto change-pass {{ step_ca_path }}/secrets/{{ item }} -f
-        expect "Please enter the password to decrypt"
-        send -- "{{ step_ca_root_password }}\r"
-        expect "Please enter the password to encrypt"
-        send -- "{{ step_ca_intermediate_password }}\r"
-        expect
-      args:
-        executable: expect
-      become: yes
-      become_user: "{{ step_ca_user }}"
-      loop:
-        - ssh_host_ca_key
-        - ssh_user_ca_key
-      when: step_ca_ssh
+      loop: "{{ _item_list | select | list }}"
+      vars:
+        _item_list:
+          - intermediate_ca_key
+          - "{{ step_ca_ssh | ternary('ssh_host_ca_key', '') }}"
+          - "{{ step_ca_ssh | ternary('ssh_user_ca_key', '') }}"
 
     - name: Remove initial provisioner
       maxhoesel.smallstep.step_ca_provisioner:
