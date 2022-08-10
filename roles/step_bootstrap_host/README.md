@@ -13,6 +13,7 @@ It will:
 - The following distributions are currently supported:
   - Ubuntu 18.04 LTS or newer
   - Debian 10 or newer
+  - Fedora 36 or newer
   - A CentOS-compatible distribution like RockyLinux/AlmaLinux 8 or newer. RockyLinux is used for testing
 - This role requires root access. Make sure to run this role with `become: yes` or equivalent
 - `step-cli` will be automatically installed, if not already present

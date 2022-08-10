@@ -9,6 +9,7 @@ This role is used by `step_bootstrap_host` and `step_ca`, but can also be used s
 - The following distributions are currently supported:
   - Ubuntu 18.04 LTS or newer
   - Debian 10 or newer
+  - Fedora 36 or newer
   - A CentOS-compatible distribution like RockyLinux/AlmaLinux 8 or newer. RockyLinux is used for testing
 - Supported architectures: amd64, arm64
 - This role requires root access. Make sure to run this role with `become: yes` or equivalent
@@ -17,7 +18,7 @@ This role is used by `step_bootstrap_host` and `step_ca`, but can also be used s
 
 ##### `step_cli_executable`
 - What to name and where to put the `step-cli` executable that will be installed by this role
-- Can be an absolute path (make sure that the parent directory is in $PATH) or a filename
+- Can be an absolute path (make sure that the parent directory is in $PATH and has correct SELinux policies set, if applicable) or a filename
 - If this executable is not found and `step_cli_executable` is a **path**, the executable will be installed there
 - If this executable is not found and  `step_cli_executable` is a **name**, the executable will be installed at `step_cli_install_dir` with the given name
 - Default: `step-cli`

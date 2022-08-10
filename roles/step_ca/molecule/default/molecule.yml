@@ -87,6 +87,17 @@ platforms:
     override_command: false
     pre_build_image: true
 
+  - name: step-ca-fedora-36
+    groups:
+      - fedora
+      - ca
+    image: "geerlingguy/docker-fedora36-ansible"
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true
+    override_command: false
+    pre_build_image: true
+
 provisioner:
   name: ansible
   config_options:
