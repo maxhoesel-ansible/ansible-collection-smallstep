@@ -4,16 +4,29 @@ Below you will find the information needed to contribute to this project.
 
 Note that by contributing to this collection, you agree with the code of conduct you can find [here.](CODE_OF_CONDUCT.md)
 
-## Requirements
+## Quick-start using the devcontainer
+
+Requirements:
+
+- Docker
+
+This repository comes with a `devcontainer.json` file that compatible editors (like VSCode) can use to quickly run a development container with all the required dependencies needed to work on this collection.
+
+To use the devcontainer, either click on the automatic prompt that should pop up when opening this repository,
+or manually open the repository inside the devcontainer by selecting that option in the bottom left remote menu inside VSCode.
+
+You should now have a fully functional dev environment with all the tools you will need to work on this collection.
+
+## Manual setup
 
 To begin development on this collection, you need to have the following dependencies installed:
 
 - Docker, accessible by your local user account
 - Python 3.8 or newer (for running ansible-core 2.13+)
 
-## Quick Start
+Then, run the following steps
 
-1. Fork the repository and clone it to your local machine
+1. Clone the repository to your local machine
 2. Run `./scripts/setup.sh` to configure a local dev environment (virtualenv) with all required dependencies
 3. Activate the virtualenv with `source .venv/bin/activate`
 4. Make your changes and commit them to a new branch
