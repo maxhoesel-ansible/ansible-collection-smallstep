@@ -7,15 +7,15 @@ categories:
   - title: 'Features/Enhancements'
     labels:
       - 'pr-feature'
-      - 'enhancement'
   - title: 'Bug Fixes'
     labels:
       - 'fix'
       - 'pr-bugfix'
       - 'bug'
-  - title: 'Documentation'
+  - title: 'Other'
     labels:
       - 'docs'
+      - 'enhancement'
 
 include-labels:
   - pr-breaking
@@ -41,12 +41,12 @@ version-resolver:
   minor:
     labels:
       - 'pr-feature'
-      - 'enhancement'
   patch:
     labels:
       - 'fix'
       - 'pr-bugfix'
       - 'bug'
+      - 'enhancement'
   default: patch
 
 template: |
