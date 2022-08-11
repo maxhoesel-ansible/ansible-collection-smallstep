@@ -9,39 +9,35 @@
     fail_msg: step_ca_name and step_ca_root_password must both be set
   when: ansible_version.string is version('2.11.1', '<')
 
-- name: Set existing root cert
-  set_fact:
-    step_ca_existing_root_file: "{{ step_ca_path }}/.step_ca_root.crt"
-    step_ca_delete_temp_root: true
-  when: >
-    step_ca_existing_root is defined and
-    step_ca_existing_root_file is not defined
-
-- name: Set existing root key
-  set_fact:
-    step_ca_existing_key_temp_file: "{{ step_ca_path }}/.step_ca_root.key"
-  when: >
-    (step_ca_existing_key is defined and
-    step_ca_existing_key_file is not defined) or
-    (step_ca_existing_key_password is defined and
-    step_ca_existing_key_file is defined)
-
-- name: Set existing root key password file
-  set_fact:
-    step_ca_existing_key_password_file: "{{ step_ca_path }}/.password_existing_root.txt"
-  when: >
-    step_ca_existing_key_password is defined
-
+# TODO: Include assert for `step_ca_existing_key_password`
 - name: Verify existing root cert/key
   assert:
     that:
       - step_ca_existing_root_file | length > 0
-      - (step_ca_existing_key_file is defined and step_ca_existing_key_file | length > 0) or (step_ca_existing_key_temp_file is defined and step_ca_existing_key_temp_file | length > 0)
+      - step_ca_existing_key_file | length > 0
     fail_msg: Existing root cert/key variables must be passed as a group
   when: >
     step_ca_existing_root_file is defined or
-    step_ca_existing_key_file is defined or
-    step_ca_existing_key_temp_file is defined
+    step_ca_existing_key_file is defined
+
+- name: Verify existing root key/password
+  assert:
+    that:
+      - step_ca_existing_key_file | length > 0
+    fail_msg: Existing root key must be passed if its password is defined
+  when: step_ca_existing_key_password is defined
+
+# TODO: Remove deprecation warning and add assert in `Verify existing root cert/key`
+- name: Check that password is provided
+# Deprecation warning 'hack'
+  ignore_errors: yes
+  fail:
+    msg: >-
+      [Warning] Root key password is not provided for remote key. This will later be disallowed in future versions.
+      Either use unencrypted local (on controller) key, or use an encrypted key, either local or remote.
+  when: >
+    step_ca_existing_key == 'remote' and
+    step_ca_existing_key_password is not defined
 
 - name: Verify RA variables
   assert:
