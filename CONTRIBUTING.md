@@ -71,7 +71,7 @@ Some additional hints:
 To update the smallstep cli/ca versions that are used to run the tests, the following files need to be modified:
 
 - `tests/integration/targets/setup_smallstep/vars/versions.yml`: Versions for module integration test
-- `tests/molecule/group_vars/all/versions.yml`: Versions for molecule tests
+- `tox.ini` (`testenv` section): Versions for molecule tests
 
 ## Information for maintainers
 

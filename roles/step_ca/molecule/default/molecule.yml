@@ -106,8 +106,23 @@ provisioner:
     defaults:
       forks: 15
   inventory:
-    links:
-      group_vars: ../../../../tests/molecule/group_vars
+    group_vars:
+      all:
+        step_cli_version: ${STEP_CLI_VERSION}
+        step_ca_version: ${STEP_CA_VERSION}
+
+      ca:
+        step_ca_name: Molecule Test CA
+        step_ca_user: step-ca-molecule
+        step_ca_root_password: molecule
+        step_ca_intermediate_password: molecule-intermediate
+        step_ca_path: /etc/step-ca-molecule
+        step_ca_ssh: yes
+
+        step_ca_existing_root_file: /tmp/molecule-ca.crt
+        step_ca_existing_key_file: /tmp/molecule-ca.key
+        step_ca_existing_key_password: molecule
+
 
 scenario:
   test_sequence:

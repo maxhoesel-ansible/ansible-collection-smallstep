@@ -1,16 +1,17 @@
 ---
+
 - name: Verify
   hosts: clients
   tasks:
     - name: Verify that root is able to access ca
-      command: /tmp/this-is-step-cli ca health
+      command: "step-cli ca health"
       become: yes
       changed_when: no
       environment:
-        STEPPATH: /etc/step-cli-molecule
+        STEPPATH: "{{ step_cli_steppath }}"
 
     - name: Attempt to access CA URL
       uri:
-        url: https://step-ca.localdomain
+        url: "{{ step_bootstrap_ca_url }}"
       failed_when: ca_query.status != 404
       register: ca_query

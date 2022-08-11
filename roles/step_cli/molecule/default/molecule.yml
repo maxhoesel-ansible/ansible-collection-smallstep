@@ -99,8 +99,11 @@ provisioner:
     defaults:
       forks: 15
   inventory:
-    links:
-      group_vars: ../../../../tests/molecule/group_vars
+    group_vars:
+      all:
+        step_cli_version: ${STEP_CLI_VERSION}
+        step_ca_version: ${STEP_CA_VERSION}
+        step_cli_executable: /bin/step-cli-molecule
 
 scenario:
   test_sequence:

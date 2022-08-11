@@ -1,9 +1,0 @@
-# Configuration for CA instances created during molecule runs
-step_ca_name: Max Hösel's intentionally-difficult-to-parse CA name
-step_ca_user: step-ca-molecule
-step_ca_root_password: molecule
-step_ca_intermediate_password: molecule-intermediate
-step_ca_path: /etc/step-ca-molecule
-step_ca_ssh: yes
-step_ca_existing_root_file: /tmp/existing.crt
-step_ca_existing_key_file: /tmp/existing.key
