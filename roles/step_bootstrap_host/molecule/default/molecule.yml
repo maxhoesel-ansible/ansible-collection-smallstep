@@ -14,17 +14,18 @@ platforms:
   #   use systemd functionality. This *should* be possible with unpriliged
   #   containers as well, but is quite the headache.
   # - they are connected to a shared network to allow simulating a remote CA
+
+  # Use the smallstep-provided CA image for testing
   - name: step-ca
-    hostname: step-ca.localdomain
+    hostname: ${STEP_CA_HOSTNAME:-step-ca-molecule.localdomain}
     groups:
       - ca
-      - ubuntu
-    image: "geerlingguy/docker-ubuntu2004-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "smallstep/step-ca:${STEP_CA_VERSION:-latest}"
     override_command: false
-    pre_build_image: true
+    pre_build_image: true # we don't actually use the container with ansible, leave it as is
+    env:
+      DOCKER_STEPCA_INIT_NAME: Molecule Bootstrap CA
+      DOCKER_STEPCA_INIT_DNS_NAMES: "${STEP_CA_HOSTNAME:-step-ca-molecule.localdomain},localhost"
     networks:
       - name: smallstep_bootstrap_host
 
@@ -149,20 +150,15 @@ provisioner:
       forks: 15
   inventory:
     group_vars:
-      ca:
-        step_ca_name: Bootstrap CA
-        step_ca_root_password: molecule
-        step_ca_existing_root_file: /tmp/existing.crt
-        step_ca_existing_key_file: /tmp/existing.key
       clients:
         # Test cusotm steppath behavior
         step_cli_user: step-molecule
         step_cli_steppath: /etc/step-cli-molecule
-        step_bootstrap_fingerprint: 345bf77397642dc9211a3820af0b1816c4afa430ad249ae705f1456b4bafa046
       all:
-        step_cli_version: ${STEP_CLI_VERSION}
-        step_ca_version: ${STEP_CA_VERSION}
-        step_bootstrap_ca_url: https://step-ca.localdomain
+        step_cli_version: ${STEP_CLI_VERSION:-latest}
+        step_ca_version: ${STEP_CA_VERSION:-latest}
+
+        step_bootstrap_ca_url: https://${STEP_CA_HOSTNAME:-step-ca-molecule.localdomain}:9000
 
 scenario:
   test_sequence:
