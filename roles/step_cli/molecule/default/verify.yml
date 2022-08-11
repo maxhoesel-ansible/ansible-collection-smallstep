@@ -4,5 +4,5 @@
   gather_facts: false
   tasks:
     - name: Verify that step-cli is installed
-      command: /opt/step-cli version
+      command: "{{ step_cli_executable }} version"
       changed_when: no

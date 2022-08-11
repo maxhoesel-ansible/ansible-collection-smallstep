@@ -30,7 +30,7 @@
 
     - name: Add ACME provisioner
       maxhoesel.smallstep.step_ca_provisioner:
-        name: ACME
+        name: "{{ step_acme_cert_ca_provisioner }}"
         type: ACME
       become: yes
       become_user: "{{ step_ca_user }}"
@@ -53,7 +53,3 @@
     - name: Bootstrap host
       include_role:
         name: maxhoesel.smallstep.step_bootstrap_host
-      vars:
-        step_bootstrap_ca_url: https://step-ca.localdomain
-        step_bootstrap_fingerprint: 345bf77397642dc9211a3820af0b1816c4afa430ad249ae705f1456b4bafa046
-        step_cli_steppath: /etc/step-cli-molecule

@@ -9,11 +9,9 @@
       Debian: www-data
       RedHat: nginx
   tasks:
-    - name: Get standalone cert
+    - name: Test getting a standalone cert
       include_role:
-        name: "step_acme_cert"
-      vars:
-        step_cli_steppath: /etc/step-cli-molecule
+        name: step_acme_cert
 
     - name: Start nginx
       systemd:
@@ -22,7 +20,7 @@
 
     - name: Get cert via webroot
       include_role:
-        name: "step_acme_cert"
+        name: step_acme_cert
       vars:
         step_service_user: step
         step_acme_cert_webroot_path: "{{ webroots[ansible_os_family] }}"
@@ -41,7 +39,6 @@
         step_acme_cert_renewal_service: step-renew-webroot
         step_acme_cert_renewal_when: 59m # force renewal to happen every minute
         step_acme_cert_renewal_reload_services: [nginx]
-        step_cli_steppath: /etc/step-cli-molecule
 
     - name: Install Nginx site [Debian]
       copy:
