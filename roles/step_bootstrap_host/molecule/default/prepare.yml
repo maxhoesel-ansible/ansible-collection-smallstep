@@ -1,3 +1,4 @@
+---
 - hosts: ubuntu:debian
   tasks:
     - name: Update apt
@@ -10,23 +11,3 @@
     - name: Install iproute
       package:
         name: iproute
-
-- hosts: ca
-  tasks:
-    - name: Copy existing ca cert/key to nodes
-      copy:
-        src: "{{ item }}"
-        dest: /tmp/
-        owner: root
-        group: root
-        mode: 0755
-      loop:
-        - "existing.crt"
-        - "existing.key"
-
-    - name: Install step-cli
-      include_role:
-        name: step_cli
-    - name: Install step-ca
-      include_role:
-        name: step_ca

@@ -11,37 +11,28 @@
       package:
         name: iproute
 
-- hosts: ca
+- hosts: localhost
   tasks:
-    - name: Copy existing ca cert/key to nodes
-      copy:
-        src: "{{ item }}"
-        dest: /tmp/
-        owner: root
-        group: root
-        mode: 0755
-      loop:
-        - "existing.crt"
-        - "existing.key"
-
-    - name: Install step-ca
-      include_role:
-        name: step_ca
-
-    - name: Add ACME provisioner
-      maxhoesel.smallstep.step_ca_provisioner:
-        name: "{{ step_acme_cert_ca_provisioner }}"
-        type: ACME
-      become: yes
-      become_user: "{{ step_ca_user }}"
-
-    - name: Reload step-ca
-      systemd:
-        name: step-ca
-        state: reloaded
+    # Somewhat hacky way to customize the container image, but we make do with what we have
+    - name: Add ACME provisioner # noqa no-changed-when
+      ansible.builtin.command: "docker exec step-ca step ca provisioner add {{ step_acme_cert_ca_provisioner }} --type=ACME"
+    - name: Get CA PID
+      ansible.builtin.command: docker exec step-ca pgrep -f step-ca
+      register: _step_ca_pid
+      changed_when: false
+    - name: Reload step-ca # noqa no-changed-when
+      ansible.builtin.command: "docker exec step-ca kill -1 {{ _step_ca_pid.stdout }}"
 
 - hosts: clients
   tasks:
+    - name: Get CA fingerprint
+      ansible.builtin.command: docker exec step-ca step certificate fingerprint certs/root_ca.crt
+      register: _ca_fingerprint
+      changed_when: false
+      check_mode: false
+      run_once: true
+      delegate_to: localhost
+
     - name: Install nginx
       package:
         name: nginx
@@ -53,3 +44,5 @@
     - name: Bootstrap host
       include_role:
         name: maxhoesel.smallstep.step_bootstrap_host
+      vars:
+        step_bootstrap_fingerprint: "{{ _ca_fingerprint.stdout }}"
