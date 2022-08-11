@@ -52,15 +52,17 @@ argument_specs:
         choices:
           - remote
           - local
-        default: remote
-        description: Whether to use an existing root certificate and if so from where to import it
+          - false
+        default: false
+        description: Whether to use an existing root certificate and if so from where to import it from
       step_ca_existing_key:
         type: str
         choices:
           - remote
           - local
-        default: remote
-        description: Whether to use an existing root key and if so from where to import it
+          - false
+        default: false
+        description: Whether to use an existing root key and if so from where to import it from
       step_ca_existing_key_password:
         type: str
         description: Password to decrypt the root key

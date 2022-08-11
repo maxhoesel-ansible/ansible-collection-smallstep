@@ -16,7 +16,7 @@
 
 - name: Initialize CA
   block:
-    - name: Create root cert password file # noqa no-changed-when
+    - name: Create root key password file # noqa no-changed-when
       copy:
         content: "{{ step_ca_root_password }}"
         dest: "{{ step_ca_root_password_file }}"
@@ -60,7 +60,7 @@
             mode: 0600
             group: "{{ step_ca_user }}"
           no_log: yes
-        - name: Decrypt temporary root key
+        - name: Decrypt temporary root key # noqa no-changed-when
           command: >-
             {{ step_cli_executable }} crypto change-pass
             {{ step_ca_existing_key_file }}
@@ -82,8 +82,8 @@
         --provisioner-password-file={{ step_ca_root_password_file | quote }}
         {% if step_ca_url is defined %} --with-ca-url={{ step_ca_url | quote }}{% endif %}
         {% if step_ca_ssh %} --ssh{% endif %}
-        {% if step_ca_existing_root_file is defined %} --root={{ step_ca_existing_root_file | quote }}{% endif %}
-        {% if step_ca_existing_key_file is defined %} --key={{ step_ca_existing_key_file | quote }}{% endif %}
+        {% if step_ca_existing_root %} --root={{ step_ca_existing_root_file | quote }}{% endif %}
+        {% if step_ca_existing_key %} --key={{ step_ca_existing_key_file | quote }}{% endif %}
         {% if step_ca_ra is defined %} --ra={{ step_ca_ra | quote }}{% endif %}
         {% if step_ca_ra_issuer is defined %} --issuer={{ step_ca_ra_issuer | quote }}{% endif %}
         {% if step_ca_ra_credentials_file is defined %} --credentials-file={{ step_ca_ra_credentials_file | quote }}{% endif %}
