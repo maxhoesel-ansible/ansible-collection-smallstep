@@ -34,15 +34,18 @@ exclude-contributors:
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&'
 
+# we are still in the 0.x phase, adjust release resolving accordingly
 version-resolver:
   major:
-    labels:
-      - 'pr-breaking'
+    labels: []
+      #- 'pr-breaking' 
   minor:
     labels:
-      - 'pr-feature'
+      - 'pr-breaking'
+      #- 'pr-feature' # only up the minor version when step-cli versions change
   patch:
     labels:
+      - 'pr-feature'
       - 'fix'
       - 'pr-bugfix'
       - 'bug'
