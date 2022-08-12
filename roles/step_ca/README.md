@@ -148,9 +148,12 @@ This role will only decrypt the root key for as long as strictly neccessary.
 - Choices:
     - `remote`: The root certificate/key is already present on the remote host
     - `local`: The root certificate/key is read from the controller
-    - `false` (default): Do not use an existing root cert/key
 - Note that both cert and key need to be either imported, **or** generated.
   For example, you cannot import the key but generate the certificate
+- Default: Not set.
+    - If unset and `_root/key_file` is also unset, a new certificate will be generated
+    - If unset and `_root/key_file` is set, the files are treated as `remote` to preserve backwards-compatibility to previous collection versions.
+      This behavior may be removed in a future release.
 
 ##### `step_ca_existing_<root/key>_file`
 - The path of an existing PEM file to be used as the root certificate/key

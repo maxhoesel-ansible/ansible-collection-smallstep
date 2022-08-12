@@ -52,16 +52,12 @@ argument_specs:
         choices:
           - remote
           - local
-          - false
-        default: false
         description: Whether to use an existing root certificate and if so from where to import it from
       step_ca_existing_key:
         type: str
         choices:
           - remote
           - local
-          - false
-        default: false
         description: Whether to use an existing root key and if so from where to import it from
       step_ca_existing_key_password:
         type: str
