@@ -38,7 +38,7 @@ change-title-escapes: '\<*_&'
 version-resolver:
   major:
     labels: []
-      #- 'pr-breaking' 
+      #- 'pr-breaking'
   minor:
     labels:
       - 'pr-breaking'
