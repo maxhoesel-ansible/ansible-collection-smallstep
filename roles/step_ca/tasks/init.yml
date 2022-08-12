@@ -16,7 +16,7 @@
 
 - name: Initialize CA
   block:
-    - name: Create root cert password file # noqa no-changed-when
+    - name: Create root key password file # noqa no-changed-when
       copy:
         content: "{{ step_ca_root_password }}"
         dest: "{{ step_ca_root_password_file }}"
@@ -24,6 +24,53 @@
         mode: 0600
         group: "{{ step_ca_user }}"
       no_log: yes
+    - name: Copy root cert from controller
+      block:
+        - name: Copy cert file
+          copy:
+            src: "{{ step_ca_existing_root_file }}"
+            dest: "{{ step_ca_root_temp_file }}"
+            owner: "{{ step_ca_user }}"
+            mode: 0600
+            group: "{{ step_ca_user }}"
+        - name: Use the temp file as remote root cert
+          set_fact:
+            step_ca_existing_root_file: "{{ step_ca_root_temp_file }}"
+      when: step_ca_existing_root|d('') == 'local'
+    - name: Copy root key from controller
+      block:
+        - name: Copy key file
+          copy:
+            src: "{{ step_ca_existing_key_file }}"
+            dest: "{{ step_ca_key_temp_file }}"
+            owner: "{{ step_ca_user }}"
+            mode: 0600
+            group: "{{ step_ca_user }}"
+        - name: Use the temp file as remote root key
+          set_fact:
+            step_ca_existing_key_file: "{{ step_ca_key_temp_file }}"
+      when: step_ca_existing_key|d('') == 'local'
+    - name: Decrypt root key
+      block:
+        - name: Copy password to temporary file
+          copy:
+            content: "{{ step_ca_existing_key_password }}"
+            dest: "{{ step_ca_existing_key_password_file }}"
+            owner: "{{ step_ca_user }}"
+            mode: 0600
+            group: "{{ step_ca_user }}"
+          no_log: yes
+        - name: Decrypt temporary root key # noqa no-changed-when
+          command: >-
+            {{ step_cli_executable }} crypto change-pass
+            {{ step_ca_existing_key_file }}
+            --out={{ step_ca_key_temp_file }}
+            --password-file={{ step_ca_existing_key_password_file }}
+            --insecure --no-password --force
+        - name: Use the temp file as remote root key
+          set_fact:
+            step_ca_existing_key_file: "{{ step_ca_key_temp_file }}"
+      when: step_ca_existing_key_password is defined
     - name: Initialize CA # noqa no-changed-when
       command: >-
         {{ step_cli_executable }} ca init
@@ -35,8 +82,8 @@
         --provisioner-password-file={{ step_ca_root_password_file | quote }}
         {% if step_ca_url is defined %} --with-ca-url={{ step_ca_url | quote }}{% endif %}
         {% if step_ca_ssh %} --ssh{% endif %}
-        {% if step_ca_existing_root_file is defined %} --root={{ step_ca_existing_root_file | quote }}{% endif %}
-        {% if step_ca_existing_key_file is defined %} --key={{ step_ca_existing_key_file | quote }}{% endif %}
+        {% if step_ca_existing_root_file %} --root={{ step_ca_existing_root_file | quote }}{% endif %}
+        {% if step_ca_existing_key_file %} --key={{ step_ca_existing_key_file | quote }}{% endif %}
         {% if step_ca_ra is defined %} --ra={{ step_ca_ra | quote }}{% endif %}
         {% if step_ca_ra_issuer is defined %} --issuer={{ step_ca_ra_issuer | quote }}{% endif %}
         {% if step_ca_ra_credentials_file is defined %} --credentials-file={{ step_ca_ra_credentials_file | quote }}{% endif %}
@@ -69,5 +116,17 @@
     - name: Root password file is absent
       file:
         path: "{{ step_ca_root_password_file }}"
+        state: absent
+    - name: Existing root password file is absent
+      file:
+        path: "{{ step_ca_existing_key_password_file }}"
+        state: absent
+    - name: Delete temporary root cert file
+      file:
+        path: "{{ step_ca_root_temp_file }}"
+        state: absent
+    - name: Delete temporary root key file
+      file:
+        path: "{{ step_ca_key_temp_file }}"
         state: absent
   when: not step_ca_config.stat.exists

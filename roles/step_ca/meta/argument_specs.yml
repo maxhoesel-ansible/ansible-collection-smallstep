@@ -47,6 +47,21 @@ argument_specs:
         default: no
         description: Create keys to sign SSH certificates
       # Existing cert options
+      step_ca_existing_root:
+        type: str
+        choices:
+          - remote
+          - local
+        description: Whether to use an existing root certificate and if so from where to import it from
+      step_ca_existing_key:
+        type: str
+        choices:
+          - remote
+          - local
+        description: Whether to use an existing root key and if so from where to import it from
+      step_ca_existing_key_password:
+        type: str
+        description: Password to decrypt the root key
       step_ca_existing_root_file:
         type: path
         description: The path of an existing PEM file to be used as the root certificate authority

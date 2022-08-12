@@ -128,20 +128,54 @@ See the [step docs](https://smallstep.com/docs/step-cli/reference/ca/init) for m
 
 #### Existing Root Cert/Key
 
-Set these values if you want to use an existing cert/key.
-These variables need to be set as a group.
+These variables can be used to import an existing certificate+key as your CA cert/key.
 
-##### `step_ca_existing_root_file`
-- The path of an existing PEM file to be used as the root certificate authority
-- The file must already exist on the remote host
+By default, this role will generate a new CA cert/key, only change these values if you want to import an existing certificate.
+
+---
+**⚠️ WARNING ⚠️**
+
+If you want to use an existing root key, it is **highly** recommended that you use an encrypted keyfile and set
+`step_ca_existing_key_password` from a secure source, such as Ansible Vault or Hashicorp Vault.
+
+Storing your root key unencrypted (even just temporarily!) is strongly recommended against and poses a great security risk.
+This role will only decrypt the root key for as long as strictly neccessary.
+
+---
+
+##### `step_ca_existing_<root/key>`
+- Whether to use an existing root certificate/key and if so from where to import it from
+- Choices:
+    - `remote`: The root certificate/key is already present on the remote host
+    - `local`: The root certificate/key is read from the controller
+- Note that both cert and key need to be either imported, **or** generated.
+  For example, you cannot import the key but generate the certificate
+- Default: Not set.
+    - If unset and `_root/key_file` is also unset, a new certificate will be generated
+    - If unset and `_root/key_file` is set, the files are treated as `remote` to preserve backwards-compatibility to previous collection versions.
+      This behavior may be removed in a future release.
+
+##### `step_ca_existing_<root/key>_file`
+- The path of an existing PEM file to be used as the root certificate/key
+- Depending on the value of `step_ca_existing_<root/key>`, the file must either be on the remote host or the controller
+
+##### `step_ca_existing_key_password`
+- Password to decrypt the existing key file
 - Default: Not set
 
-##### `step_ca_existing_key_file`
-- The path of an existing key file of the root certificate authority
-- The key file must not be password-protected
-- The file must already exist on the remote host
-- Default: Not set
+Example usage:
 
+```yaml
+# Select where to import the root certificate from. Can be `remote`, `local`, `false`
+step_ca_existing_root: remote
+step_ca_existing_root_file: /tmp/existing-ca-root.crt
+
+# Same for the key, except that the key is read from the controller
+step_ca_existing_key: local
+step_ca_existing_key_file: /home/controller/secret-ca-key.pem
+# If your keyfile is password-protected, you can set the decryption password like so:
+step_ca_existing_key_password: Very-secret-password
+```
 
 #### RA Variables
 

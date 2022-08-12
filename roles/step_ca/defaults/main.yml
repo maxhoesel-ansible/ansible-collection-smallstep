@@ -12,8 +12,11 @@ step_ca_path: /etc/step-ca
 step_ca_dns: "{{ ansible_fqdn }},{{ ansible_default_ipv4.address }}"
 step_ca_address: ":443"
 
+#step_ca_existing_root:
+#step_ca_existing_key:
 #step_ca_existing_root_file:
 #step_ca_existing_key_file:
+#step_ca_existing_key_password:
 #step_ca_url:
 step_ca_ssh: false
 

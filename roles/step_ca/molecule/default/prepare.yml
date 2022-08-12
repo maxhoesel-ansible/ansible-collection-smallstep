@@ -10,16 +10,3 @@
     - name: Install iproute
       package:
         name: iproute
-
-- hosts: ca
-  tasks:
-  - name: Copy existing ca cert/key to nodes
-    copy:
-      src: "{{ item }}"
-      dest: /tmp/
-      owner: root
-      group: root
-      mode: 0755
-    loop:
-      - "molecule-ca.crt"
-      - "molecule-ca.key"
