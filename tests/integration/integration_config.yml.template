@@ -1,0 +1,24 @@
+---
+# Configuration for the smallstep module tests.
+# This template is rendered by render_config.sh, called from tox
+# You can use these variable names in your module integration tests.
+
+# Remote CA access options - this could be a VM somewhere or a local container
+# Use these variables for normal module integration tests
+ca_url: ${STEP_REMOTE_CA_URL}
+ca_fp: ${STEP_REMOTE_CA_FP}
+# Use this provisioner to create certs/tokens/etc. The password file is already present after calling `setup_remote_provisioner`
+ca_provisioner: ${STEP_REMOTE_CA_PROVISIONER_NAME}
+ca_provisioner_password: ${STEP_REMOTE_CA_PROVISIONER_PASSWORD}
+ca_provisioner_password_file: /tmp/provisioner_passfile
+
+
+# Currently tested versions
+ca_version: ${STEP_CA_VERSION}
+cli_version: ${STEP_CLI_VERSION}
+
+# Locally reachable CA settings - this is needed by modules like step_ca_provisioner that need FS access
+# Don't use these unless you know what you are doing
+ca_user: ${STEP_LOCAL_CA_USER}
+ca_path: ${STEP_LOCAL_STEPPATH}
+cli_binary: ${STEP_LOCAL_CLI_BINARY}

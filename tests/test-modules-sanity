@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -eu
+set -o pipefail
+
+tox -e sanity -- \
+    --docker --color -v \
+    --python 3.6 \
+    `# As we only support py36+, pyupgrade is set to remove the py27 boilerplate. Don't check for that as we don't need it` \
+    --skip-test metaclass-boilerplate --skip-test future-import-boilerplate

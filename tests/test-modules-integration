@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+
+set -eu
+set -o pipefail
+
+SCRIPT_DIRECTORY=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# Docker settings
+export STEP_DOCKER_NETWORK="step-ansible-modules"
+
+# Remote CA settings
+export STEP_REMOTE_CA_CT_NAME="step-ca-ansible-test"
+export STEP_REMOTE_CA_CT_HOSTNAME="step-ca"
+export STEP_REMOTE_CA_PROVISIONER_NAME="ansible"
+export STEP_REMOTE_CA_PROVISIONER_PASSWORD="ansible-module-tests-pw"
+export STEP_REMOTE_CA_URL="https://$STEP_REMOTE_CA_CT_HOSTNAME:9000"
+# FP can only evaluated when the remote docker ct is running
+export STEP_REMOTE_CA_FP=""
+
+# Local CA settings
+export STEP_LOCAL_CA_USER=step
+export STEP_LOCAL_CLI_BINARY=step
+export STEP_LOCAL_STEPPATH=/home/step # hardcoded in Dockerfile
+
+LOCAL_CA_TAG=local-ca
+
+# Cleanup function to delete any docker objects that we might have created
+cleanup() {
+    echo "Cleaning up..."
+    set +e # cleanup, we don't care if some stuff doesn't exist
+    docker rm -f "$STEP_REMOTE_CA_CT_NAME" > /dev/null
+    docker network rm "$STEP_DOCKER_NETWORK" > /dev/null
+    echo "Done"
+    set -e
+    exit
+}
+trap cleanup INT ERR EXIT
+
+prepare() {
+    docker network create $STEP_DOCKER_NETWORK
+}
+
+render_config() {
+    # The test config contains parameters that the module targets use to connect to the local/remote ca respectively.
+    # We render out this config right before starting a integration test
+    echo "Rendering configuration"
+    tests/integration/render_config.sh tests/integration/integration_config.yml.template > tests/integration/integration_config.yml
+}
+
+remote_ca() {
+    echo "Starting remote CA container"
+    docker run -d \
+        --name $STEP_REMOTE_CA_CT_NAME --network $STEP_DOCKER_NETWORK --hostname $STEP_REMOTE_CA_CT_HOSTNAME \
+        -e "DOCKER_STEPCA_INIT_NAME=Ansible-Test" \
+        -e "DOCKER_STEPCA_INIT_DNS_NAMES=localhost,$STEP_REMOTE_CA_CT_HOSTNAME" \
+        -e "DOCKER_STEPCA_INIT_PROVISIONER_NAME=$STEP_REMOTE_CA_PROVISIONER_NAME" \
+        -e "DOCKER_STEPCA_INIT_PASSWORD=$STEP_REMOTE_CA_PROVISIONER_PASSWORD" \
+        "smallstep/step-ca:$STEP_CA_VERSION"
+
+
+    # Give the CA a little bit to initialize
+    echo "Waiting for CA to come online"
+    # TODO: Check the container status with docker instead of exec-ing
+    timeout 20 bash -c "while ! docker exec $STEP_REMOTE_CA_CT_NAME step ca health &> /dev/null; do sleep 1; done"
+
+    STEP_REMOTE_CA_FP=$(docker exec $STEP_REMOTE_CA_CT_NAME step certificate fingerprint certs/root_ca.crt)
+    export STEP_REMOTE_CA_FP
+
+    render_config
+
+    tox -e integration -- \
+        --color -v \
+        --controller docker:default --target docker:default,python=3.6 \
+        --docker-network $STEP_DOCKER_NETWORK  \
+        --skip-tags $LOCAL_CA_TAG \
+        --docker-terminate=always `#Change this if you want to debug test targets`
+}
+
+local_ca() {
+    local image_name="step-ca-ansible"
+
+    echo "Building docker image for local-ca test targets: $image_name with step-ca version $STEP_CA_VERSION"
+    docker build tests/integration/docker/step-ca-ansible -t $image_name \
+        --build-arg "STEP_CA_VERSION=$STEP_CA_VERSION" \
+        --build-arg "PYTHON_VERSION=$PYTHON_VERSION" \
+        --build-arg "STEP_CA_USER=$STEP_LOCAL_CA_USER"
+
+    render_config
+
+    tox -e integration -- \
+        --color -v \
+        --controller docker:default --target "docker:$image_name,python=$PYTHON_VERSION@/usr/local/bin/python3" \
+        --docker-network $STEP_DOCKER_NETWORK  \
+        --tags $LOCAL_CA_TAG \
+        --docker-terminate=always `#Change this if you want to debug test targets`
+}
+
+main() {
+    # shellcheck disable=1091
+    source "$SCRIPT_DIRECTORY/constants.sh"
+
+    prepare
+    local_ca
+    remote_ca
+    cleanup
+}
+
+main "$@"

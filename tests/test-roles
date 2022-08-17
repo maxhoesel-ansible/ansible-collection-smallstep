@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+
+set -eu
+set -o pipefail
+
+# Hostname to use for the ca container in molecule scenarios
+export STEP_MOLECULE_CA_HOSTNAME=step-ca-molecule.localdomain
+
+SCRIPT_DIRECTORY=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+USAGE=$(cat << EOF
+Usage: test-roles [filter] [--help, -h]
+
+Run all tox molecule role scenarios that match the given filter.
+If no filter is given, all role scenarios will be run.
+
+Example: ./test-roles step_ca
+EOF
+)
+
+main() {
+    # shellcheck disable=1091
+    source "$SCRIPT_DIRECTORY/constants.sh"
+
+    set +u
+    if [[ $1 == "--help" || $1 == "-h" ]]; then
+        echo "$USAGE"
+        exit 1
+    elif [[ -z $1 ]]; then
+        scenarios=$(tox -l | grep ansible | grep -v "lint" | tr '\n' ',')
+    else
+        scenarios=$(tox -l | grep ansible | grep -v "lint" | grep "$1" | tr '\n' ',')
+    fi
+    set -u
+
+    tox -e "$scenarios"
+}
+
+main "$@"

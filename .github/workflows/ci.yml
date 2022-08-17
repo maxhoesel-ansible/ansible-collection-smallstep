@@ -47,18 +47,12 @@ jobs:
           python -m pip install -r requirements.txt
 
       - name: Run sanity tests
-        run: tox -e sanity -- --docker --color -v --python 3.6 --skip-test metaclass-boilerplate --skip-test future-import-boilerplate
+        run: tests/test-modules-sanity
 
   modules-integration:
     needs: modules-sanity
     name: "Modules Integration"
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        target:
-          #- docker:centos7
-          - docker:default,python=3.6
     steps:
       - name: Check out codebase
         uses: actions/checkout@v3
@@ -72,7 +66,7 @@ jobs:
           python -m pip install -r requirements.txt
 
       - name: Run integration tests
-        run: tox -e integration -- --color -v --controller docker:default --target ${{ matrix.target }}
+        run: tests/test-modules-integration
 
   discover-scenarios:
     runs-on: ubuntu-latest
@@ -120,15 +114,10 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Build and install collection
-        run: |
-          ansible-galaxy collection build --force
-          ansible-galaxy collection install *.tar.gz --force
-
       - name: Initialize tox
         run: tox -l
       - name: Run role tests
-        run: tox -e ${{ matrix.role }}
+        run: tests/test-roles ${{ matrix.role }}
 
   publish:
     name: "Publish to Ansible Galaxy"

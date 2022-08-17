@@ -1,57 +1,24 @@
-- name: Testing keys are present
-  copy:
-    src: "{{ item }}"
-    dest: "/tmp/"
-    owner: "{{ step_ca_user }}"
-    group: "{{ step_ca_user }}"
-    mode: 0600
-  loop:
-    - tests_key
-    - tests_crt
-- name: Testing password file is present
-  copy:
-    content: "{{ step_ca_password }}"
-    dest: "/tmp/tests_passfile"
-    owner: "{{ step_ca_user }}"
-    group: "{{ step_ca_user }}"
-    mode: 0644 # needs to be readable by the client requesting the cert
-- name: Create test provisioners
-  maxhoesel.smallstep.step_ca_provisioner: "{{ item }}"
-  loop:
-    - name: tests-JWK
-      type: JWK
-      create: yes
-      jwk_password_file: "/tmp/tests_passfile"
-  become: yes
-  become_user: "{{ step_ca_user }}"
+- name: Create certificate
+  maxhoesel.smallstep.step_ca_certificate:
+    name: "127.0.0.1"
+    crt_file: /tmp/generated_certificate
+    key_file: /tmp/generated_key
+    provisioner: "{{ ca_provisioner }}"
+    provisioner_password_file: "{{ ca_provisioner_password_file }}"
+    force: yes
+    not_after: 1h
 
-- name: Reload Server
-  service:
-    name: step-ca
-    state: reloaded
+- name: Try to revoke cert
+  maxhoesel.smallstep.step_ca_revoke:
+    cert: /tmp/generated_certificate
+    key: /tmp/generated_key
+    reason: "Testing cert revocation"
+    reason_code: 1
+  register: revocation
 
-- block:
-    - name: Create certificate
-      maxhoesel.smallstep.step_ca_certificate:
-        name: "127.0.0.1"
-        crt_file: /tmp/generated_certificate
-        key_file: /tmp/generated_key
-        provisioner: tests-JWK
-        provisioner_password_file: "/tmp/tests_passfile"
-        force: yes
-        not_after: 1h
-    - name: Try to revoke cert
-      maxhoesel.smallstep.step_ca_revoke:
-        cert: /tmp/generated_certificate
-        key: /tmp/generated_key
-        reason: "Testing cert revocation"
-        reason_code: 1
-        #token: "{{ generated_token.token }}"
-      register: revocation
-    - name: Verify that cert got revoked
-      assert:
-        that: revocation.changed
-  become: yes
+- name: Verify that cert got revoked
+  assert:
+    that: revocation.changed
 
 - name: Delete generated files
   file:
@@ -60,14 +27,3 @@
   loop:
     - /tmp/generated_certificate
     - /tmp/generated_key
-    - /tmp/tests_passfile
-
-- name: Remove test provisioners
-  maxhoesel.smallstep.step_ca_provisioner:
-    name: "{{ item.0 }}"
-    type: "{{ item.1 }}"
-    state: absent
-  become: yes
-  become_user: "{{ step_ca_user }}"
-  loop:
-    - ["tests-JWK", "JWK"]

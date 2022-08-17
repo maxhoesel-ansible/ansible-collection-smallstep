@@ -1,2 +1,2 @@
 dependencies:
-  - setup_smallstep
+  - setup_remote_ca

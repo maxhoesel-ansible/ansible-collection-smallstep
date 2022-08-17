@@ -17,7 +17,7 @@ platforms:
 
   # Use the smallstep-provided CA image for testing
   - name: step-ca
-    hostname: ${STEP_CA_HOSTNAME:-step-ca-molecule.localdomain}
+    hostname: ${STEP_MOLECULE_CA_HOSTNAME:-step-ca-molecule.localdomain}
     groups:
       - ca
     image: "smallstep/step-ca:${STEP_CA_VERSION:-latest}"
@@ -25,7 +25,7 @@ platforms:
     pre_build_image: true # we don't actually use the container with ansible, leave it as is
     env:
       DOCKER_STEPCA_INIT_NAME: Molecule ACME CA
-      DOCKER_STEPCA_INIT_DNS_NAMES: "${STEP_CA_HOSTNAME:-step-ca-molecule.localdomain},localhost"
+      DOCKER_STEPCA_INIT_DNS_NAMES: "${STEP_MOLECULE_CA_HOSTNAME:-step-ca-molecule.localdomain},localhost"
     networks:
       - name: smallstep_acme_cert
 
@@ -157,7 +157,7 @@ provisioner:
         step_ca_version: ${STEP_CA_VERSION:-latest}
         step_cli_steppath: /etc/step-cli-molecule
 
-        step_bootstrap_ca_url: https://${STEP_CA_HOSTNAME:-step-ca-molecule.localdomain}:9000
+        step_bootstrap_ca_url: https://${STEP_MOLECULE_CA_HOSTNAME:-step-ca-molecule.localdomain}:9000
 
         step_acme_cert_ca_provisioner: ACME
 
