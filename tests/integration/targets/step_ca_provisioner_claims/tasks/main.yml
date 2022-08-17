@@ -1,28 +1,31 @@
-# We set up 3 provisioners with custom claims to fully test the module:
-# claims-single (ACME): To test most parameters and single-provisioner updates
-# claims-double (ACME + AWS): To test updating multiple provisioners with the same name
-- name: Set claim facts
-  set_fact:
-    claims_provisioner:
-      name: claims-test
-      type: ACME
-      min_tls_cert_duration: 1h
-      default_tls_cert_duration: 20h
-    claims_global:
-      global_claims: yes
-      min_tls_cert_duration: 1h
-      default_tls_cert_duration: 20h
-
 - block:
+  # We set up 3 provisioners with custom claims to fully test the module:
+  # claims-single (ACME): To test most parameters and single-provisioner updates
+  # claims-double (ACME + AWS): To test updating multiple provisioners with the same name
+  - name: Set claim facts
+    set_fact:
+      claims_provisioner:
+        name: claims-test
+        type: ACME
+        min_tls_cert_duration: 1h
+        default_tls_cert_duration: 20h
+      claims_global:
+        global_claims: yes
+        min_tls_cert_duration: 1h
+        default_tls_cert_duration: 20h
+
   - name: Testing provisioners are present
     maxhoesel.smallstep.step_ca_provisioner:
       name: "{{ claims_provisioner.name }}"
       type: "{{ claims_provisioner.type }}"
+      step_cli_executable: "{{ cli_binary }}"
 
   - name: Provisioner claims are present
     maxhoesel.smallstep.step_ca_provisioner_claims: "{{ claims_provisioner }}"
+
   - name: Global claims are present
     maxhoesel.smallstep.step_ca_provisioner_claims: "{{ claims_global }}"
+
 
   # Update the provisioner to test both adding and overwriting claims:
   # - max_tls_cert_duration is newly added
@@ -33,6 +36,7 @@
       max_tls_cert_duration: 33h
       default_tls_cert_duration: 24h
     register: step_ca_current_claims
+
   - name: Test updating global claims
     maxhoesel.smallstep.step_ca_provisioner_claims:
       global_claims: yes
@@ -68,6 +72,7 @@
       exclusive: yes
       min_tls_cert_duration: 10m
     register: step_ca_current_claims
+
   - name: Set expected claim
     set_fact:
       expected_provisioner:
@@ -77,23 +82,26 @@
       quiet: yes
       that: step_ca_current_claims.claims == expected_provisioner
 
-  become: yes
-  become_user: "{{ step_ca_user }}"
+  - name: Get Server PID
+    command: pgrep -f step-ca
+    register: _pid
+  - name: Restart Server
+    command: "kill -1 {{ _pid.stdout }}"
+    become: false
 
-- name: Restart Server
-  service:
-    name: step-ca
-    state: restarted
-  become: yes
-
-- block:
   - name: Check server health
-    command: "step-cli ca health"
+    command: "{{ cli_binary }} ca health"
     changed_when: no
+
   - name: Testing provisioner is absent
     maxhoesel.smallstep.step_ca_provisioner:
       name: "{{ claims_provisioner.name }}"
       type: "{{ claims_provisioner.type }}"
       state: absent
+      step_cli_executable: "{{ cli_binary }}"
   become: yes
-  become_user: "{{ step_ca_user }}"
+  become_user: "{{ ca_user }}"
+  environment:
+      STEPPATH: "{{ ca_path }}"
+  tags:
+    - local-ca

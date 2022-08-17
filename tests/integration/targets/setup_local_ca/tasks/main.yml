@@ -1,0 +1,16 @@
+- block:
+  - name: Look for default provisioner
+    command: "{{ cli_binary }} ca provisioner list"
+    environment:
+      STEPPATH: "{{ ca_path }}"
+    register: "_provisioners"
+    changed_when: false
+  - name: Remove default provisioner
+    command: "{{ cli_binary }} ca provisioner remove admin"
+    environment:
+      STEPPATH: "{{ ca_path }}"
+    when: "'admin' in _provisioners.stdout"
+  become: yes
+  become_user: "{{ ca_user }}"
+  tags:
+    - local-ca

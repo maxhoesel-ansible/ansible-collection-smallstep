@@ -21,65 +21,55 @@ To begin development on this collection, you need to have the following dependen
 6. Once you're done, commit your changes (make sure that you are in the venv).
    Pre-commit will format your code and check for any obvious errors when you do so.
 
-## Hints for Development
+## Development Guide
 
-For Modules:
-- Make sure that you have read the [Ansible module conventions](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_best_practices.html)
-- Make sure to use the doc fragment and utils already present when possible.
-- Each module should typically wrap around one step-cli command or a set of closely related commands.
-  The modules name should reflect this. For example, step_ca_provisioner performs the same functionality as "step ca provisioner add/remove".
-- Make sure to use the doc fragment and utils already present, specifically the connection fragments used for parameters like --ca-url and --offline.
-- If you need to call `step-cli`, do so via `run_step_cli_command()` in `run.py`.
-  This function automatically assembles command-line arguments for you - all you
-  need to do is provide it with a simple dict of module parameters mapped to their CLI equivalent. It also handles errors and check mode for you
-- If you need to troubleshoot inside the ansible-test container, add `--docker-terminate never` to the
-  call inside the hacking script. The container will then persist even on failure, and you can debug it
+### Module Development
 
-For Roles:
-- None so far
+The modules in this collection are mostly simple wrappers around the `step-cli` tool.
+Feel free to add a new module if you would like to implement another subcommand.
+Here are some general hints for module development:
 
-In general:
-- Don't be afraid to rewrite your local branch history to clean up your commit messages!
-  You should familiarize yourself with `git rebase -i` if you haven't done so already.
+- Read the [Ansible module conventions](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_best_practices.html)
+- Use the pre-existing `doc_fragments` and `module_utils` python modules where applicable. Feel free to use an existing module as a base
+- Name your module according to the `step-li` command that it wraps around (Example: `step-cli ca provisioner` -> `step_ca_provisioner`).
+- Use the `CLIWrapper` class in [step_cli_wrapper.py](/plugins/module_utils/step_cli_wrapper.py) to run step-cli commands
+- Try to make the calls idempotent where possible. Modules should always support check mode
 
-## Testing Framework
+You need to write tests to ensure that your module works and keeps working properly (see [here](https://docs.ansible.com/ansible/latest/dev_guide/testing_integration.html) for the Ansible Integration testing guide). Notes:
 
-We use `molecule` to test all roles and the `ansible-test` suite to test modules. Calls to these are handled by `tox` and the [`tox-ansible` extension]( https://github.com/ansible-community/tox-ansible).
-You can run all the required tests for this project with `./scripts/test.sh`. You can also open that file to view the individual test stages.
+- Typically, each module should have one integration test target (see [here for examples](/tests/integration/targets/)) that ensures that the module works as expected
+- If your module interacts with a remote step CA (i.e. your module is part of the `step ca` subcommand), you can request creating one by adding the following to your targets `meta/main.yml`:
 
-Note that you **can't** just run `tox`, as the `sanity` and `integration` environments need extra parameters passed to
-`ansible-test`. Without these, they will fail. In addition, the `tox-ansible` plugin (which automatically generate scenario envs)
-also adds a few unneeded environments to the list, such as `env`.
+    ```yaml
+    # In targets/<your_target>/meta/main.yml
 
-#### Creating new module tests
+    ---
+    dependencies:
+    - setup_remote_ca
+    ```
 
-We currently only run integration tests for our modules via `ansible-test`. If you added a new module (or added new functionality to an already existing module),
-you will need to write new tests for it. Each module has its own integration target in `tests/integration/targets`. To start, copy an existing targets directory
-and adjust the test tasks for your module.
-
-Some additional hints:
-
+    This will automatically configure your host to trust the remote CA. Then, use the variable names defined in `tests/integration/integration_config.yml.template` to access the remote CA. Use an existing target for guidance if needed.
 - All targets are run sequentially on the same host. Make sure to clean up after yourself! You don't need to handle failures gracefully however,
   as the testing environment is destroyed on the first error.
-- All targets call the `setup_smallstep` target via the dependency declared in `meta/main.yml`. This target performs basic setup
-  of both step-cli and step-ca, so you don't need to install them in your target
-- See `targets/setup_smallstep/defaults/main.yml` for some variables you can use in your tests
-- You can run modules from this collection with `environment: {"STEPPATH": "{{ STEP_CA_PATH }}"}` if you don't want to specify ca_config/ca_url for every module call
+- You can test your modules by running `tests/test-modules-sanity` and `tests/test-modules-integration`. These tests are also run as part of the CI.
 
-### Updating test versions
+### Role Development
 
-To update the smallstep cli/ca versions that are used to run the tests, the following files need to be modified:
+General Notes:
 
-- `tests/integration/targets/setup_smallstep/vars/versions.yml`: Versions for module integration test
-- `tox.ini` (`testenv` section): Versions for molecule tests
+- None so far
+
+For testing, we use the `molecule` framework. Molecule scenarios are handled by `tox` and the [`tox-ansible` extension]( https://github.com/ansible-community/tox-ansible). Notes:
+
+- To see all available scenarios, run `tox -l` and look for the scenarios starting with `ansible-py*`.
+- To run all molecule scenarios, simply call `tests/test-roles`
+    - Or pass a (partial) scenario name as a filter to limit execution (for example, `/tests/test-roles acme_cert` to limit molecule scenarios to the ACME role only)
 
 ## Information for maintainers
 
-This project uses sematic versioning. Version numbers and  releases/changelogs are automatically generated using [release-drafter](https://github.com/release-drafter/release-drafter), utilizing pull request labels.
-
-When merging a pull request, make sure to select an appropriate label (pr-bugfix, pr-feature, etc.).
-release-drafter will automatically update the draft release changelog and the galaxy.yml version will be bumped if needed.
-
-Once a draft release is published, collection packages will be added to the release and ansible-galaxy automatically.
-
-If you need to manually bump the collection version, run the `update-version` script and adjust the test versions if required.
+- To update the smallstep cli/ca versions that are used to run the tests, bump the values in `tests/constants.sh`
+- This project uses sematic versioning. Version numbers and  releases/changelogs are automatically generated using [release-drafter](https://github.com/release-drafter/release-drafter), utilizing pull request labels.
+- When merging a pull request, make sure to select an appropriate label (pr-bugfix, pr-feature, etc.).
+  Release-drafter will automatically update the draft release changelog and the galaxy.yml version will be bumped if needed.
+- Once a draft release is actually published, collection packages will be added to the release and ansible-galaxy automatically.
+- If you need to manually bump the collection version, run the `update-version` script and adjust the test versions if required.

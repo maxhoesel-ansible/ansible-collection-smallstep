@@ -1,83 +1,16 @@
-- name: Testing keys are present
-  copy:
-    src: "{{ item }}"
-    dest: "/tmp/"
-    owner: "{{ step_ca_user }}"
-    group: "{{ step_ca_user }}"
-    mode: 0600
-  loop:
-    - tests_key
-    - tests_crt
-- name: Testing password file is present
-  copy:
-    content: "{{ step_ca_password }}"
-    dest: "/tmp/tests_passfile"
-    owner: "{{ step_ca_user }}"
-    group: "{{ step_ca_user }}"
-    mode: 0644 # needs to be readable by the client requesting the cert
-- name: Create test provisioners
-  maxhoesel.smallstep.step_ca_provisioner: "{{ item }}"
-  loop:
-    - name: tests-JWK
-      type: JWK
-      jwk_password_file: "/tmp/tests_passfile"
-      create: yes
-  become: yes
-  become_user: "{{ step_ca_user }}"
-
-- name: Reload Server
-  service:
-    name: step-ca
-    state: reloaded
-
-- block:
-    - name: Create normal certificate on CA
-      maxhoesel.smallstep.step_ca_certificate:
-        name: "127.0.0.1"
-        crt_file: /tmp/generated_certificate
-        key_file: /tmp/generated_key
-        provisioner: tests-JWK
-        provisioner_password_file: "/tmp/tests_passfile"
-        san:
-          - foo.bar
-        kty: RSA
-        size: 4096
-        not_after: 3h
-        not_before: 1m
-    - name: Delete generated cert
-      file:
-        path: "{{ item }}"
-        state: absent
-      loop:
-        - /tmp/generated_certificate
-        - /tmp/generated_key
-  become: yes
-
-- name: Get token for certificate creation
-  maxhoesel.smallstep.step_ca_token:
+- name: Create normal certificate on CA
+  maxhoesel.smallstep.step_ca_certificate:
     name: "127.0.0.1"
-    provisioner: tests-JWK
-    provisioner_password_file: "/tmp/tests_passfile"
-    return_token: yes
-  become: yes
-  become_user: "{{ step_ca_user }}"
-  register: generated_token
-
-- block:
-    - name: Create certificate with token on CA
-      maxhoesel.smallstep.step_ca_certificate:
-        name: "127.0.0.1"
-        crt_file: /tmp/generated_certificate
-        key_file: /tmp/generated_key
-        provisioner: tests-JWK
-        provisioner_password_file: "/tmp/tests_passfile"
-        force: yes
-        kty: EC
-        crv: P-384
-        not_after: 3h
-        not_before: 1m
-        token: "{{ generated_token.token }}"
-  become: yes
+    crt_file: /tmp/generated_certificate
+    key_file: /tmp/generated_key
+    provisioner: "{{ ca_provisioner }}"
+    provisioner_password_file: "{{ ca_provisioner_password_file }}"
+    san:
+      - foo.bar
+    kty: RSA
+    size: 4096
+    not_after: 3h
+    not_before: 1m
 
 - name: Delete generated files
   file:
@@ -86,14 +19,3 @@
   loop:
     - /tmp/generated_certificate
     - /tmp/generated_key
-    - /tmp/tests_passfile
-
-- name: Remove test provisioners
-  maxhoesel.smallstep.step_ca_provisioner:
-    name: "{{ item.0 }}"
-    type: "{{ item.1 }}"
-    state: absent
-  become: yes
-  become_user: "{{ step_ca_user }}"
-  loop:
-    - ["tests-JWK", "JWK"]

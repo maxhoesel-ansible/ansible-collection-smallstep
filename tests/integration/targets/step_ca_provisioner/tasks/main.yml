@@ -1,28 +1,28 @@
-- name: Testing keys are present
-  copy:
-    src: "{{ item }}"
-    dest: "/tmp/"
-    owner: "{{ step_ca_user }}"
-    group: "{{ step_ca_user }}"
-    mode: 0600
-  loop:
-    - tests_key
-    - tests_crt
-
-- name: Testing password file is present
-  copy:
-    content: "{{ step_ca_password }}"
-    dest: "/tmp/tests_passfile"
-    owner: "{{ step_ca_user }}"
-    group: "{{ step_ca_user }}"
-    mode: 0644 # needs to be readable by the client requesting the cert
-
 - block:
+  - name: Testing keys are present
+    copy:
+      src: "{{ item }}"
+      dest: "/tmp/"
+      owner: "{{ ca_user }}"
+      group: "{{ ca_user }}"
+      mode: 0600
+    loop:
+      - tests_key
+      - tests_crt
+
+  - name: Testing password file is present
+    copy:
+      content: "password-testing"
+      dest: "/tmp/tests_passfile"
+      owner: "{{ ca_user }}"
+      group: "{{ ca_user }}"
+      mode: 0644 # needs to be readable by the client requesting the cert
+
   # The values for these test provisioners are mostly identical to the ones in the smallstep documentation,
   # so many of the online provisioners do not actually work. Good enough to test our module
   # functionality still.
   - name: Create test provisioners
-    maxhoesel.smallstep.step_ca_provisioner: "{{ item }}"
+    maxhoesel.smallstep.step_ca_provisioner: "{{ item | combine({'step_cli_executable': cli_binary}) }}"
     loop:
       - name: tests-JWK
         type: JWK
@@ -57,7 +57,7 @@
         k8s_pem_keys_file: "/tmp/tests_crt"
 
   - name: Test creation idempotency
-    maxhoesel.smallstep.step_ca_provisioner: "{{ item }}"
+    maxhoesel.smallstep.step_ca_provisioner: "{{ item | combine({'step_cli_executable': cli_binary })}}"
     loop:
       - name: tests-JWK
         type: JWK
@@ -107,7 +107,9 @@
         - max@smallstep.com
         - new@admin.com
       state: "updated"
+      step_cli_executable: "{{ cli_binary }}"
     register: update_test
+
   - name: Verify that provisioner got updated
     ansible.builtin.assert:
       that:
@@ -120,28 +122,29 @@
       name: "{{ item.0 }}"
       type: "{{ item.1 }}"
       state: absent
+      step_cli_executable: "{{ cli_binary }}"
     loop:
       - ["tests-OIDC", "OIDC"]
       - ["tests-Amazon", "AWS"]
       - ["tests-Google", "GCP"]
-  become: yes
-  become_user: "{{ step_ca_user }}"
 
-- name: Restart Server
-  service:
-    name: step-ca
-    state: restarted
-  become: yes
 
-- block:
+  - name: Get Server PID
+    command: pgrep -f step-ca
+    register: _pid
+  - name: Restart Server
+    command: "kill -1 {{ _pid.stdout }}"
+    become: false
+
   - name: Check server health
-    command: "step-cli ca health"
+    command: "{{ cli_binary }} ca health"
     changed_when: no
 
   - name: Remove test provisioners
     maxhoesel.smallstep.step_ca_provisioner:
       name: "{{ item }}"
       state: absent
+      step_cli_executable: "{{ cli_binary }}"
     loop:
       - "tests-JWK"
       - "tests-ACME"
@@ -149,11 +152,15 @@
       - "tests-k8s"
 
   - name: Get step-ca config
-    command: "cat {{ step_ca_path }}/config/ca.json"
+    command: "cat {{ ca_path }}/config/ca.json"
     register: step_ca_config
-  - name: Verify that all provisioners (except for sshpop) are absent
+  - name: Verify that all provisioners are absent
     assert:
       that:
         - (step_ca_config.stdout | from_json).authority.provisioners is not defined
   become: yes
-  become_user: "{{ step_ca_user }}"
+  become_user: "{{ ca_user }}"
+  environment:
+    STEPPATH: "{{ ca_path }}"
+  tags:
+    - local-ca
