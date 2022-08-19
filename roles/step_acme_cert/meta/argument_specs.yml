@@ -1,23 +1,49 @@
 argument_specs:
   main:
-    short_description: Main entrypoint
+    short_description: Setup an auto-renewing ACME cert using step tooling
+    description:
+      - This role acquires a certificate from the CA via ACME, then sets up automatic renewal with C(step-cli renew)'s daemon mode
+      - |
+        Requirements:
+
+        - Root access using C(become: yes) or equivalent
+        - The host must be bootstrapped with R(step_bootstrap_host,ansible_collections.maxhoesel.smallstep.step_bootstrap_host_role) and the root user must be able to access the CA
+      - |
+        Supported distributions:
+
+        - Ubuntu 18.04 LTS or newer
+        - Debian 10 or newer
+        - Fedora 36 or newer
+        - A CentOS-compatible distribution like RockyLinux/AlmaLinux 8 or newer. RockyLinux is used for testing
     options:
       step_cli_executable:
         type: path
-        description: Path or name of the step-cli executable to use for executing commands in this role
+        description:
+          - Path or name of the step-cli executable to use for executing commands in this role
+          - Can be an absolute path or a command (make sure the executable is in $PATH) for all users
         default: step-cli
+      step_cli_steppath:
+        type: path
+        description:
+          - Optionally set a custom C($STEPPATH) from which to read the step config
+          - "Example: C(/etc/step-cli)"
+        default: $HOME/.step
       step_acme_cert_ca_provisioner:
         type: str
         required: yes
-        description: Name of the provisioner on the CA that will issue the ACME cert
+        description:
+          - Name of the provisioner on the CA that will issue the ACME cert
       step_acme_cert_webroot_path:
         type: str
         default: ""
-        description: Path to the webroot for ACME, or empty for standalone mode
+        description:
+          - If set, this role will use C  (step-cli)s webroot mode to get a new certificate.
+          - If empty, this role will use the standalone mode instead, causing C(step-cli) to bind itself to port 80. Make sure that no other services are listening on this port.
+          - Note that C(step-cli) only needs to bind to this port when getting a B(new) certificate. It does not need to bind if it is only B(renewing) a valid certificate
       # Certificate Options
       step_acme_cert_name:
         type: str
-        default: '{{ ansible_fqdn }}'
+        default: "{{ ansible_fqdn }}"
         description: The subject name that the certificate will be issued for
       step_acme_cert_san:
         type: list
@@ -26,7 +52,9 @@ argument_specs:
         description: Subject Alternate Names to add to the cert
       step_acme_cert_duration:
         type: str
-        description: Valid duration of the certificate
+        description:
+          - Valid duration of the certificate
+          - Uses the provisioner default (typically 24h) if no duration is given
       step_acme_cert_contact:
         type: str
         default: root@localhost
@@ -75,12 +103,18 @@ argument_specs:
       step_acme_cert_renewal_service:
         type: str
         default: step-renew
-        description: Name of the systemd service that will handle cert renewals
+        description:
+          - Name of the systemd service that will handle cert renewals
+          - If you have multiple cert/key pairs on one system, you will have to set a unique service name for each pair. If you only have one, then you can leave this as is.
       step_acme_cert_renewal_when:
         type: str
-        description: Renew the cert when its remaining valid time crosses this threshold
+        description:
+          - Renew the cert when its remaining valid time crosses this threshold
+          - Uses the smallstep default (1/3 of the certs valid duration) if left undefined
       step_acme_cert_renewal_reload_services:
         type: list
         elements: str
         default: []
-        description: Reload or restart these systemd services after a cert renewal
+        description:
+          - Reload or restart these systemd services after a cert renewal
+          - "Example: C(['nginx.service', 'mysqld.service'])"

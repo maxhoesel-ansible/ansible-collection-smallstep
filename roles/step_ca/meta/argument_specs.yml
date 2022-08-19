@@ -1,16 +1,76 @@
 argument_specs:
   main:
-    short_description: Main entrypoint
+    short_description: Install and initialize a Smallstep certificates server (C(step-ca)).
+    description:
+      - |
+        This role performs the following actions:
+
+        1. Install C(step-cli) if required
+        2. Install C(step-ca)
+        3. Create a user to run the step-ca server, if it doesn't already exist
+        4. Initialize a fresh ca server with no provisioners using C(step ca init)
+        5. Daemonize step-ca using a systemd service
+      - |
+        Requirements:
+
+        - Root access using C(become: yes) or equivalent
+      - |
+        Supported distributions:
+
+        - Ubuntu 18.04 LTS or newer
+        - Debian 10 or newer
+        - Fedora 36 or newer
+        - A CentOS-compatible distribution like RockyLinux/AlmaLinux 8 or newer. RockyLinux is used for testing
+      - |
+        B(NOTE): Please make sure that you have read the L(considerations,https://smallstep.com/docs/step-ca/certificate-authority-server-production) for running a step-ca server in production. This role follows these considerations where possible, but you should still be familiar with the basic operation of the C(step-ca) server.
+      - |
+        B(NOTE ON THE ROOT KEY): By default C(step-ca) generates two keys when initialized - a root CA key and an intermediate key used to sign certificates. Both are present and encrypted on the ca host after this role exits, with the C(step-ca) server configured to read the intermediate key password from a protected file in I(step_ca_path). The root key can thus only be decrypted with the password set in I(step_ca_root_password).
+
+        It is thus very important that you B(back up your root key and password) in a safe and secure location. The details of your backup scheme will depend on your environment and threat model.
+      - |
+        B(WARNING ABOUT USING EXISTING KEYS): If you want to use an existing root key, it is B(highly) recommended that you use an encrypted keyfile and set I(step_ca_existing_key_password) from a secure source, such as Ansible Vault or Hashicorp Vault.
+
+        Storing your root key unencrypted (even just temporarily!) is strongly discouraged and poses a great security risk. This role will only decrypt the root key for as long as strictly neccessary.
     options:
-      # Install options
-      step_ca_version:
-        type: str
-        default: latest
-        description: Version of step-ca to install
+      step_cli_executable:
+        type: path
+        description:
+          - What to name and where to put the C(step-cli) executable that will be installed by this role
+          - Can be an absolute path (make sure that the parent directory is in C($PATH)) or a filename
+          - If this executable is not found and I(step_cli_executable) is a B(path), the executable will be installed there
+          - If this executable is not found and I(step_cli_executable) is a B(name), the executable will be installed at I(step_cli_install_dir) with the given name
+        default: step-cli
       step_cli_version:
         type: str
         default: latest
-        description: Version of step-cli to install
+        description:
+          - Set the version of step to install
+          - Can be a version tag (e.g. C(0.15.3)), or C(latest) to always install the most recent version
+          - It is B(highly) recommended that your cli version matches the collection version (e.g. if you are using the collection version C(0.20.x) you should be installing step-cli version C(0.20.x) as well)
+          - Note that the role will query the GitHub API if this value is set to C(latest). Try setting a specific version if you are running into rate limiting issues
+      step_cli_install_dir:
+        type: path
+        default: "/usr/bin"
+        description:
+          - Used if the binary defined by I(step_cli_executable) is not found on the system and I(step_cli_executable) contains a executable name
+          - Sets the directory to install I(step_cli_executable) into
+          - The directory must already exist
+          - Ignored if I(step_cli_executable) contains a directory already
+      # Install options (step-ca)
+      step_ca_executable:
+        type: path
+        default: "/usr/bin/step-ca"
+        description:
+          - Where to put the `step-ca` executable that will be installed by this role
+          - Must be an absolute path
+      step_ca_version:
+        type: str
+        default: latest
+        description:
+          - Version of step-ca to install
+          - Can be a version tag (e.g. C(0.15.3)), or C(latest) to always install the most recent version
+          - It is B(highly) recommended that your ca version matches the collection version (e.g. if you are using the collection version C(0.20.x) you should be installing step-ca version C(0.20.x) as well)
+          - Note that the role will query the GitHub API if this value is set to C(latest). Try setting a specific version if you are running into rate limiting issues
       step_ca_user:
         type: str
         default: step-ca
@@ -30,7 +90,9 @@ argument_specs:
         description: Password used to encrypt the root key
       step_ca_intermediate_password:
         type: str
-        description: Password used to encrypt the intermediate key. If unset, uses the root password for both
+        description:
+          - Password used to encrypt the intermediate key.
+          - If unset, uses the root password will be used as the intermediate password
       step_ca_dns:
         type: str
         default: "{{ ansible_fqdn}},{{ ansible_default_ipv4.address }}"
@@ -58,16 +120,23 @@ argument_specs:
         choices:
           - remote
           - local
-        description: Whether to use an existing root key and if so from where to import it from
+        description:
+          - Whether to use an existing root key and if so from where to import it from
+          - Note that both cert and key need to be either imported, B(or) generated. For example, you cannot import the key but generate the certificate
+          - Note that if this is unset and I(step_ca_existing_root/key_file) is set, the files are treated as C(remote) to preserve backwards-compatibility to previous collection versions. This behavior may be removed in a future release
       step_ca_existing_key_password:
         type: str
         description: Password to decrypt the root key
       step_ca_existing_root_file:
         type: path
-        description: The path of an existing PEM file to be used as the root certificate authority
+        description:
+          - The path of an existing PEM file to be used as the root certificate authority
+          - Depending on the value of I(step_ca_existing_root), the file must either be on the remote host or the controller
       step_ca_existing_key_file:
         type: path
-        description: The path of an existing key file of the root certificate authority
+        description:
+          - The path of an existing key file of the root certificate authority
+          - Depending on the value of I(step_ca_existing_key), the file must either be on the remote host or the controller
       # RA options
       step_ca_ra:
         type: str
@@ -77,8 +146,4 @@ argument_specs:
         description: The registration authority issuer name to use
       step_ca_ra_credentials_file:
         type: path
-        description: he registration authority credentials file to use
-      step_cli_executable:
-        type: path
-        description: Path or name of the step-cli executable to use for executing commands in this role
-        default: step-cli
+        description: The registration authority credentials file to use

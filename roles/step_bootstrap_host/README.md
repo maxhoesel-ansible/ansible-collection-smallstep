@@ -36,13 +36,13 @@ It will:
   (e.g. if you are using the collection version 0.20.x you should be installing step-cli version 0.20.x as well)
 - Note that the role will query the GitHub API if this value is set to `latest`. Try setting
   a specific version if you are running into rate limiting issues
-- Default: `latest` (same as the upstream step-cli packages)
+- Default: `latest`
 
 ##### `step_cli_install_dir`
-- Used if `step_cli_executable` is not found and contains a executable name
+- Used if the binary defined by `step_cli_executable` is not found on the system and `step_cli_executable` contains a executable name
 - Sets the directory to install `step_cli_executable` into
 - The directory must already exist
-- Ignored if `step_cli_executable` contains a path already
+- Ignored if `step_cli_executable` contains a directory already
 - Default: `/usr/bin`
 
 ### Bootstrap

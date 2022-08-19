@@ -1,28 +1,78 @@
 argument_specs:
   main:
-    short_description: Main entrypoint
+    short_description: Install C(step-cli) on a host and configure it to trust your CA.
+    description:
+      - This is intended as a one-stop role that sets up all the components neccessary for using C(step-cli) on a given host.
+      - |
+        This role will perform the following steps:
+
+        1. Install C(step-cli) if required (using the R(step_cli role,ansible_collections.maxhoesel.smallstep.step_cli_role))
+        2. Install the CA root cert into the system trust store
+        3. Configure the root user to automatically connect to your CA when running C(step-cli)
+      - |
+        Requirements:
+
+        - Root access using C(become: yes) or equivalent
+      - |
+        Supported distributions:
+
+        - Ubuntu 18.04 LTS or newer
+        - Debian 10 or newer
+        - Fedora 36 or newer
+        - A CentOS-compatible distribution like RockyLinux/AlmaLinux 8 or newer. RockyLinux is used for testing
     options:
       step_cli_executable:
         type: path
-        description: Path or name of the step-cli executable to use for executing commands in this role
+        description:
+          - What to name and where to put the C(step-cli) executable that will be installed by this role
+          - Can be an absolute path (make sure that the parent directory is in C($PATH)) or a filename
+          - If this executable is not found and I(step_cli_executable) is a B(path), the executable will be installed there
+          - If this executable is not found and I(step_cli_executable) is a B(name), the executable will be installed at I(step_cli_install_dir) with the given name
         default: step-cli
       step_cli_version:
         type: str
         default: latest
-        description: Version of step-cli to install
+        description:
+          - Set the version of step to install
+          - Can be a version tag (e.g. C(0.15.3)), or C(latest) to always install the most recent version
+          - It is B(highly) recommended that your cli version matches the collection version (e.g. if you are using the collection version C(0.20.x) you should be installing step-cli version C(0.20.x) as well)
+          - Note that the role will query the GitHub API if this value is set to C(latest). Try setting a specific version if you are running into rate limiting issues
+      step_cli_install_dir:
+        type: path
+        default: "/usr/bin"
+        description:
+          - Used if the binary defined by I(step_cli_executable) is not found on the system and I(step_cli_executable) contains a executable name
+          - Sets the directory to install I(step_cli_executable) into
+          - The directory must already exist
+          - Ignored if I(step_cli_executable) contains a directory already
+      step_cli_steppath:
+        type: path
+        default: $HOME/.step
+        description:
+          - Optionally set a custom C($STEPPATH) for bootstrapping
+          - "B(NOTE): If set, you will have to supply your custom C($STEPPATH) in all future role/module/C(step-cli) calls on this host that use the step config"
+          - "Example: C(/etc/step-cli)"
       step_bootstrap_ca_url:
         type: str
         required: yes
-        description: URL of the step-ca CA
+        description:
+          - URL of the step-ca CA
+          - "Example: C(https://myca.localdomain)"
       step_bootstrap_fingerprint:
         type: str
         required: yes
-        description: Fingerprint of the CA root cert
+        description:
+          - Fingerprint of the CA root cert
+          - This is used to verify the authenticity of the remote CA
       step_bootstrap_install_cert:
         type: bool
         default: yes
-        description: Whether to install the CA cert into the system root trust store(s)
+        description:
+          - Whether to install the CA cert into the system root trust store(s)
+          - If set to false, this role only installs C(step-cli) and configures the root user to run C(step-cli) against your CA. Other applications on your system will B(not) trust the CA, as the certificate won't be in the system trust store.
       step_bootstrap_force:
         type: bool
         default: no
-        description: Whether to force bootstrapping of the CA configuration.
+        description:
+          - Whether to force bootstrapping of the CA configuration.
+          - If true, will cause an overwrite of any existing CA configuration, including root certificate. Useful to change the CA URL, or even change to a new CA entirely.
