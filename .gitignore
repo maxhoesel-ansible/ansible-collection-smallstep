@@ -111,7 +111,7 @@ celerybeat.pid
 
 # Environments
 .env
-.venv
+.venv*
 env/
 venv/
 ENV/
@@ -145,8 +145,7 @@ dmypy.json
 
 # Ansible collection archives
 *.tar.gz
-# Adding this to gitignore breaks ansible-test. so let's not do that
-#ansible_collections/
+docs/ansible_collections/
 
 # Don't commit ephermal integration config
 tests/integration/integration_config.yml

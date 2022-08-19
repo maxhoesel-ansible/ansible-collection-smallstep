@@ -68,7 +68,7 @@ To learn more about the differences between Online/Offline/Local-Only Modules, s
 
 - A recent release of Ansible. This collection officially supports the 2 most recent Ansible releases.
   Older versions might still work, but are not supported
-- Python 3.6 or newer
+- Python 3.6 or newer on the target host
 
 Individual roles or modules may have additional dependencies, please check their respective documentation.
 
@@ -78,13 +78,96 @@ Via ansible-galaxy (recommended):
 
 `ansible-galaxy collection install maxhoesel.smallstep>=your-step-cli-version,<next-major-version`
 
-For more information about supported step-cli versions, see the support notice at the beginning of this file.
+For more information about supported step-cli versions, see the support notice at the top of this file.
 
 Alternatively, you can download a collection archive from a [previous release](hhttps://github.com/maxhoesel-ansible/ansible-collection-smallstep/releases).
 
 You can also clone this repository directly if you want a slightly more up-to-date (and potentially buggy) version.
 
 `ansible-galaxy collection install git+https://github.com/maxhoesel-ansible/ansible-collection-smallstep`
+
+## Module Usage
+
+This collection contains several modules for managing your smallstep environment.
+Most of them wrap around `step-cli` commands, so they usually support all the features of the respective command.
+
+If you'd like to know more about an individual module, you can view its documentation using `ansible-doc maxhoesel.smallstep.<step_module_name>` (or use the [online docs](https://ansible-collection-smallstep.readthedocs.io)).
+
+The `step-cli` tool has two sets of commands - standalone and CA.
+
+- Standalone commands are executed by  `step-cli` directly with no external CA required. Example: `step-cli certificate create`
+- CA commands require the usage of an external step CA (Example: `step-cli ca certificate`). Depending on the module, there are two modes:
+  - Online mode: `step-cli` communicates with the CA over HTTPS and requests the data it needs.
+  - Offline/Local mode: `step-cli` accesses the CA files (certificates, config) directly. This only works on the CA host itself.
+
+Most CA modules can use either online or offline mode using the `offline` parameter, but there are some exceptions.
+For example, the `step_ca_provisioner_(claims)` modules(s) need to run in offline mode as they directly write to the CA config.
+See [this table](#ca-modules) for details.
+
+In order to talk to your CA in online mode, `step-cli` needs to already trust it. You can achieve this by:
+- Running the module on a host that was configured with `step_bootstrap_host` as root (recommended).
+- Pasing the `ca_url` and `root` parameters to the module.
+
+For offline mode, you need to:
+  - Provide `step-cli` with the path to your CA config (`$STEPPATH/config/ca.json` by default).
+    You can override this with the `ca_config` parameter if required.
+  - Run the module as the user the CA is running as to prevent permission issues
+
+Below are some examples to showcase the different options. These examples assume that a CA is already set up on the local host.
+
+```yaml
+- hosts: ca
+  tasks:
+    - name: Run a module in online mode by specifying the CA URL and CA cert
+      maxhoesel.smallstep.step_ca_certificate:
+        root: /etc/ssl/myca.crt
+        ca_url: https://my-ca.localdomain
+        #params go here
+
+    # This will only work if you ran step_bootstrap_host on this host first!
+    - name: Run a module as root to use the CA configured during bootstrapping
+      maxhoesel.smallstep.step_ca_certificate:
+        #params go here
+      become: yes
+
+    - name: Run a module in offline mode
+      maxhoesel.smallstep.step_ca_certificate:
+        offline: yes
+        # params go here
+      become: yes
+      # You should run modules acting on a local CA as the user that the CA runs as.
+      # If you configured your CA with `step_ca`, the default user name is `step-ca`.
+      become_user: step-ca
+
+    - name: Run a offline-only module and manually supply the ca_config
+      maxhoesel.smallstep.step_ca_provisioner:
+        ca_config: /etc/step-ca/config/ca.json
+        #params go here
+      become: yes
+      become_user: step-ca
+```
+
+### About `$STEPPATH`
+
+All modules in this collection respect the `$STEPPATH` environment variable used to customize the step-cli config directory.
+If you want to use a custom `$STEPPATH` for your environment, you can use the `step_cli_steppath` role variables
+and the `environment` ansible parameter for modules:
+
+
+```yaml
+  - name: Initialize a host with a custom STEPPATH
+    maxhoesel.smallstep.step_bootstrap_host:
+    vars:
+      step_bootstrap_ca_url: https://my-ca.localdomain
+      step_bootstrap_fingerprint: "your root CA certs fingerprint"
+      step_cli_steppath: /etc/step-cli
+
+  - name: Use the custom $STEPPATH in a module
+    maxhoesel.smallstep.step_ca_certificate:
+      # params go here
+    environment:
+      STEPPATH: /etc/step-cli
+```
 
 ## Getting started (Step-By-Step)
 
@@ -175,88 +258,6 @@ To actually initialize the clients, you can use [`step_bootstrap_host`](roles/st
 At this point, your CA is up and running and your hosts are configured to trust it. You're ready to go!
 You can take a look at the available modules to further configure your CA and hosts if you wish to do so.
 
-## Module Usage
-
-This collection contains several modules for mamaging your smallstep environment.
-Most of them wrap around `step-cli` commands, so they usually support all the features of the respective command.
-
-If you'd like to know more about an individual module, you can view its documentation using `ansible-doc maxhoesel.smallstep.<step_module_name>`.
-
-The `step-cli` tool has two sets of commands - standalone and CA.
-
-- Standalone commands are executed by  `step-cli` directly with no external CA required. Example: `step-cli certificate create`
-- CA commands require the usage of an external step CA (Example: `step-cli ca certificate`). Depending on the module, there are two modes:
-  - Online mode: `step-cli` communicates with the CA over HTTPS and requests the data it needs.
-  - Offline/Local mode: `step-cli` accesses the CA files (certificates, config) directly. This only works on the CA host itself.
-
-Most CA modules can use either online or offline mode using the `offline` parameter, but there are some exceptions.
-For example, the `step_ca_provisioner_(claims)` modules(s) need to run in offline mode as they directly write to the CA config.
-See [this table](#ca-modules) for details.
-
-In order to talk to your CA in online mode, `step-cli` needs to already trust it. You can achieve this by:
-- Running the module on a host that was configured with `step_bootstrap_host` as root (recommended).
-- Pasing the `ca_url` and `root` parameters to the module.
-
-For offline mode, you need to:
-  - Provide `step-cli` with the path to your CA config (`$STEPPATH/config/ca.json` by default).
-    You can override this with the `ca_config` parameter if required.
-  - Run the module as the user the CA is running as to prevent permission issues
-
-Below are some examples to showcase the different options. These examples assume that a CA is already set up on the local host.
-
-```yaml
-- hosts: ca
-  tasks:
-    - name: Run a module in online mode by specifying the CA URL and CA cert
-      maxhoesel.smallstep.step_ca_certificate:
-        root: /etc/ssl/myca.crt
-        ca_url: https://my-ca.localdomain
-        #params go here
-
-    # This will only work if you ran step_bootstrap_host on this host first!
-    - name: Run a module as root to use the CA configured during bootstrapping
-      maxhoesel.smallstep.step_ca_certificate:
-        #params go here
-      become: yes
-
-    - name: Run a module in offline mode
-      maxhoesel.smallstep.step_ca_certificate:
-        offline: yes
-        # params go here
-      become: yes
-      # You should run modules acting on a local CA as the user that the CA runs as.
-      # If you configured your CA with `step_ca`, the default user name is `step-ca`.
-      become_user: step-ca
-
-    - name: Run a offline-only module and manually supply the ca_config
-      maxhoesel.smallstep.step_ca_provisioner:
-        ca_config: /etc/step-ca/config/ca.json
-        #params go here
-      become: yes
-      become_user: step-ca
-```
-
-### About `$STEPPATH`
-
-All modules in this collection respect the `$STEPPATH` environment variable used to customize the step-cli config directory.
-If you want to use a custom `$STEPPATH` for your environment, you can use the `step_cli_steppath` role variables
-and the `environment` ansible parameter for modules:
-
-
-```yaml
-  - name: Initialize a host with a custom STEPPATH
-    maxhoesel.smallstep.step_bootstrap_host:
-    vars:
-      step_bootstrap_ca_url: https://my-ca.localdomain
-      step_bootstrap_fingerprint: "your root CA certs fingerprint"
-      step_cli_steppath: /etc/step-cli
-
-  - name: Use the custom $STEPPATH in a module
-    maxhoesel.smallstep.step_ca_certificate:
-      # params go here
-    environment:
-      STEPPATH: /etc/step-cli
-```
 
 ## License & Author
 

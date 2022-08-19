@@ -2,11 +2,12 @@ authors:
 - Max Hösel <ansible@maxhoesel.de>
 build_ignore:
 - '*.tar.gz'
-- .venv
+- '.venv*'
 - .github
 - .tox
 - .pytest_cache
 - scripts
+- docs
 dependencies: {}
 description: Mangage Smallstep CA servers
 issues: https://github.com/maxhoesel-ansible/ansible-collection-smallstep/issues
