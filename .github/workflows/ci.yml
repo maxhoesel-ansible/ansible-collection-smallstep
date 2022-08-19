@@ -31,6 +31,38 @@ jobs:
       - name: Run pre-commit checks
         uses: pre-commit/action@v3.0.0
 
+  docs:
+    name: "Docs"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out codebase
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up Python 3
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3"
+      - name: Set up pip and install requirements
+        run: |
+          sudo apt update
+          sudo apt install -y rsync
+          python -m pip install --upgrade pip
+          python -m pip install -r docs/requirements.txt
+
+      - name: Build and install collection
+        run: |
+          ansible-galaxy collection build --force
+          ansible-galaxy collection install *.tar.gz --force
+
+      - name: Generate docs
+        run: |
+          mkdir temp-rst
+          antsibull-docs collection --fail-on-error --breadcrumbs --indexes --use-html-blobs --use-current --dest-dir temp-rst maxhoesel.smallstep
+          rsync -cprv --delete-after temp-rst/collections/ rst/collections/
+          cd rst && sphinx-build -M html ./ ../build -c . -W --keep-going
+        working-directory: ./docs
+
   modules-sanity:
     name: "Modules Sanity"
     runs-on: ubuntu-latest

@@ -26,7 +26,6 @@ This was the last collection version released under the old versioning scheme.
 
 ---
 
-
 ## Components
 
 ### Roles
@@ -39,11 +38,11 @@ This was the last collection version released under the old versioning scheme.
 | [`step_cli`](roles/step_cli/README.md) | Install step-cli and nothing else. Used by bootstrap_host and step_ca under the hood.
 
 
-### Standalone Modules
+### Modules
 
-None so far
+**📔 Module Documentation is available [online](https://ansible-collection-smallstep.readthedocs.io) 📔**
 
-### CA Modules
+#### CA Modules
 
 ---
 **NOTE**
@@ -61,6 +60,10 @@ To learn more about the differences between Online/Offline/Local-Only Modules, s
 | `step_ca_provisioner_claims` | **DECREPATED!** (use `step_ca_provisioner` instead) Manage provisioner claims | ❌ | ✅ |
 | `step_ca_revoke` | Revoke a Certificate | ✅ | `offline` parameter |
 | `step_ca_token` | Generate an OTT granting access to the CA | ✅ | `offline` parameter |
+
+#### Standalone Modules
+
+None so far
 
 ## Installation
 
