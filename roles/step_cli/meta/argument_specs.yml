@@ -1,8 +1,42 @@
 argument_specs:
   main:
-    short_description: Main entrypoint
+    short_description: Install the C(step-cli) tool on a host.
+    description:
+      - This role is used by R(step_bootstrap_host,ansible_collections.maxhoesel.smallstep.step_bootstrap_host_role) and R(step_ca,ansible_collections.maxhoesel.smallstep.step_ca_role), but can also be used standalone to install the cli tool and then do nothing else.
+      - |
+        Requirements:
+
+        - Root access using C(become: yes) or equivalent
+      - |
+        Supported distributions:
+
+        - Ubuntu 18.04 LTS or newer
+        - Debian 10 or newer
+        - Fedora 36 or newer
+        - A CentOS-compatible distribution like RockyLinux/AlmaLinux 8 or newer. RockyLinux is used for testing
+      - "Supported architectures: amd64, arm64"
     options:
+      step_cli_executable:
+        type: path
+        description:
+          - What to name and where to put the C(step-cli) executable that will be installed by this role
+          - Can be an absolute path (make sure that the parent directory is in C($PATH)) or a filename
+          - If this executable is not found and I(step_cli_executable) is a B(path), the executable will be installed there
+          - If this executable is not found and I(step_cli_executable) is a B(name), the executable will be installed at I(step_cli_install_dir) with the given name
+        default: step-cli
       step_cli_version:
         type: str
         default: latest
-        description: Version of step-cli to install
+        description:
+          - Set the version of step to install
+          - Can be a version tag (e.g. C(0.15.3)), or C(latest) to always install the most recent version
+          - It is B(highly) recommended that your cli version matches the collection version (e.g. if you are using the collection version C(0.20.x) you should be installing step-cli version C(0.20.x) as well)
+          - Note that the role will query the GitHub API if this value is set to C(latest). Try setting a specific version if you are running into rate limiting issues
+      step_cli_install_dir:
+        type: path
+        default: "/usr/bin"
+        description:
+          - Used if the binary defined by I(step_cli_executable) is not found on the system and I(step_cli_executable) contains a executable name
+          - Sets the directory to install I(step_cli_executable) into
+          - The directory must already exist
+          - Ignored if I(step_cli_executable) contains a directory already

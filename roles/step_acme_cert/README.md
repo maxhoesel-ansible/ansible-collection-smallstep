@@ -36,8 +36,8 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 - Required: Yes
 
 ##### `step_acme_cert_webroot_path`
-- If set, this role will use `step-cli`s webroot mode to get a new certificate.
-- If empty, this role will use the standalone mode instead, causing `step-cli` to bind itself to port 80. Make sure that no other services are listening on this port.
+- If set, this role will use `step-cli`s webroot mode to get a new certificate
+- If empty, this role will use the standalone mode instead, causing `step-cli` to bind itself to port 80. Make sure that no other services are listening on this port
   Note that `step-cli` only needs to bind to this port when getting a *new* certificate. It does not need to bind if it is only *renewing* a certificate.
 - Default: ""
 

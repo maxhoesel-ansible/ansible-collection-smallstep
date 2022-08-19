@@ -1,6 +1,6 @@
 # maxhoesel.smallstep.step_cli
 
-Install the `step` CLI tool on a host.
+Install the `step-cli`  tool on a host.
 
 This role is used by `step_bootstrap_host` and `step_ca`, but can also be used standalone to install the cli tool and then do nothing else.
 

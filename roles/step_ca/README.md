@@ -106,7 +106,7 @@ See the [step docs](https://smallstep.com/docs/step-cli/reference/ca/init) for m
 
 ##### `step_ca_intermediate_password`
 - Password used to encrypt the intermediate key
-- If unset, uses the root password for both
+- If unset, uses the root password will be used as the intermediate password
 - Default: Not set
 
 ##### `step_ca_dns`
@@ -138,7 +138,7 @@ By default, this role will generate a new CA cert/key, only change these values 
 If you want to use an existing root key, it is **highly** recommended that you use an encrypted keyfile and set
 `step_ca_existing_key_password` from a secure source, such as Ansible Vault or Hashicorp Vault.
 
-Storing your root key unencrypted (even just temporarily!) is strongly recommended against and poses a great security risk.
+Storing your root key unencrypted (even just temporarily!) is strongly discouraged and poses a great security risk.
 This role will only decrypt the root key for as long as strictly neccessary.
 
 ---
@@ -153,7 +153,7 @@ This role will only decrypt the root key for as long as strictly neccessary.
 - Default: Not set.
     - If unset and `_root/key_file` is also unset, a new certificate will be generated
     - If unset and `_root/key_file` is set, the files are treated as `remote` to preserve backwards-compatibility to previous collection versions.
-      This behavior may be removed in a future release.
+      This behavior may be removed in a future release
 
 ##### `step_ca_existing_<root/key>_file`
 - The path of an existing PEM file to be used as the root certificate/key
