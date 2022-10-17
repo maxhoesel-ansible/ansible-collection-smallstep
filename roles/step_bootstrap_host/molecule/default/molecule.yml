@@ -3,9 +3,6 @@ dependency:
   name: galaxy
 driver:
   name: docker
-  network:
-    - name: smallstep_bootstrap_host
-      driver: bridge
 platforms:
   # Note on containers:
   # - We use the images provided by geerlingguy, as they provide out-of-the-box
@@ -26,6 +23,8 @@ platforms:
     env:
       DOCKER_STEPCA_INIT_NAME: Molecule Bootstrap CA
       DOCKER_STEPCA_INIT_DNS_NAMES: "${STEP_MOLECULE_CA_HOSTNAME:-step-ca-molecule.localdomain},localhost"
+    docker_networks:
+      - name: smallstep_bootstrap_host
     networks:
       - name: smallstep_bootstrap_host
 
@@ -40,6 +39,8 @@ platforms:
     privileged: true
     override_command: false
     pre_build_image: true
+    docker_networks:
+      - name: smallstep_bootstrap_host
     networks:
       - name: smallstep_bootstrap_host
 
@@ -54,6 +55,8 @@ platforms:
     privileged: true
     override_command: false
     pre_build_image: true
+    docker_networks:
+      - name: smallstep_bootstrap_host
     networks:
       - name: smallstep_bootstrap_host
 
@@ -68,6 +71,8 @@ platforms:
     privileged: true
     override_command: false
     pre_build_image: true
+    docker_networks:
+      - name: smallstep_bootstrap_host
     networks:
       - name: smallstep_bootstrap_host
 
@@ -82,6 +87,8 @@ platforms:
     privileged: true
     override_command: false
     pre_build_image: true
+    docker_networks:
+      - name: smallstep_bootstrap_host
     networks:
       - name: smallstep_bootstrap_host
 
@@ -96,6 +103,8 @@ platforms:
     privileged: true
     override_command: false
     pre_build_image: true
+    docker_networks:
+      - name: smallstep_bootstrap_host
     networks:
       - name: smallstep_bootstrap_host
 
@@ -110,6 +119,8 @@ platforms:
     privileged: true
     override_command: false
     pre_build_image: true
+    docker_networks:
+      - name: smallstep_bootstrap_host
     networks:
       - name: smallstep_bootstrap_host
 
@@ -124,6 +135,8 @@ platforms:
     privileged: true
     override_command: false
     pre_build_image: true
+    docker_networks:
+      - name: smallstep_bootstrap_host
     networks:
       - name: smallstep_bootstrap_host
 
@@ -138,6 +151,8 @@ platforms:
     privileged: true
     override_command: false
     pre_build_image: true
+    docker_networks:
+      - name: smallstep_bootstrap_host
     networks:
       - name: smallstep_bootstrap_host
 
