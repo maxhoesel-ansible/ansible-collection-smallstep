@@ -2,9 +2,22 @@
 offline: true
 
 exclude_paths:
+  - ".cache"
   - tests/integration/targets/
   - .github/
-  - docs/
+
+warn_list:
+  - "name[missing]"
 
 skip_list:
-  - 'fqcn-builtins'
+  - "key-order[task]"
+  # Lots of false positives from this one, any equals sign in a command will trigger it
+  - "no-free-form"
+  # We may be in our unstable phase still, nothing wrong about that
+  - "galaxy[version-incorrect]"
+  # While we should migrate away from the old builtins, this is in no way urgent
+  - "fqcn-builtins"
+  # Doesn't take into account variable names and similar, too noisy
+  - "name[casing]"
+  # Then only plays in a collection are going to be molecule plays, which already have a name through their filename
+  - "name[play]"
