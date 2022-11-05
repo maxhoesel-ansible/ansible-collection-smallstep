@@ -100,11 +100,8 @@ platforms:
 
 provisioner:
   name: ansible
-  config_options:
-    ssh_connection:
-      pipelining: yes
-    defaults:
-      forks: 15
+  env:
+    ANSIBLE_PIPELINING: "True"
   inventory:
     group_vars:
       all:
