@@ -10,7 +10,7 @@ author: Max Hösel (@maxhoesel)
 short_description: Manage default or provisioner claims on a C(step-ca) server
 version_added: '0.2.1'
 deprecated:
-    removed_in: "0.23.0"
+    removed_in: "0.24.0"
     why: >
       These features are now available in step_ca_provisioner.
       This module directly edits the CA.json config, which is not recommended.
