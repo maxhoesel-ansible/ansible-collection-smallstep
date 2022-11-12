@@ -23,13 +23,22 @@
         remote_src: yes
       retries: 3
       delay: 3
-    - name: Install step-ca binary # noqa no-changed-when
+    - name: Install step-ca binary <0.23 # noqa no-changed-when
       shell: >
         set -o pipefail &&
         mv -Z /tmp/step-ca_{{ step_ca_version }}/bin/* {{ step_ca_executable | dirname }}
       args:
         executable: /bin/bash
       notify: restart step-ca
+      when: step_ca_version is version("0.23", "<")
+    - name: Install step-ca binary >=0.23 # noqa no-changed-when
+      shell: >
+        set -o pipefail &&
+        mv -Z /tmp/step-ca_{{ step_ca_version }}/step-ca {{ step_ca_executable | dirname }}
+      args:
+        executable: /bin/bash
+      notify: restart step-ca
+      when: step_ca_version is version("0.23", ">=")
   always:
     - name: Remove step release archive
       file:
