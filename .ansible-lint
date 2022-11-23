@@ -1,4 +1,4 @@
-# Don't automatically install roles from galaxy
+# Don't automatically install roles from galaxy to prevent flaky tests
 offline: true
 
 exclude_paths:
@@ -6,18 +6,14 @@ exclude_paths:
   - tests/integration/targets/
   - .github/
 
+# Unfortunately, warnings only show up when running ansible-lint normally, not during pre-commit
 warn_list:
-  - "name[missing]"
+  - "name[missing]" # this is *sometimes* okay, like with a block or simple include
 
 skip_list:
-  - "key-order[task]"
-  # Lots of false positives from this one, any equals sign in a command will trigger it
-  - "no-free-form"
-  # We may be in our unstable phase still, nothing wrong about that
-  - "galaxy[version-incorrect]"
-  # While we should migrate away from the old builtins, this is in no way urgent
-  - "fqcn-builtins"
-  # Doesn't take into account variable names and similar, too noisy
-  - "name[casing]"
-  # Then only plays in a collection are going to be molecule plays, which already have a name through their filename
-  - "name[play]"
+  - "key-order[task]" # Lots of false positives from this one, any equals sign in a command will trigger it
+  - "no-free-form" # ... really?
+  - "galaxy[version-incorrect]" # This errors on 0.x versions, which we are totally okay with
+  - "fqcn-builtins" # While we should migrate away from the old builtins, this is in no way urgent
+  - "name[casing]" # too noisy, does not account for names starting with variable names
+  - "name[play]" # The only plays in a collection are going to be molecule plays, which already have a name through their filename
