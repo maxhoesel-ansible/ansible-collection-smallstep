@@ -4,7 +4,7 @@
   tasks:
     # Slightly hacky way to get the CA fingerprint. We could also look at logs but i prefer this method
     - name: Get CA fingerprint
-      command: docker exec step-ca step certificate fingerprint certs/root_ca.crt
+      ansible.builtin.command: podman exec step-ca step certificate fingerprint certs/root_ca.crt
       register: _ca_fingerprint
       changed_when: false
       check_mode: false

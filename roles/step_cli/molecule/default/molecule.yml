@@ -2,104 +2,87 @@
 dependency:
   name: galaxy
 driver:
-  name: docker
+  name: podman
 platforms:
-  # Note on containers:
-  # - We use the images provided by geerlingguy, as they provide out-of-the-box
-  #   support for Ansible and systemd (needed to test service management).
-  # - The containers run as privileged containers so that we can
-  #   use systemd functionality. This *should* be possible with unpriliged
-  #   containers as well, but is quite the headache.
-  # - they are connected to a shared network to allow simulating a remote CA
+  # We use the images provided by geerlingguy where possible, as they provide out-of-the-box
+  # support for Ansible (pre_build_image=true, speeds up testing).
   - name: step-cli-ubuntu-22
-    image: "geerlingguy/docker-ubuntu2204-ansible"
+    image: "docker.io/geerlingguy/docker-ubuntu2204-ansible"
     groups:
       - ubuntu
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
     override_command: false
     pre_build_image: true
+    systemd: always
 
   - name: step-cli-ubuntu-20
-    image: "geerlingguy/docker-ubuntu2004-ansible"
+    image: "docker.io/geerlingguy/docker-ubuntu2004-ansible"
     groups:
       - ubuntu
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
     override_command: false
     pre_build_image: true
+    systemd: always
 
   - name: step-cli-ubuntu-18
-    image: "geerlingguy/docker-ubuntu1804-ansible"
+    image: "docker.io/geerlingguy/docker-ubuntu1804-ansible"
     groups:
       - ubuntu
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
     override_command: false
     pre_build_image: true
+    systemd: always
 
   - name: step-cli-debian-11
-    image: "geerlingguy/docker-debian11-ansible"
+    image: "docker.io/geerlingguy/docker-debian11-ansible"
     groups:
       - debian
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
     override_command: false
     pre_build_image: true
+    systemd: always
 
   - name: step-cli-debian-10
-    image: "geerlingguy/docker-debian10-ansible"
+    image: "docker.io/geerlingguy/docker-debian10-ansible"
     groups:
       - debian
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
     override_command: false
     pre_build_image: true
+    systemd: always
 
   - name: step-cli-rockylinux-9
-    image: "geerlingguy/docker-rockylinux9-ansible"
+    image: "docker.io/geerlingguy/docker-rockylinux9-ansible"
     groups:
       - rockylinux
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
     override_command: false
     pre_build_image: true
+    systemd: always
 
   - name: step-cli-rockylinux-8
-    image: "geerlingguy/docker-rockylinux8-ansible"
+    image: "docker.io/geerlingguy/docker-rockylinux8-ansible"
     groups:
       - rockylinux
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
     override_command: false
     pre_build_image: true
+    systemd: always
 
   - name: step-cli-fedora-36
-    image: "geerlingguy/docker-fedora36-ansible"
+    image: "docker.io/geerlingguy/docker-fedora36-ansible"
     groups:
       - fedora
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
     override_command: false
     pre_build_image: true
+    systemd: always
 
 provisioner:
   name: ansible
   env:
-    ANSIBLE_PIPELINING: "True"
+    # This is required for podman to function: https://github.com/ansible-community/molecule-podman/issues/2
+    ANSIBLE_PIPELINING: false
+    #ANSIBLE_VERBOSITY: 3 # enable for debugging
   inventory:
     group_vars:
       all:
-        step_cli_version: ${STEP_CLI_VERSION}
-        step_ca_version: ${STEP_CA_VERSION}
+        # These will be set to a concrete version if running from tox,
+        # fallback on the latest version if running molecule directly
+        step_cli_version: ${STEP_CLI_VERSION:-latest}
+        step_ca_version: ${STEP_CA_VERSION:-latest}
         step_cli_executable: /bin/step-cli-molecule
 
 scenario:
