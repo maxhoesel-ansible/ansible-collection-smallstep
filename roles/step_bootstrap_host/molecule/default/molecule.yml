@@ -2,164 +2,110 @@
 dependency:
   name: galaxy
 driver:
-  name: docker
+  name: podman
 platforms:
-  # Note on containers:
-  # - We use the images provided by geerlingguy, as they provide out-of-the-box
-  #   support for Ansible and systemd (needed to test service management).
-  # - The containers run as privileged containers so that we can
-  #   use systemd functionality. This *should* be possible with unpriliged
-  #   containers as well, but is quite the headache.
-  # - they are connected to a shared network to allow simulating a remote CA
+  # We use the images provided by geerlingguy where possible, as they provide out-of-the-box
+  # support for Ansible (pre_build_image=true, speeds up testing).
 
   # Use the smallstep-provided CA image for testing
   - name: step-ca
-    hostname: ${STEP_MOLECULE_CA_HOSTNAME:-step-ca-molecule.localdomain}
     groups:
       - ca
-    image: "smallstep/step-ca:${STEP_CA_VERSION:-latest}"
+    image: "docker.io/smallstep/step-ca:${STEP_CA_VERSION:-latest}"
+    # we don't actually use the container with ansible, leave it as is
     override_command: false
-    pre_build_image: true # we don't actually use the container with ansible, leave it as is
+    pre_build_image: true
     env:
-      DOCKER_STEPCA_INIT_NAME: Molecule Bootstrap CA
-      DOCKER_STEPCA_INIT_DNS_NAMES: "${STEP_MOLECULE_CA_HOSTNAME:-step-ca-molecule.localdomain},localhost"
-    docker_networks:
-      - name: smallstep_bootstrap_host
-    networks:
-      - name: smallstep_bootstrap_host
+      DOCKER_STEPCA_INIT_NAME: "Molecule_Bootstrap_CA"
+      DOCKER_STEPCA_INIT_DNS_NAMES: "step-ca,localhost"
+    network: molecule-step-bootstrap-host
 
   - name: step-host-ubuntu-22
-    hostname: step-host-ubuntu-22.localdomain
     groups:
       - clients
       - ubuntu
-    image: "geerlingguy/docker-ubuntu2204-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-ubuntu2204-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
-    docker_networks:
-      - name: smallstep_bootstrap_host
-    networks:
-      - name: smallstep_bootstrap_host
+    network: molecule-step-bootstrap-host
 
   - name: step-host-ubuntu-20
-    hostname: step-host-ubuntu-20.localdomain
     groups:
       - clients
       - ubuntu
-    image: "geerlingguy/docker-ubuntu2004-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-ubuntu2004-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
-    docker_networks:
-      - name: smallstep_bootstrap_host
-    networks:
-      - name: smallstep_bootstrap_host
+    network: molecule-step-bootstrap-host
 
   - name: step-host-ubuntu-18
-    hostname: step-host-ubuntu-18.localdomain
     groups:
       - clients
       - ubuntu
-    image: "geerlingguy/docker-ubuntu1804-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-ubuntu1804-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
-    docker_networks:
-      - name: smallstep_bootstrap_host
-    networks:
-      - name: smallstep_bootstrap_host
+    network: molecule-step-bootstrap-host
 
   - name: step-host-debian-11
-    hostname: step-host-debian-11.localdomain
     groups:
       - clients
       - debian
-    image: "geerlingguy/docker-debian11-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-debian11-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
-    docker_networks:
-      - name: smallstep_bootstrap_host
-    networks:
-      - name: smallstep_bootstrap_host
+    network: molecule-step-bootstrap-host
 
   - name: step-host-debian-10
-    hostname: step-host-debian-10.localdomain
     groups:
       - clients
       - debian
-    image: "geerlingguy/docker-debian10-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-debian10-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
-    docker_networks:
-      - name: smallstep_bootstrap_host
-    networks:
-      - name: smallstep_bootstrap_host
+    network: molecule-step-bootstrap-host
 
   - name: step-host-rockylinux-9
-    hostname: step-host-rockylinux-9.localdomain
     groups:
       - clients
       - rockylinux
-    image: "geerlingguy/docker-rockylinux9-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-rockylinux9-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
-    docker_networks:
-      - name: smallstep_bootstrap_host
-    networks:
-      - name: smallstep_bootstrap_host
+    network: molecule-step-bootstrap-host
 
   - name: step-host-rockylinux-8
-    hostname: step-host-rockylinux-8.localdomain
     groups:
       - clients
       - rockylinux
-    image: "geerlingguy/docker-rockylinux8-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-rockylinux8-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
-    docker_networks:
-      - name: smallstep_bootstrap_host
-    networks:
-      - name: smallstep_bootstrap_host
+    network: molecule-step-bootstrap-host
 
   - name: step-host-fedora-36
-    hostname: step-host-fedora-36.localdomain
     groups:
       - clients
       - fedora
-    image: "geerlingguy/docker-fedora36-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-fedora36-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
-    docker_networks:
-      - name: smallstep_bootstrap_host
-    networks:
-      - name: smallstep_bootstrap_host
+    network: molecule-step-bootstrap-host
 
 provisioner:
   name: ansible
   env:
-    ANSIBLE_PIPELINING: "True"
+    # This is required for podman to function: https://github.com/ansible-community/molecule-podman/issues/2
+    ANSIBLE_PIPELINING: false
+    #ANSIBLE_VERBOSITY: 3 # enable for debugging
   inventory:
     group_vars:
       clients:
@@ -170,7 +116,7 @@ provisioner:
         step_cli_version: ${STEP_CLI_VERSION:-latest}
         step_ca_version: ${STEP_CA_VERSION:-latest}
 
-        step_bootstrap_ca_url: https://${STEP_MOLECULE_CA_HOSTNAME:-step-ca-molecule.localdomain}:9000
+        step_bootstrap_ca_url: https://step-ca:9000
 
 scenario:
   test_sequence:

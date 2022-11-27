@@ -28,7 +28,7 @@ options:
     aliases:
       - aws_account
   aws_iid_roots_file:
-    description: Removed from step-cli. Does nothing. Will be removed in release 0.23.0.
+    description: Removed from step-cli. Does nothing. Will be removed in release 0.24.0.
     type: path
   azure_audience:
     description: The Microsoft Azure audience name used to validate the identity tokens.
@@ -149,7 +149,7 @@ options:
     aliases:
       - configuration_endpoint
   oidc_domain:
-    description: Removed from step-cli. Does nothing. Will be removed in release 0.23.0.
+    description: Removed from step-cli. Does nothing. Will be removed in release 0.24.0.
     type: str
   oidc_groups:
     description: The group list used to validate the groups extenstion in an OpenID Connect token. Must be a list
@@ -539,7 +539,7 @@ def run_module():
     module_args = dict(
         allow_renewal_after_expiry=dict(type="bool"),
         aws_accounts=dict(type="list", elements="str", aliases=["aws_account"]),
-        aws_iid_roots_file=dict(type="path", removed_in_version="0.23.0",
+        aws_iid_roots_file=dict(type="path", removed_in_version="0.24.0",
                                 removed_from_collection="maxhoesel.smallstep"),
         azure_audience=dict(type="str"),
         azure_object_ids=dict(type="list", elements="str", aliases=["azure_object_id"]),
@@ -564,19 +564,19 @@ def run_module():
                          deprecated_aliases=[
             {
                 "name": "oidc_admin_email",
-                "version": "0.23.0",
+                "version": "0.24.0",
                 "collection_name": "maxhoesel.smallstep"
             }
         ]),
         oidc_client_id=dict(type="str", aliases=["client_id"]),
         oidc_client_secret=dict(type="str", no_log=True, aliases=["client_secret"]),
         oidc_configuration_endpoint=dict(type="str", aliases=["configuration_endpoint"]),
-        oidc_domain=dict(type="str", removed_in_version="0.23.0", removed_from_collection="maxhoesel.smallstep"),
+        oidc_domain=dict(type="str", removed_in_version="0.24.0", removed_from_collection="maxhoesel.smallstep"),
         oidc_groups=dict(type="list", elements="str", aliases=["group", "oidc_group"]),
         oidc_listen_address=dict(type="str", aliases=["listen_address", "oidc_client_address"], deprecated_aliases=[
             {
                 "name": "oidc_client_address",
-                "version": "0.23.0",
+                "version": "0.24.0",
                 "collection_name": "maxhoesel.smallstep"
             }
         ]),
@@ -586,7 +586,7 @@ def run_module():
         password_file=dict(type="path", no_log=False, aliases=["jwk_password_file"], deprecated_aliases=[
             {
                 "name": "jwk_password_file",
-                "version": "0.23.0",
+                "version": "0.24.0",
                 "collection_name": "maxhoesel.smallstep"
             }
         ]),
@@ -594,7 +594,7 @@ def run_module():
                         deprecated_aliases=[
             {
                 "name": "k8s_pem_keys_file",
-                "version": "0.23.0",
+                "version": "0.24.0",
                 "collection_name": "maxhoesel.smallstep"
             }
         ]),
@@ -625,7 +625,7 @@ def run_module():
         x5c_root=dict(type="path", aliases=["x5c_root_file"], deprecated_aliases=[
             {
                 "name": "x5c_root_file",
-                "version": "0.23.0",
+                "version": "0.24.0",
                 "collection_name": "maxhoesel.smallstep"
             }
         ]),

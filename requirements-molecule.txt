@@ -2,4 +2,4 @@
 # Molecule and molecule-docker are ... not the most reliable pieces of software when it comes to updates,
 # so lets manage their versions ourselves
 molecule==4.0.3
-molecule-docker==2.1.0
+molecule-podman==2.0.3

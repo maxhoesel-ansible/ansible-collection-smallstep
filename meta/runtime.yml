@@ -4,5 +4,5 @@ plugin_routing:
     modules:
         step_ca_provisioner_claims:
             deprecation:
-                removal_version: 0.23.0
+                removal_version: 0.24.0
                 warning_text: Claims features are now available in step_ca_provisioner

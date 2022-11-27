@@ -1,165 +1,108 @@
----
-dependency:
-  name: galaxy
 driver:
-  name: docker
+  name: podman
 platforms:
-  # Note on containers:
-  # - We use the images provided by geerlingguy, as they provide out-of-the-box
-  #   support for Ansible and systemd (needed to test service management).
-  # - The containers run as privileged containers so that we can
-  #   use systemd functionality. This *should* be possible with unpriliged
-  #   containers as well, but is quite the headache.
-  # - they are connected to a shared network to allow simulating a remote CA
+  # We use the images provided by geerlingguy where possible, as they provide out-of-the-box
+  # support for Ansible (pre_build_image=true, speeds up testing).
 
   # Use the smallstep-provided CA image for testing
   - name: step-ca
-    hostname: ${STEP_MOLECULE_CA_HOSTNAME:-step-ca-molecule.localdomain}
     groups:
       - ca
-    image: "smallstep/step-ca:${STEP_CA_VERSION:-latest}"
+    image: "docker.io/smallstep/step-ca:${STEP_CA_VERSION:-latest}"
+    # we don't actually use the container with ansible, leave it as is
     override_command: false
-    pre_build_image: true # we don't actually use the container with ansible, leave it as is
+    pre_build_image: true
     env:
-      DOCKER_STEPCA_INIT_NAME: Molecule ACME CA
-      DOCKER_STEPCA_INIT_DNS_NAMES: "${STEP_MOLECULE_CA_HOSTNAME:-step-ca-molecule.localdomain},localhost"
-    docker_networks:
-      - name: smallstep_acme_cert
-    networks:
-      - name: smallstep_acme_cert
+      DOCKER_STEPCA_INIT_NAME: "Molecule_Bootstrap_CA"
+      DOCKER_STEPCA_INIT_DNS_NAMES: "step-ca,localhost"
+    network: molecule-step-acme-cert
 
-  - name: step-cert-ubuntu-22
-    hostname: step-cert-ubuntu-22.localdomain
+  - name: step-host-ubuntu-22
     groups:
       - clients
       - ubuntu
-    image: "geerlingguy/docker-ubuntu2204-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-ubuntu2204-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
-    docker_networks:
-      - name: smallstep_acme_cert
-    networks:
-      - name: smallstep_acme_cert
+    network: molecule-step-acme-cert
 
-  - name: step-cert-ubuntu-20
-    hostname: step-cert-ubuntu-20.localdomain
+  - name: step-host-ubuntu-20
     groups:
       - clients
       - ubuntu
-    image: "geerlingguy/docker-ubuntu2004-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-ubuntu2004-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
-    docker_networks:
-      - name: smallstep_acme_cert
-    networks:
-      - name: smallstep_acme_cert
+    network: molecule-step-acme-cert
 
-  - name: step-cert-ubuntu-18
-    hostname: step-cert-ubuntu-18.localdomain
+  - name: step-host-ubuntu-18
     groups:
       - clients
       - ubuntu
-    image: "geerlingguy/docker-ubuntu1804-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-ubuntu1804-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
-    docker_networks:
-      - name: smallstep_acme_cert
-    networks:
-      - name: smallstep_acme_cert
+    network: molecule-step-acme-cert
 
-  - name: step-cert-debian-11
-    hostname: step-cert-debian-11.localdomain
+  - name: step-host-debian-11
     groups:
       - clients
       - debian
-    image: "geerlingguy/docker-debian11-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-debian11-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
-    docker_networks:
-      - name: smallstep_acme_cert
-    networks:
-      - name: smallstep_acme_cert
+    network: molecule-step-acme-cert
 
-  - name: step-cert-debian-10
-    hostname: step-cert-debian-10.localdomain
+  - name: step-host-debian-10
     groups:
       - clients
       - debian
-    image: "geerlingguy/docker-debian10-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-debian10-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
-    docker_networks:
-      - name: smallstep_acme_cert
-    networks:
-      - name: smallstep_acme_cert
+    network: molecule-step-acme-cert
 
-  - name: step-cert-rockylinux-9
-    hostname: step-cert-rockylinux-9.localdomain
+  - name: step-host-rockylinux-9
     groups:
       - clients
       - rockylinux
-    image: "geerlingguy/docker-rockylinux9-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-rockylinux9-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
-    docker_networks:
-      - name: smallstep_acme_cert
-    networks:
-      - name: smallstep_acme_cert
+    network: molecule-step-acme-cert
 
-  - name: step-cert-rockylinux-8
-    hostname: step-cert-rockylinux-8.localdomain
+  - name: step-host-rockylinux-8
     groups:
       - clients
       - rockylinux
-    image: "geerlingguy/docker-rockylinux8-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-rockylinux8-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
-    docker_networks:
-      - name: smallstep_acme_cert
-    networks:
-      - name: smallstep_acme_cert
+    network: molecule-step-acme-cert
 
-  - name: step-cert-fedora-36
-    hostname: step-cert-fedora-36.localdomain
+  - name: step-host-fedora-36
     groups:
       - clients
       - fedora
-    image: "geerlingguy/docker-fedora36-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-fedora36-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
-    docker_networks:
-      - name: smallstep_acme_cert
-    networks:
-      - name: smallstep_acme_cert
+    network: molecule-step-acme-cert
 
 provisioner:
   name: ansible
   env:
-    ANSIBLE_PIPELINING: "True"
+    # This is required for podman to function: https://github.com/ansible-community/molecule-podman/issues/2
+    ANSIBLE_PIPELINING: false
+    #ANSIBLE_VERBOSITY: 3 # enable for debugging
   inventory:
     group_vars:
       ca:
@@ -169,9 +112,8 @@ provisioner:
         step_ca_version: ${STEP_CA_VERSION:-latest}
         step_cli_steppath: /etc/step-cli-molecule
 
-        step_bootstrap_ca_url: https://${STEP_MOLECULE_CA_HOSTNAME:-step-ca-molecule.localdomain}:9000
-
         step_acme_cert_ca_provisioner: ACME
+        step_bootstrap_ca_url: https://step-ca:9000
 
 scenario:
   test_sequence:
