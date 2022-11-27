@@ -8,9 +8,7 @@ Note that by contributing to this collection, you agree with the code of conduct
 
 To begin development on this collection, you need to have the following dependencies installed:
 
-- Python 3.8 or newer (for running ansible-core 2.13+)
-
-## Quick Start
+- Python 3.8 or newer (for running tests with ansible-core 2.13+)
 
 1. Fork the repository and clone it to your local machine
 2. Run `./scripts/setup.sh` to configure a local dev environment (virtualenv) with all required dependencies
@@ -26,6 +24,7 @@ The modules in this collection are mostly simple wrappers around the `step-cli` 
 Feel free to add a new module if you would like to implement another subcommand.
 Here are some general hints for module development:
 
+- All modules should target Python 3.6 as the minimum supported version
 - Read the [Ansible module conventions](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_best_practices.html)
 - Use the pre-existing `doc_fragments` and `module_utils` python modules where applicable. Feel free to use an existing module as a base
 - Name your module according to the `step-li` command that it wraps around (Example: `step-cli ca provisioner` -> `step_ca_provisioner`).
@@ -48,11 +47,10 @@ Some general guidelines:
 Writing tests for your contributions ensure that they continue working in the future.
 In addition to the testing venv, you will also need the following:
 
-- `podman` 4 or newer for role tests with molecule (see [here](#setting-up-podman)).
-- `docker` for module tests (both sanity and integration). `podman-docker` may also function, but this is not guaranteed.
+- `podman` 4.0 or newer for both ansible-test and molecule (see [here](#setting-up-podman) for a setup guide).
 
 We use `tox` in conjunction with `tox-ansible` to run tests against both modules and roles with multiple Ansible versions.
-If you set up your environment as described [above](#quick-start), you should already have everything installed.
+If you set up your environment as described [above](#getting-started), you should already have everything installed.
 
 To run tests, use the wrapper scripts in the `tests` directory from the collection root:
 
@@ -63,15 +61,31 @@ To run tests, use the wrapper scripts in the `tests` directory from the collecti
     - To limit the scope to a single role, add a filter parameter: `./tests/test-roles step_cli`
     - Alternatively, you can use `tox -l` to list all available scenarios and then select a single one with `tox -e <scenario-name-here>`
 
-## Module Tests
+## Setting up Podman
 
-All module tests are executed using `docker`, make sure that it is installed, running and that you are in the `docker` group.
+To run role or module tests, you will need the following:
+
+- `podman` version 4+ (as it comes with the new netvark networking stack)
+- `aardvark-dns`, a plugin for netvark which provides DNS between containers in the same network
+
+On Archlinux, you can install these with this command: `sudo pacman -S podman aardvark-dns`.
+Other distributions may not have these versions [available in their repositories](https://pkgs.org/search/?q=podman), you might have install things manually.
+
+**NOTE:** If you previously used an older (`<=3.x`) version of `podman` you will have to migrate to the new networking stack fist. This can be done with `podman system reset`
+
+Finally, make sure that your user has a subuid/subgid configuration associated with them so that you can run rootless containers.
+Check the `/etc/subuid` and `/etc/subgid` files for entries corresponding to your username.
+If none are found, you can add them like so: `sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 <USERNAME>` (make sure that the range is not  already taken by another user in `/etc/subuid`/`/etc/subgid`).
+
+Once you have applied your changes, run `podman system migrate` to force `podman` to pick up the new configuration.
+
+That's it! Podman should now be working! To test it, you can run a container just like with docker: `podman run --rm -it ubuntu bash`
+
+## Module Tests
 
 The sanity tests should "just work" - they can give you valuable feedback and uncover accidental mistakes like mismatches between your module docs and argspec.
 
 You can run the integration tests with the provided script.
-
-### Writing Module tests
 
 When writing module tests, you can start out by either copying an existing target such as [`step_ca_bootstrap`](./tests/integration/targets/step_ca_bootstrap/), or start out from scratch.
 In either case, there is a step-ca available in the integration environment that you can use for your tests ([`test-modules-integration`](./tests/test-modules-integration) takes care of that, see [this section](#using-the-local-ca) for mode details on how this works).
@@ -98,7 +112,7 @@ dependencies:
 
 See the [integration config template](./tests/integration/integration_config.yml.template) for a list of variables that you can use in your integration targets.
 
-#### Using the Local CA
+### Using the Local CA
 
 The CA is normally a separate docker container managed by the [`test-modules-integration`](./tests/test-modules-integration) script.
 This works fine for most modules.
@@ -143,27 +157,6 @@ Once you're done, you can:
 - See all available scenarios with `tox -l` and look for the scenarios starting with `ansible-py*`.
 - Run all molecule scenarios with `tests/test-roles`
 - Pass a (partial) scenario name as a filter to limit execution (for example, `/tests/test-roles acme_cert` to limit molecule scenarios to the ACME role only)
-
-
-### Setting up Podman
-
-To run role tests, you will need the following:
-
-- `podman` version 4+ (as it comes with the new netvark networking stack)
-- `aardvark-dns`
-
-On Archlinux, you can install these with this command: `sudo pacman -S podman aardvark-dns`.
-Other distributions may not have this version available in their repositories, you might have install things manually.
-
-**NOTE:** If you previously used an older version of `podman` you will have to migrate to the new networking stack. This can be done with `podman system reset`
-
-Finally, make sure that your user as a subuid/subgid configuration associated with them so that we can run rootless containers.
-Check the `/etc/subuid` and `/etc/subgid` files for entries corresponding to your username.
-If none are found, you can add them like so: `sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 <USERNAME>` (make sure that the range is not  already taken in `/etc/subuid`/`/etc/subgid`).
-
-Once you have applied your changes, run `podman system migrate` to force `podman` to pick up the new configuration.
-
-That's it! Podman should now be working! To test it, you can run a container just like with docker: `podman run --rm -it ubuntu bash`
 
 ### Writing Role Tests
 
