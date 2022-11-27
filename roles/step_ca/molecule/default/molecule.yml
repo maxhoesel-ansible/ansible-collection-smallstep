@@ -2,22 +2,16 @@
 dependency:
   name: galaxy
 driver:
-  name: docker
+  name: podman
 platforms:
-  # Note on containers:
-  # - We use the images provided by geerlingguy, as they provide out-of-the-box
-  #   support for Ansible and systemd (needed to test service management).
-  # - The containers run as privileged containers so that we can
-  #   use systemd functionality. This *should* be possible with unpriliged
-  #   containers as well, but is quite the headache.
+  # We use the images provided by geerlingguy where possible, as they provide out-of-the-box
+  # support for Ansible (pre_build_image=true, speeds up testing).
   - name: step-ca-ubuntu-22
     groups:
       - ubuntu
       - ca
-    image: "geerlingguy/docker-ubuntu2204-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-ubuntu2204-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
 
@@ -25,10 +19,8 @@ platforms:
     groups:
       - ubuntu
       - ca
-    image: "geerlingguy/docker-ubuntu2004-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-ubuntu2004-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
 
@@ -36,10 +28,8 @@ platforms:
     groups:
       - ubuntu
       - ca
-    image: "geerlingguy/docker-ubuntu1804-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-ubuntu1804-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
 
@@ -47,10 +37,8 @@ platforms:
     groups:
       - debian
       - ca
-    image: "geerlingguy/docker-debian11-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-debian11-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
 
@@ -58,10 +46,8 @@ platforms:
     groups:
       - debian
       - ca
-    image: "geerlingguy/docker-debian10-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-debian10-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
 
@@ -69,10 +55,8 @@ platforms:
     groups:
       - rockylinux
       - ca
-    image: "geerlingguy/docker-rockylinux9-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-rockylinux9-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
 
@@ -80,10 +64,8 @@ platforms:
     groups:
       - rockylinux
       - ca
-    image: "geerlingguy/docker-rockylinux8-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-rockylinux8-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
 
@@ -91,23 +73,25 @@ platforms:
     groups:
       - fedora
       - ca
-    image: "geerlingguy/docker-fedora36-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
+    image: "docker.io/geerlingguy/docker-fedora36-ansible"
+    systemd: always
     override_command: false
     pre_build_image: true
+
 
 provisioner:
   name: ansible
   env:
-    ANSIBLE_PIPELINING: "True"
+    # This is required for podman to function: https://github.com/ansible-community/molecule-podman/issues/2
+    ANSIBLE_PIPELINING: false
+    #ANSIBLE_VERBOSITY: 3 # enable for debugging
   inventory:
     group_vars:
       all:
-        step_cli_version: ${STEP_CLI_VERSION}
-        step_ca_version: ${STEP_CA_VERSION}
-
+        # These will be set to a concrete version if running from tox,
+        # fallback on the latest version if running molecule directly
+        step_cli_version: ${STEP_CLI_VERSION:-latest}
+        step_ca_version: ${STEP_CA_VERSION:-latest}
       ca:
         step_ca_name: Molecule Test CA
         step_ca_user: step-ca-molecule
@@ -121,7 +105,6 @@ provisioner:
         step_ca_existing_key: local
         step_ca_existing_key_file: files/molecule-ca.key
         step_ca_existing_key_password: molecule
-
 
 scenario:
   test_sequence:
