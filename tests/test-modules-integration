@@ -6,14 +6,13 @@ set -o pipefail
 SCRIPT_DIRECTORY=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 # Docker settings
-export STEP_DOCKER_NETWORK="step-ansible-modules"
+export STEP_PODMAN_NETWORK="step-ansible-modules"
 
 # Remote CA settings
-export STEP_REMOTE_CA_CT_NAME="step-ca-ansible-test"
-export STEP_REMOTE_CA_CT_HOSTNAME="step-ca"
+export STEP_REMOTE_CA_CT_NAME="step-ca"
 export STEP_REMOTE_CA_PROVISIONER_NAME="ansible"
 export STEP_REMOTE_CA_PROVISIONER_PASSWORD="ansible-module-tests-pw"
-export STEP_REMOTE_CA_URL="https://$STEP_REMOTE_CA_CT_HOSTNAME:9000"
+export STEP_REMOTE_CA_URL="https://$STEP_REMOTE_CA_CT_NAME:9000"
 # FP can only evaluated when the remote docker ct is running
 export STEP_REMOTE_CA_FP=""
 
@@ -28,8 +27,8 @@ LOCAL_CA_TAG=local-ca
 cleanup() {
     echo "Cleaning up..."
     set +e # cleanup, we don't care if some stuff doesn't exist
-    docker rm -f "$STEP_REMOTE_CA_CT_NAME" > /dev/null
-    docker network rm "$STEP_DOCKER_NETWORK" > /dev/null
+    podman rm -f "$STEP_REMOTE_CA_CT_NAME" > /dev/null
+    podman network rm "$STEP_PODMAN_NETWORK" > /dev/null
     echo "Done"
     set -e
     exit
@@ -37,7 +36,7 @@ cleanup() {
 trap cleanup INT ERR EXIT
 
 prepare() {
-    docker network create $STEP_DOCKER_NETWORK
+    podman network create $STEP_PODMAN_NETWORK
 }
 
 render_config() {
@@ -49,10 +48,10 @@ render_config() {
 
 remote_ca() {
     echo "Starting remote CA container"
-    docker run -d \
-        --name $STEP_REMOTE_CA_CT_NAME --network $STEP_DOCKER_NETWORK --hostname $STEP_REMOTE_CA_CT_HOSTNAME \
+    podman run -d \
+        --name $STEP_REMOTE_CA_CT_NAME --network $STEP_PODMAN_NETWORK \
         -e "DOCKER_STEPCA_INIT_NAME=Ansible-Test" \
-        -e "DOCKER_STEPCA_INIT_DNS_NAMES=localhost,$STEP_REMOTE_CA_CT_HOSTNAME" \
+        -e "DOCKER_STEPCA_INIT_DNS_NAMES=localhost,$STEP_REMOTE_CA_CT_NAME" \
         -e "DOCKER_STEPCA_INIT_PROVISIONER_NAME=$STEP_REMOTE_CA_PROVISIONER_NAME" \
         -e "DOCKER_STEPCA_INIT_PASSWORD=$STEP_REMOTE_CA_PROVISIONER_PASSWORD" \
         "smallstep/step-ca:$STEP_CA_VERSION"
@@ -61,9 +60,9 @@ remote_ca() {
     # Give the CA a little bit to initialize
     echo "Waiting for CA to come online"
     # TODO: Check the container status with docker instead of exec-ing
-    timeout 20 bash -c "while ! docker exec $STEP_REMOTE_CA_CT_NAME step ca health &> /dev/null; do sleep 1; done"
+    timeout 20 bash -c "while ! podman exec $STEP_REMOTE_CA_CT_NAME step ca health &> /dev/null; do sleep 1; done"
 
-    STEP_REMOTE_CA_FP=$(docker exec $STEP_REMOTE_CA_CT_NAME step certificate fingerprint certs/root_ca.crt)
+    STEP_REMOTE_CA_FP=$(podman exec $STEP_REMOTE_CA_CT_NAME step certificate fingerprint certs/root_ca.crt)
     export STEP_REMOTE_CA_FP
 
     render_config
@@ -71,7 +70,7 @@ remote_ca() {
     tox -e integration -- \
         --color -v \
         --controller docker:default --target docker:default,python=3.6 \
-        --docker-network $STEP_DOCKER_NETWORK  \
+        --docker-network $STEP_PODMAN_NETWORK  \
         --skip-tags $LOCAL_CA_TAG \
         --docker-terminate=always `#Change this if you want to debug test targets`
 }
@@ -80,7 +79,7 @@ local_ca() {
     local image_name="step-ca-ansible"
 
     echo "Building docker image for local-ca test targets: $image_name with step-ca version $STEP_CA_VERSION"
-    docker build tests/integration/docker/step-ca-ansible -t $image_name \
+    podman build tests/integration/docker/step-ca-ansible -t $image_name \
         --build-arg "STEP_CA_VERSION=$STEP_CA_VERSION" \
         --build-arg "PYTHON_VERSION=$PYTHON_VERSION" \
         --build-arg "STEP_CA_USER=$STEP_LOCAL_CA_USER"
@@ -90,7 +89,7 @@ local_ca() {
     tox -e integration -- \
         --color -v \
         --controller docker:default --target "docker:$image_name,python=$PYTHON_VERSION@/usr/local/bin/python3" \
-        --docker-network $STEP_DOCKER_NETWORK  \
+        --docker-network $STEP_PODMAN_NETWORK  \
         --tags $LOCAL_CA_TAG \
         --docker-terminate=always `#Change this if you want to debug test targets`
 }

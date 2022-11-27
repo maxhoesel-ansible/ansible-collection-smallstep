@@ -1,5 +1,5 @@
-To test module functionality, we need a ready-to-go docker image serving the smallstep CA to out target container in a docker network.
-For most tests, we can simply use the upstream image for this (see the testenv:integration section in [tox.ini](/tox.ini)).
+To test module functionality, we need a ready-to-go docker image serving the smallstep CA to our target container in a docker network.
+For most tests, we can simply use the upstream image for this (see the test-modules-integration script).
 
 However, there are modules that need direct access to the CA resources (like, on the same host) and the upstream image does not work as an ansible target by default (big surprise).
 
