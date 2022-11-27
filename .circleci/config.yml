@@ -1,0 +1,33 @@
+version: 2.1
+
+orbs:
+  collection-testing: maxhoesel-ansible/ansible-collection-testing@0.1.0
+
+jobs:
+  modules-sanity:
+    executor: collection-testing/default
+    steps:
+      - checkout
+      - collection-testing/install-podman-on-ubuntu
+      - collection-testing/install-requirements-txt
+      - run:
+          command: tests/test-modules-sanity
+  modules-integration:
+    executor: collection-testing/default
+    steps:
+      - checkout
+      - collection-testing/install-podman-on-ubuntu
+      - collection-testing/install-requirements-txt
+      - run:
+          command: tests/test-modules-integration
+
+workflows:
+  ci:
+    jobs:
+      - collection-testing/pre-commit-lint
+      - collection-testing/antsibull-docs:
+          collection-name: maxhoesel.smallstep
+      - collection-testing/tox-role-scenarios:
+          parallelism: 15
+      - modules-sanity
+      - modules-integration

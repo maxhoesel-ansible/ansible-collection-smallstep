@@ -5,7 +5,7 @@
 ARG STEP_CA_VERSION=latest
 ARG PYTHON_VERSION=3.6
 
-FROM smallstep/step-ca:${STEP_CA_VERSION} as ca
+FROM docker.io/smallstep/step-ca:${STEP_CA_VERSION} as ca
 
 FROM python:${PYTHON_VERSION}-alpine
 
