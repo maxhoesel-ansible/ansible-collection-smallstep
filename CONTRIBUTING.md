@@ -262,6 +262,13 @@ verifier:
   name: ansible
 ```
 
+# Collection Docs
+
+In addition to the `README.md`s, we use `antsibull-docs` to generate sphinx documentation for both modules and roles (from the `meta/argument_specs.yml` file).
+See [here](https://docs.ansible.com/ansible/latest/dev_guide/developing_collections_documenting.html) for more information about the build process.
+
+The CI also builds the docs to ensure they don't break silently.
+
 # Misc Lifecycle Maintainer Information
 
 - To update the smallstep cli/ca versions that are used to run the tests, bump the values in `tests/constants.sh`
