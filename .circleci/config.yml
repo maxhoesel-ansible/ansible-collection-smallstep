@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  collection-testing: maxhoesel-ansible/ansible-collection-testing@0.1.0
+  collection-testing: maxhoesel-ansible/ansible-collection-testing@0.1.1
 
 jobs:
   modules-sanity:
@@ -29,5 +29,6 @@ workflows:
           collection-name: maxhoesel.smallstep
       - collection-testing/tox-role-scenarios:
           parallelism: 15
+          resource-class: large
       - modules-sanity
       - modules-integration
