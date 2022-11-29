@@ -1,8 +1,8 @@
 # maxhoesel.smallstep - Ansible Collection for Smallstep CA/CLI
 
-![Release](https://img.shields.io/github/v/release/maxhoesel-ansible/ansible-collection-smallstep)
-![CI Status](https://img.shields.io/github/workflow/status/maxhoesel-ansible/ansible-collection-smallstep/CI/main)
-![License](https://img.shields.io/github/license/maxhoesel-ansible/ansible-collection-smallstep)
+![Release](https://img.shields.io/github/v/release/maxhoesel-ansible/ansible-collection-smallstep?style=flat-square)
+![Build Status](https://img.shields.io/circleci/build/github/maxhoesel-ansible/ansible-collection-smallstep/main?style=flat-square)
+![License](https://img.shields.io/github/license/maxhoesel-ansible/ansible-collection-smallstep?style=flat-square)
 
 An Ansible collection containing roles/modules to install, configure and interact with the [Smallstep certificate server](https://github.com/smallstep/certificates)
 and the [CLI tool](https://github.com/smallstep/cli). Possible uses for this collection include:
