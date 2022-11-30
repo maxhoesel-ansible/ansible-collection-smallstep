@@ -8,7 +8,9 @@ Note that by contributing to this collection, you agree with the code of conduct
 
 To begin development on this collection, you need to have the following dependencies installed:
 
-- Python 3.8 or newer (for running tests with ansible-core 2.13+)
+- A python version that supports the release of `ansible-core` in `requirements.txt` (see ["Control node Python" here](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#node-requirement-summary))
+
+To get started quickly:
 
 1. Fork the repository and clone it to your local machine
 2. Run `./scripts/setup.sh` to configure a local dev environment (virtualenv) with all required dependencies
