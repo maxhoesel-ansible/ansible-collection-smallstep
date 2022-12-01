@@ -8,7 +8,7 @@ autopep8==2.0.0
 pre-commit==2.20.0
 
 # Testing
-tox==3.27.0
+tox==3.27.1
 
 # Utility packages needed for scripts
 pyyaml==6.0.0
