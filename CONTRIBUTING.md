@@ -4,7 +4,7 @@ Below you will find the information needed to contribute to this project.
 
 Note that by contributing to this collection, you agree with the code of conduct you can find [here.](/CODE_OF_CONDUCT.md)
 
-# Getting Started
+## Getting Started
 
 To begin development on this collection, you need to have the following dependencies installed:
 
@@ -20,7 +20,7 @@ To get started quickly:
 6. Once you're done, commit your changes (make sure that you are in the venv).
    Pre-commit will format your code and check for any obvious errors when you do so.
 
-# Developing Modules
+## Developing Modules
 
 The modules in this collection are mostly simple wrappers around the `step-cli` tool.
 Feel free to add a new module if you would like to implement another subcommand.
@@ -33,7 +33,7 @@ Here are some general hints for module development:
 - Use the `CLIWrapper` class in [step_cli_wrapper.py](/plugins/module_utils/step_cli_wrapper.py) to run step-cli commands
 - Try to make the calls idempotent where possible. Modules should always support check mode
 
-# Developing Roles
+## Developing Roles
 
 Each role in this collection performs a complex task to bring a remote host into a desired state.
 If you want to write a new role, look to the existing ones for inspiration.
@@ -44,7 +44,7 @@ Some general guidelines:
 - Keep the configuration for the user simple and try to provide sensible defaults where possible
 - Try to avoid using complex data structures as role variables/parameters, use simple values that can be composed easily instead.
 
-# Testing Infrastructure
+## Testing Infrastructure
 
 Writing tests for your contributions ensure that they continue working in the future.
 In addition to the testing venv, you will also need the following:
@@ -63,7 +63,7 @@ To run tests, use the wrapper scripts in the `tests` directory from the collecti
     - To limit the scope to a single role, add a filter parameter: `./tests/test-roles step_cli`
     - Alternatively, you can use `tox -l` to list all available scenarios and then select a single one with `tox -e <scenario-name-here>`
 
-## Setting up Podman
+### Setting up Podman
 
 To run role or module tests, you will need the following:
 
@@ -83,7 +83,7 @@ Once you have applied your changes, run `podman system migrate` to force `podman
 
 That's it! Podman should now be working! To test it, you can run a container just like with docker: `podman run --rm -it ubuntu bash`
 
-## Module Tests
+### Module Tests
 
 The sanity tests should "just work" - they can give you valuable feedback and uncover accidental mistakes like mismatches between your module docs and argspec.
 
@@ -114,7 +114,7 @@ dependencies:
 
 See the [integration config template](./tests/integration/integration_config.yml.template) for a list of variables that you can use in your integration targets.
 
-### Using the Local CA
+#### Using the Local CA
 
 The CA is normally a separate docker container managed by the [`test-modules-integration`](./tests/test-modules-integration) script.
 This works fine for most modules.
@@ -140,7 +140,7 @@ This will cause the target to get run on a host with a local CA installed, see t
 In the background, this is done by running the `local-ca` integration tests on a custom test host based on the official `step-ca` docker image, see [here](./tests/integration/docker/step-ca-ansible/README.md) for details.
 
 
-## Role Tests
+### Role Tests
 
 Testing Ansible roles ensures that they do exactly what we want them to and nothing more.
 We perform role tests using `molecule` with the `molecule-podman` driver with rootless containers.
@@ -160,7 +160,7 @@ Once you're done, you can:
 - Run all molecule scenarios with `tests/test-roles`
 - Pass a (partial) scenario name as a filter to limit execution (for example, `/tests/test-roles acme_cert` to limit molecule scenarios to the ACME role only)
 
-### Writing Role Tests
+#### Writing Role Tests
 
 There are tons of good guides online for how to write tests using molecule.
 Alternatively, you can always look at the existing molecule scenarios in this collection
@@ -264,14 +264,14 @@ verifier:
   name: ansible
 ```
 
-# Collection Docs
+## Collection Docs
 
 In addition to the `README.md`s, we use `antsibull-docs` to generate sphinx documentation for both modules and roles (from the `meta/argument_specs.yml` file).
 See [here](https://docs.ansible.com/ansible/latest/dev_guide/developing_collections_documenting.html) for more information about the build process.
 
 The CI also builds the docs to ensure they don't break silently.
 
-# Misc Lifecycle Maintainer Information
+## Misc Lifecycle Maintainer Information
 
 - To update the smallstep cli/ca versions that are used to run the tests, bump the values in `tests/constants.sh`
 - This project uses sematic versioning. Version numbers and  releases/changelogs are automatically generated using [release-drafter](https://github.com/release-drafter/release-drafter), utilizing pull request labels.
