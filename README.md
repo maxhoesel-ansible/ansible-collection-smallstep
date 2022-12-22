@@ -40,7 +40,7 @@ This was the last collection version released under the old versioning scheme.
 
 ### Modules
 
-**📔 Module Documentation is available [online](https://ansible-collection-smallstep.readthedocs.io) 📔**
+**📘 Module Documentation is available [online](https://ansible-collection-smallstep.readthedocs.io)**
 
 #### CA Modules
 
