@@ -28,6 +28,14 @@ This was the last collection version released under the old versioning scheme.
 
 ## Components
 
+---
+**📘 Documentation**
+
+- For role documentation, see their `README.md`s or the online docs [here](https://ansible-collection-smallstep.readthedocs.io)
+- For modules documentation, see the online docs [here](https://ansible-collection-smallstep.readthedocs.io)
+
+---
+
 ### Roles
 
 | Role | Description |
@@ -37,10 +45,7 @@ This was the last collection version released under the old versioning scheme.
 | [`step_acme_cert`](roles/step_acme_cert/README.md) | Set up a Let's Encrypt-style certificate on a host using your ca, including automatic renewal.
 | [`step_cli`](roles/step_cli/README.md) | Install step-cli and nothing else. Used by bootstrap_host and step_ca under the hood.
 
-
 ### Modules
-
-**📘 Module Documentation is available [online](https://ansible-collection-smallstep.readthedocs.io)**
 
 #### CA Modules
 
