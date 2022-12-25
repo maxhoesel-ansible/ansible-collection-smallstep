@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  collection-testing: maxhoesel-ansible/ansible-collection-testing@0.2.3
+  collection-testing: maxhoesel-ansible/ansible-collection-testing@0.3.5
 
 jobs:
   modules-sanity:
@@ -21,14 +21,26 @@ jobs:
       - run:
           command: tests/test-modules-integration
 
+filters: &tagged
+  tags:
+    # Official Semver Regex. Yes, it's LOOOONG
+    only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
+  branches:
+    ignore: /.*/
+
 workflows:
   ci:
     jobs:
       - collection-testing/pre-commit-lint
-      - collection-testing/antsibull-docs:
-          collection-name: maxhoesel.smallstep
+      - collection-testing/antsibull-docs
       - collection-testing/tox-role-scenarios:
-          parallelism: 15
+          parallelism: 8
           resource-class: large
+      - collection-testing/publish-github:
+          context: collection-publishing
+          filters: *tagged
+      - collection-testing/publish-galaxy:
+          context: collection-publishing
+          filters: *tagged
       - modules-sanity
       - modules-integration
