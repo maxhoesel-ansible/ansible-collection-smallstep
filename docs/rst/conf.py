@@ -6,22 +6,19 @@
 # documentation:
 # http://www.sphinx-doc.org/en/master/config
 
-# pylint: skip-file
+import yaml
 
-# Yes, this is a horrendous way to extract our collection version.
-# Yes, it works.
-# If you'd like to figure out how to import that module, be my guest!
-with open("../../plugins/module_utils/constants.py") as f:
-    exec(f.read())
-
-version = COLLECTION_VERSION
+with open("../../galaxy.yml", encoding="utf-8") as f:
+    galaxy = yaml.safe_load(f)
+version = galaxy["version"]
 release = version
 
-project = 'Ansible collections'
-copyright = 'Ansible contributors'
+project = 'maxhoesel.smallstep'
+# pylint: disable=redefined-builtin
+copyright = 'Max Hösel and Contributor'
 
 title = 'maxhoesel.smallstep Collection Documentation'
-html_short_title = 'maxhoesel.smallstep docs'
+html_short_title = 'maxhoesel.smallstep Docs'
 
 extensions = ['sphinx.ext.autodoc', 'sphinx.ext.intersphinx', 'sphinx_antsibull_ext']
 
@@ -39,12 +36,14 @@ html_use_modindex = False
 html_use_index = False
 html_copy_source = False
 
+# See https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html#confval-intersphinx_mapping for the syntax
 intersphinx_mapping = {
     'python': ('https://docs.python.org/2/', (None, '../python2.inv')),
     'python3': ('https://docs.python.org/3/', (None, '../python3.inv')),
     'jinja2': ('http://jinja.palletsprojects.com/', (None, '../jinja2.inv')),
     'ansible_devel': ('https://docs.ansible.com/ansible/devel/', (None, '../ansible_devel.inv')),
-    # If you want references to resolve to a released Ansible version (say, `5`), uncomment and replace X by this version:
+    # If you want references to resolve to a released Ansible version (say, `5`),
+    # uncomment and replace X by this version:
     # 'ansibleX': ('https://docs.ansible.com/ansible/X/', (None, '../ansibleX.inv')),
 }
 

@@ -8,22 +8,11 @@ set -e
 # Create collection documentation into temporary directory
 rm -rf temp-rst
 mkdir -p temp-rst
-
-# Temporarily create and install collection
-rm -rf ./ansible_collections
-mkdir -p ./ansible_collections
-export ANSIBLE_COLLECTIONS_PATHS=./docs:$ANSIBLE_COLLECTIONS_PATHS
-(
-    cd ..
-    ansible-galaxy collection build --output-path ./docs --force
-    ansible-galaxy collection install -p ./docs docs/maxhoesel-smallstep-*.tar.gz --force
-)
-
-antsibull-docs collection \
+chmod og-w temp-rst  # antsibull-docs wants that directory only readable by itself
+antsibull-docs \
+    --config-file antsibull-docs.cfg \
+    collection \
     --use-current \
-    --no-use-html-blobs \
-    --breadcrumbs \
-    --indexes \
     --dest-dir temp-rst \
     maxhoesel.smallstep
 

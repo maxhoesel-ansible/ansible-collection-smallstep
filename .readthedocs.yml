@@ -18,7 +18,7 @@ build:
         && ansible-galaxy collection install *.tar.gz --force
         && cd docs
         && mkdir temp-rst
-        && antsibull-docs collection --fail-on-error --breadcrumbs --indexes --use-html-blobs --use-current --dest-dir temp-rst maxhoesel.smallstep
+        && antsibull-docs --config-file antsibull-docs.cfg collection --use-current --dest-dir temp-rst maxhoesel.smallstep
       - cd docs && rsync -cprv --delete-after temp-rst/collections/ rst/collections/
 
 sphinx:

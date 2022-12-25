@@ -3,8 +3,13 @@
 set -eu
 set -o pipefail
 
+SCRIPT_DIRECTORY=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+# shellcheck disable=1091
+source "$SCRIPT_DIRECTORY/constants.sh"
+
+# As we only support py36+, pyupgrade is set to remove the py27 boilerplate. Don't check for that as we don't need it
 tox -e sanity -- \
     --docker --color -v \
-    --python 3.6 \
-    `# As we only support py36+, pyupgrade is set to remove the py27 boilerplate. Don't check for that as we don't need it` \
+    --python "$PYTHON_VERSION" \
     --skip-test metaclass-boilerplate --skip-test future-import-boilerplate
