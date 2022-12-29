@@ -1,13 +1,25 @@
 authors:
 - Max Hösel <ansible@maxhoesel.de>
 build_ignore:
-- '*.tar.gz'
-- .venv*
+- .circleci
 - .github
+- tests
+- CODE_OF_CONDUCT.md
+- CONTRIBUTING.md
+- pyproject.toml
+- tox.ini
+- .yamllint
+- .ansible-lint
+- .pre-commit-config.yaml
+- '*.tar.gz'
+- .venv
 - .tox
 - .pytest_cache
 - scripts
-- docs
+- requirements.txt
+- requirements-molecule.txt
+- '**/requirements-molecule.txt'
+- '**/requirements.txt'
 dependencies: {}
 description: Mangage Smallstep CA servers
 issues: https://github.com/maxhoesel-ansible/ansible-collection-smallstep/issues
