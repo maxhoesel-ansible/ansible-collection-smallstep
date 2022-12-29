@@ -3,7 +3,6 @@ authors:
 build_ignore:
 - .circleci
 - .github
-- tests
 - CODE_OF_CONDUCT.md
 - CONTRIBUTING.md
 - pyproject.toml
