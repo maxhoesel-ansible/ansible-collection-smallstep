@@ -5,7 +5,7 @@ ansible-core==2.14.3
 ansible-lint==6.13.1
 pylint==2.16.2
 autopep8==2.0.1
-pre-commit==2.20.0
+pre-commit==3.1.1
 
 # Testing
 tox==3.27.1
