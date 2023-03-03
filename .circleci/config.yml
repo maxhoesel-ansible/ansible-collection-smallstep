@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  collection-testing: maxhoesel-ansible/ansible-collection-testing@0.3.5
+  collection-testing: maxhoesel-ansible/ansible-collection-testing@0.3.6
 
 jobs:
   modules-sanity:
