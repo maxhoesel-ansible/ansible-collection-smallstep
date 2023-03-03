@@ -14,8 +14,6 @@ ARG STEP_CA_USER=step
 # Get binaries from step-ca container
 COPY --from=ca /usr/local/bin/step /usr/local/bin/step
 COPY --from=ca /usr/local/bin/step-ca /usr/local/bin/step-ca
-COPY --from=ca /usr/local/bin/step-awskms-init /usr/local/bin/step-awskms-init
-COPY --from=ca /usr/local/bin/step-cloudkms-init /usr/local/bin/step-cloudkms-init
 
 # Recreate step environment
 ENV STEP="/home/${STEP_CA_USER}"
