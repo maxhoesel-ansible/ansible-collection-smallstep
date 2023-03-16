@@ -34,7 +34,7 @@ workflows:
       - collection-testing/pre-commit-lint
       - collection-testing/antsibull-docs
       - collection-testing/tox-role-scenarios:
-          parallelism: 8
+          parallelism: 16
           resource-class: large
       - collection-testing/publish-github:
           context: collection-publishing
