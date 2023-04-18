@@ -167,8 +167,6 @@ options:
   password_file:
     description: The path to the file containing the password to encrypt or decrypt the private key.
     type: path
-    aliases:
-      - jwk_password_file
   public_key:
     description: >
         The file containing the JWK public key.
@@ -559,8 +557,6 @@ def run_module():
         oidc_groups=dict(type="list", elements="str", aliases=["group", "oidc_group"]),
         oidc_listen_address=dict(type="str", aliases=["listen_address", "oidc_client_address"]),
         oidc_tenant_id=dict(type="str", aliases=["tenant_id"]),
-        # This is already specified in admin.py, but apparently also used in JWK provisioning?
-        # Seems like a source of conflict - for now we override it here
         password_file=dict(type="path", no_log=False),
         public_key=dict(type="path", aliases=["jwk_public_key", "k8ssa_public_key", "k8s_pem_keys_file"]),
         require_eab=dict(type="bool"),
