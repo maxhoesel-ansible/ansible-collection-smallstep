@@ -62,7 +62,6 @@ To learn more about the differences between Online/Offline/Local-Only Modules, s
 | [`step_ca_certificate`](https://ansible-collection-smallstep.readthedocs.io/en/latest/collections/maxhoesel/smallstep/step_ca_certificate_module.html) | Generate a new private key and certificate signed by the CA root certificate | ✅ | `offline` parameter |
 | [`step_ca_provisioner`](https://ansible-collection-smallstep.readthedocs.io/en/latest/collections/maxhoesel/smallstep/step_ca_provisioner_module.html) | Manage provisioners on a `step-ca` server | `admin` parameters, [if configured](https://smallstep.com/docs/step-ca/provisioners/#remote-provisioner-management) | ✅ |
 | [`step_ca_renew`](https://ansible-collection-smallstep.readthedocs.io/en/latest/collections/maxhoesel/smallstep/step_ca_renew_module.html) | Renew a valid certificate | ✅ | `offline` parameter |
-| [`step_ca_provisioner_claims`](https://ansible-collection-smallstep.readthedocs.io/en/latest/collections/maxhoesel/smallstep/step_ca_provisioner_claims_module.html) | **DECREPATED!** (use `step_ca_provisioner` instead) Manage provisioner claims | ❌ | ✅ |
 | [`step_ca_revoke`](https://ansible-collection-smallstep.readthedocs.io/en/latest/collections/maxhoesel/smallstep/step_ca_revoke_module.html) | Revoke a Certificate | ✅ | `offline` parameter |
 | [`step_ca_token`](https://ansible-collection-smallstep.readthedocs.io/en/latest/collections/maxhoesel/smallstep/step_ca_token_module.html) | Generate an OTT granting access to the CA | ✅ | `offline` parameter |
 
