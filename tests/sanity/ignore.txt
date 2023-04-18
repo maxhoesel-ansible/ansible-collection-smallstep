@@ -1,2 +1,1 @@
 plugins/modules/step_ca_provisioner.py validate-modules:doc-default-does-not-match-spec # Can't always rely on $STEPPATH being set
-plugins/modules/step_ca_provisioner_claims.py validate-modules:doc-default-does-not-match-spec # Can't always rely on $STEPPATH being set
