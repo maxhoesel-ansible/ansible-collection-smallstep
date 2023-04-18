@@ -26,7 +26,7 @@
     loop:
       - name: tests-JWK
         type: JWK
-        jwk_password_file: "/tmp/tests_passfile"
+        password_file: "/tmp/tests_passfile"
         create: yes
       - name: tests-OIDC
         type: OIDC
@@ -62,7 +62,7 @@
       - name: tests-JWK
         type: JWK
         create: yes
-        jwk_password_file: "/tmp/tests_passfile"
+        password_file: "/tmp/tests_passfile"
       - name: tests-OIDC
         type: OIDC
         oidc_client_id: 1087160488420-8qt7bavg3qesdhs6it824mhnfgcfe8il.apps.googleusercontent.com

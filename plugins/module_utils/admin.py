@@ -5,7 +5,7 @@ args = dict(
     admin_key=dict(type="path"),
     admin_provisioner=dict(type="str", aliases=["admin_issuer"]),
     admin_subject=dict(type="str", aliases=["admin_name"]),
-    password_file=dict(type="path", no_log=False)
+    admin_password_file=dict(type="path", no_log=False)
 )
 
 param_spec = {key: f"--{key.replace('_', '-')}" for key in args}

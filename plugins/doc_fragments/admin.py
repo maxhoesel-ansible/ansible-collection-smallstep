@@ -20,7 +20,7 @@ class ModuleDocFragment:
         type: str
         aliases:
           - admin_name
-      password_file:
+      admin_password_file:
         description: The path to the file containing the password to encrypt or decrypt the private key.
         type: path
     '''
