@@ -27,7 +27,7 @@ jobs:
             TEST_RETRIES: 3
             TEST_RETRY_DELAY: 300
 
-filters: &tagged
+filters: &semver-tagged
   tags:
     # Official Semver Regex. Yes, it's LOOOONG
     only: /^v(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
@@ -46,9 +46,9 @@ workflows:
           retry-delay: 300
       - collection-testing/publish-github:
           context: collection-publishing
-          filters: *tagged
+          filters: *semver-tagged
       - collection-testing/publish-galaxy:
           context: collection-publishing
-          filters: *tagged
+          filters: *semver-tagged
       - modules-sanity
       - modules-integration
