@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  collection-testing: maxhoesel-ansible/ansible-collection-testing@0.3.6
+  collection-testing: maxhoesel-ansible/ansible-collection-testing@0.3.8
 
 jobs:
   modules-sanity:
@@ -12,6 +12,9 @@ jobs:
       - collection-testing/install-requirements-txt
       - run:
           command: tests/test-modules-sanity
+          environment:
+            TEST_RETRIES: 3
+            TEST_RETRY_DELAY: 300
   modules-integration:
     executor: collection-testing/default
     steps:
@@ -20,6 +23,9 @@ jobs:
       - collection-testing/install-requirements-txt
       - run:
           command: tests/test-modules-integration
+          environment:
+            TEST_RETRIES: 3
+            TEST_RETRY_DELAY: 300
 
 filters: &tagged
   tags:
@@ -36,6 +42,8 @@ workflows:
       - collection-testing/tox-role-scenarios:
           parallelism: 16
           resource-class: large
+          retries: 3
+          retry-delay: 300
       - collection-testing/publish-github:
           context: collection-publishing
           filters: *tagged

@@ -1,7 +1,28 @@
 #!/usr/bin/env bash
 
+# Run tets on the roles in this collection.
+# Usage: test-roles [filter] [--help, -h]
+#
+# Run all tox molecule role scenarios that match the given filter.
+# If no filter is given, all role scenarios will be run.
+#
+# Example: ./test-roles step_ca
+#
+# To keep retrying a failing test, you can set the following environment variables.
+# This is mainly intended for CI use.
+#   TEST_RETRIES=<num> - Number of times to try the test. Default: 1
+#   TEST_RETRY_DELAY=<num> - Number of seconds to wait between failing test runs. Default: 300 (5min)
+
 set -eu
 set -o pipefail
+
+# shellcheck disable=1091
+source "$SCRIPT_DIRECTORY/constants.sh"
+# shellcheck disable=1091
+source "$SCRIPT_DIRECTORY/util.sh"
+
+TEST_RETRIES="${TEST_RETRIES:-1}"
+TEST_RETRY_DELAY="${TEST_RETRY_DELAY:-300}"
 
 # Hostname to use for the ca container in molecule scenarios
 export STEP_MOLECULE_CA_HOSTNAME=step-ca-molecule.localdomain
@@ -32,7 +53,7 @@ main() {
     fi
     set -u
 
-    tox -e "$scenarios"
+    retry "$TEST_RETRIES" "$TEST_RETRY_DELAY" tox -e "$scenarios"
 }
 
 main "$@"

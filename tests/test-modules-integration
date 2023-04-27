@@ -1,9 +1,22 @@
 #!/usr/bin/env bash
 
+# Perform integration tests on the modules
+# To keep retrying a failing test, you can set the following environment variables.
+# This is mainly intended for CI use.
+#   TEST_RETRIES=<num> - Number of times to try the test. Default: 1
+#   TEST_RETRY_DELAY=<num> - Number of seconds to wait between failing test runs. Default: 300 (5min)
+
 set -eu
 set -o pipefail
 
 SCRIPT_DIRECTORY=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+# shellcheck disable=1091
+source "$SCRIPT_DIRECTORY/constants.sh"
+# shellcheck disable=1091
+source "$SCRIPT_DIRECTORY/util.sh"
+
+TEST_RETRIES="${TEST_RETRIES:-1}"
+TEST_RETRY_DELAY="${TEST_RETRY_DELAY:-300}"
 
 # Docker settings
 export STEP_PODMAN_NETWORK="step-ansible-modules"
@@ -51,7 +64,7 @@ remote_ca() {
     # CircleCIs systemd session is, in some way, misconfigured and that causes some issues with podman and cgroups
     # Instead of fixing it, we can just fallback to cgroupfs
     # See: https://github.com/containers/podman/issues/16529
-    podman run --cgroup-manager=cgroupfs -d \
+    retry "$TEST_RETRIES" "$TEST_RETRY_DELAY" podman run --cgroup-manager=cgroupfs -d \
         --name $STEP_REMOTE_CA_CT_NAME --network $STEP_PODMAN_NETWORK \
         -e "DOCKER_STEPCA_INIT_NAME=Ansible-Test" \
         -e "DOCKER_STEPCA_INIT_DNS_NAMES=localhost,$STEP_REMOTE_CA_CT_NAME" \
@@ -70,7 +83,7 @@ remote_ca() {
 
     render_config
 
-    tox -e integration -- \
+    retry "$TEST_RETRIES" "$TEST_RETRY_DELAY" tox -e integration -- \
         --color -v \
         --controller docker:default --target docker:default,python=3.6 \
         --docker-network $STEP_PODMAN_NETWORK  \
@@ -85,14 +98,14 @@ local_ca() {
     # CircleCIs systemd session is, in some way, misconfigured and that causes some issues with podman and cgroups
     # Instead of fixing it, we can just fallback to cgroupfs
     # See: https://github.com/containers/podman/issues/16529
-    podman build --cgroup-manager=cgroupfs tests/integration/docker/step-ca-ansible -t $image_name \
+    retry "$TEST_RETRIES" "$TEST_RETRY_DELAY" podman build --cgroup-manager=cgroupfs tests/integration/docker/step-ca-ansible -t $image_name \
         --build-arg "STEP_CA_VERSION=$STEP_CA_VERSION" \
         --build-arg "PYTHON_VERSION=$PYTHON_VERSION" \
         --build-arg "STEP_CA_USER=$STEP_LOCAL_CA_USER"
 
     render_config
 
-    tox -e integration -- \
+    retry "$TEST_RETRIES" "$TEST_RETRY_DELAY" tox -e integration -- \
         --color -v \
         --controller docker:default --target "docker:$image_name,python=$PYTHON_VERSION@/usr/local/bin/python3" \
         --docker-network $STEP_PODMAN_NETWORK  \
@@ -101,9 +114,6 @@ local_ca() {
 }
 
 main() {
-    # shellcheck disable=1091
-    source "$SCRIPT_DIRECTORY/constants.sh"
-
     prepare
     local_ca
     remote_ca
