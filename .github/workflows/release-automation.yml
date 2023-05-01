@@ -41,7 +41,7 @@ jobs:
         run: scripts/update-version "${{ needs.update-release-draft.outputs.version-tag }}"
 
       - name: Open PR for collection version update
-        uses: peter-evans/create-pull-request@v4
+        uses: peter-evans/create-pull-request@v5
         with:
           add-paths: |
             galaxy.yml
