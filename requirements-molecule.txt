@@ -3,3 +3,4 @@
 # so lets manage their versions ourselves
 molecule==4.0.4
 molecule-podman==2.0.3
+ansible-compat==3.0.2
