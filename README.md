@@ -73,7 +73,7 @@ None so far
 
 ### Dependencies
 
-- A recent release of Ansible. This collection officially supports the 2 most recent Ansible releases.
+- A recent release of Ansible. This collection officially supports the 3 most recent Ansible releases.
   Older versions might still work, but are not supported
 - Python 3.6 or newer on the target host
 
