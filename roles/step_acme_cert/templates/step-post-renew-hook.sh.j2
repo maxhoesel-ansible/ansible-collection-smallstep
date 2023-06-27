@@ -1,0 +1,12 @@
+#!{{ step_acme_cert_post_renewal_shell }}
+####### added by ansible: maxhoesel.smallstep.step_acme_cert - changes will be overwritten #######
+set -eu
+export STEP_CLI="{{ step_cli_executable_absolute.stdout }}"
+export CERT_FILE="{{ step_acme_cert_certfile_full.path }}"
+export KEY_FILE="{{ step_acme_cert_keyfile_full.path }}"
+{% for command in step_acme_cert_post_renewal_commands -%}
+{{ command }}
+{% endfor -%}
+{% if step_acme_cert_renewal_reload_services -%}
+systemctl try-reload-or-restart {{ step_acme_cert_renewal_reload_services | join(' ') }}
+{% endif -%}

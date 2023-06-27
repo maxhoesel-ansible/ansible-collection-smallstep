@@ -78,6 +78,18 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 - Renew the cert when its remaining valid time crosses this threshold
 - Default: undefined (uses the smallstep default: 1/3 of the certificates valid duration, i.e. 8 hours for a 24h cert)
 
+##### `step_acme_cert_post_renewal_shell`
+- Shell with which to run `step_acme_cert_post_renewal_commands`
+- Must be a valid shell
+- Default: `/bin/sh`
+
+##### `step_acme_cert_post_renewal_commands`
+- Run these commands after a cert renewal
+- Must be a list of commands executable with the shell specified in `step_acme_cert_post_renewal_shell`
+- `${STEP_CLI}`, `${CERT_FILE}` and `${KEY_FILE}` are available for use. All are absolute paths to files.
+- Example: `["cp ${CERT_FILE} /path/to/somewhere/", "chmod 400 ${KEY_FILE}"]`
+- Default: `[]`
+
 ##### `step_acme_cert_renewal_reload_services`
 - Reload or restart these systemd services after a cert renewal
 - Must be a list of systemd units
