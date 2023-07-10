@@ -25,5 +25,6 @@ step_ca_ssh: false
 #step_ca_ra_credentials_file:
 
 # CLI vars
+step_cli_install: true
 step_cli_executable: step-cli
 #step_cli_version: latest

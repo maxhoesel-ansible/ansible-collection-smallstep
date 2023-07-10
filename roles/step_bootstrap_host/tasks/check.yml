@@ -7,6 +7,7 @@
       - step_bootstrap_fingerprint | length > 0
   when: ansible_version.string is version('2.11.1', '<')
 
-- name: Install step_cli # always run this, to ensure our cli version is up-to-date
+- name: Install step_cli # always run this (if desired), to ensure our cli version is up-to-date
   include_role:
     name: maxhoesel.smallstep.step_cli
+  when: step_cli_install

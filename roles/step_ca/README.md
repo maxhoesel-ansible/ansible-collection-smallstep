@@ -41,12 +41,10 @@ It is thus **very** important that you **back up your root key and password** in
 
 ### Installation (step-cli)
 
-##### `step_cli_executable`
-- What to name and where to put the `step-cli` executable that will be installed by this role
-- Can be an absolute path (make sure that the parent directory is in $PATH and has correct SELinux policies set, if applicable) or a filename
-- If this executable is not found and `step_cli_executable` is a **path**, the executable will be installed there
-- If this executable is not found and  `step_cli_executable` is a **name**, the executable will be installed at `step_cli_install_dir` with the given name
-- Default: `step-cli`
+##### `step_cli_install`
+- Whether to install the `step-cli` utility
+- Set this to `false` if the utility is already installed via other means (in this case, the role will use `step_cli_executable`)
+- Default: `true`
 
 ##### `step_cli_version`
 - Set the version of step to install
@@ -56,6 +54,13 @@ It is thus **very** important that you **back up your root key and password** in
 - Note that the role will query the GitHub API if this value is set to `latest`. Try setting
   a specific version if you are running into rate limiting issues
 - Default: `latest` (same as the upstream step-cli packages)
+
+##### `step_cli_executable`
+- What to name and where to put the `step-cli` executable that will be installed by this role
+- Can be an absolute path (make sure that the parent directory is in $PATH and has correct SELinux policies set, if applicable) or a filename
+- If this executable is not found and `step_cli_executable` is a **path**, the executable will be installed there
+- If this executable is not found and  `step_cli_executable` is a **name**, the executable will be installed at `step_cli_install_dir` with the given name
+- Default: `step-cli`
 
 ##### `step_cli_install_dir`
 - Used if `step_cli_executable` is not found and contains a executable name
