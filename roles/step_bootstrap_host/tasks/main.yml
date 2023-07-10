@@ -4,8 +4,8 @@
 - name: STEPPATH is present
   ansible.builtin.file:
     path: "{{ step_cli_steppath }}"
-    owner: root
-    group: root
+    owner: "{{ ansible_user_id }}"
+    group: "{{ ansible_user_id }}"
     mode: "750"
     state: directory
 
