@@ -21,14 +21,12 @@ argument_specs:
         - Fedora 36 or newer
         - A CentOS-compatible distribution like RockyLinux/AlmaLinux 8 or newer. RockyLinux is used for testing
     options:
-      step_cli_executable:
-        type: path
+      step_cli_install:
+        type: bool
+        default: true
         description:
-          - What to name and where to put the C(step-cli) executable that will be installed by this role
-          - Can be an absolute path (make sure that the parent directory is in C($PATH)) or a filename
-          - If this executable is not found and I(step_cli_executable) is a B(path), the executable will be installed there
-          - If this executable is not found and I(step_cli_executable) is a B(name), the executable will be installed at I(step_cli_install_dir) with the given name
-        default: step-cli
+          - Whether to install the C(step-cli) utility
+          - Set this to C(false) if the utility is already installed via other means (in this case, the role will use C(step_cli_executable)
       step_cli_version:
         type: str
         default: latest
@@ -37,6 +35,14 @@ argument_specs:
           - Can be a version tag (e.g. C(0.15.3)), or C(latest) to always install the most recent version
           - It is B(highly) recommended that your cli version matches the collection version (e.g. if you are using the collection version C(0.20.x) you should be installing step-cli version C(0.20.x) as well)
           - Note that the role will query the GitHub API if this value is set to C(latest). Try setting a specific version if you are running into rate limiting issues
+      step_cli_executable:
+        type: path
+        description:
+          - What to name and where to put the C(step-cli) executable that will be installed by this role
+          - Can be an absolute path (make sure that the parent directory is in C($PATH)) or a filename
+          - If this executable is not found and I(step_cli_executable) is a B(path), the executable will be installed there
+          - If this executable is not found and I(step_cli_executable) is a B(name), the executable will be installed at I(step_cli_install_dir) with the given name
+        default: step-cli
       step_cli_install_dir:
         type: path
         default: "/usr/bin"
