@@ -1,0 +1,23 @@
+services:
+  test-runner:
+    build:
+      dockerfile: tests/modules/containers/ansible-test/Dockerfile
+      context: ../../
+      args:
+        PYTHON_VERSION: ${CONTROLLER_PYTHON_VERSION}
+        ANSIBLE_VERSION: ${ANSIBLE_VERSION}
+    networks:
+      - ansible-collection-smallstep-modules
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    # As we only support py36+, pyupgrade is set to remove the py27 boilerplate.
+    # Don't check for that as we don't need it.
+    command: ["cd /root/.ansible/collections/ansible_collections/maxhoesel/smallstep \
+      && ansible-test sanity --docker --color -v \
+      --python ${NODE_PYTHON_VERSION} \
+      --skip-test metaclass-boilerplate \
+      --skip-test future-import-boilerplate"]
+
+networks:
+  ansible-collection-smallstep-modules:
+    driver: bridge

@@ -1,1 +1,1 @@
-../../../../requirements-molecule.txt
+../../../../tests/roles/requirements.txt

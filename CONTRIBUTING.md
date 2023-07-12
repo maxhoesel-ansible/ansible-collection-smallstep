@@ -8,7 +8,7 @@ Note that by contributing to this collection, you agree with the code of conduct
 
 To begin development on this collection, you need to have the following dependencies installed:
 
-- A python version that supports the release of `ansible-core` in `requirements.txt` (see ["Control node Python" here](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#node-requirement-summary))
+- A python version that supports the release of `ansible-core` in `requirements.txt` (see [here](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#control-node-requirements))
 
 To get started quickly:
 

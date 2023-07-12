@@ -32,5 +32,6 @@ repository: https://github.com/maxhoesel-ansible/ansible-collection-smallstep
 tags:
 - smallstep
 - ca
+- application
 - certificates
 version: 0.24.1
