@@ -1,0 +1,14 @@
+---
+# Configuration for the smallstep module tests.
+# This template is rendered by render_config.sh, called from tox
+# You can use these variable names in your module integration tests.
+
+# Currently tested versions
+ca_version: ${STEP_CA_VERSION}
+cli_version: ${STEP_CLI_VERSION}
+
+# Locally reachable CA settings - this is needed by modules like step_ca_provisioner that need FS access
+# Don't use these unless your target is tagged with `local-ca` and you use `setup_local_ca`
+ca_user: ${STEP_LOCAL_CA_USER}
+ca_path: ${STEP_LOCAL_STEPPATH}
+cli_binary: ${STEP_LOCAL_CLI_BINARY}

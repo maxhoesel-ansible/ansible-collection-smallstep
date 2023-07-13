@@ -41,7 +41,6 @@ RUN cd /etc/ssh \
 ENV CONFIGPATH="/home/${STEP_CA_USER}/config/ca.json"
 ENV PWDPATH="/home/${STEP_CA_USER}/secrets/password"
 
-VOLUME ["/home/${STEP_CA_USER}"]
 STOPSIGNAL SIGTERM
 HEALTHCHECK CMD step ca health 2>/dev/null | grep "^ok" >/dev/null
 

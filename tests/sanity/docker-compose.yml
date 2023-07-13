@@ -1,7 +1,8 @@
+version: "3"
+
 services:
   test-runner:
-    # TODO: replace this with proper versioned image
-    build:  https://github.com/maxhoesel-ansible/dockerfiles.git#main:ansible-test-collection-runner
+    image: quay.io/maxhoesel-ansible/ansible-test-collection-runner:${ANSIBLE_VERSION}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ../../:/collection:ro
@@ -12,6 +13,3 @@ services:
       --python ${NODE_PYTHON_VERSION} \
       --skip-test metaclass-boilerplate \
       --skip-test future-import-boilerplate"
-
-
-# idea: install collection at runtime?
