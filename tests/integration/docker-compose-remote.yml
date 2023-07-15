@@ -19,7 +19,7 @@ services:
       PRE_COMMANDS: "/collection/scripts/render_template.sh \
         /collection/tests/integration/integration_config.yml.template-remote > /collection/tests/integration/integration_config.yml"
       ANSIBLE_TEST_ARGS: "integration --color -v \
-        --controller docker:default --target docker:default,python=${NODE_PYTHON_VERSION} \
+        --controller docker:default,cgroup=v1-only --target docker:default,python=${NODE_PYTHON_VERSION} \
         --docker-network ansible-collection-smallstep-integration-ca \
         --skip-tags local-ca"
     depends_on:

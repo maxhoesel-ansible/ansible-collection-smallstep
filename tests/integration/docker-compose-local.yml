@@ -19,7 +19,7 @@ services:
       PRE_COMMANDS: "/collection/scripts/render_template.sh \
         /collection/tests/integration/integration_config.yml.template-local > /collection/tests/integration/integration_config.yml"
       ANSIBLE_TEST_ARGS: "integration --color -v \
-        --controller docker:default --target docker:step-ansible-local-ca,python=${NODE_PYTHON_VERSION}@/usr/local/bin/python3 \
+        --controller docker:default,cgroup=v1-only --target docker:step-ansible-local-ca,python=${NODE_PYTHON_VERSION}@/usr/local/bin/python3 \
         --tags local-ca"
     # Wait for the local image to be built
     depends_on:
