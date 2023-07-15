@@ -5,7 +5,9 @@ services:
   test-runner-local:
     image: quay.io/maxhoesel-ansible/ansible-test-collection-runner:${ANSIBLE_VERSION}
     volumes:
+      # Pass through the docker socket
       - /var/run/docker.sock:/var/run/docker.sock
+      # and our collection
       - ../../:/collection
     environment:
       # versions
@@ -19,11 +21,8 @@ services:
       PRE_COMMANDS: "/collection/scripts/render_template.sh \
         /collection/tests/integration/integration_config.yml.template-local > /collection/tests/integration/integration_config.yml"
       ANSIBLE_TEST_ARGS: "integration --color -v \
-        --controller docker:default,cgroup=v1-only --target docker:step-ansible-local-ca,python=${NODE_PYTHON_VERSION}@/usr/local/bin/python3 \
+        --controller docker:default --target docker:step-ansible-local-ca:ca${STEP_CA_VERSION},python=${NODE_PYTHON_VERSION}@/usr/bin/python${NODE_PYTHON_VERSION} \
         --tags local-ca"
-    # Wait for the local image to be built
-    depends_on:
-      - local-ca
 
   # build local-ca container so that we can use it for tests.
   # We don't actually use the started container, we just need the built image in the local cache
@@ -31,8 +30,7 @@ services:
     build:
       context: ./docker/local-ca
       tags:
-        - step-ansible-local-ca
+        - step-ansible-local-ca:ca${STEP_CA_VERSION}
       args:
         STEP_CA_VERSION: ${STEP_CA_VERSION}
-        PYTHON_VERSION: ${NODE_PYTHON_VERSION}
-    entrypoint: ["echo", "local-ca built"]
+        ANSIBLE_VERSION: ${ANSIBLE_VERSION}

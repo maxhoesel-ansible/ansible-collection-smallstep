@@ -1,0 +1,16 @@
+[Unit]
+Name=Step-ca
+
+[Service]
+Environment="STEP=/home/step"
+Environment="STEPPATH=/home/step"
+Environment="STEP=/home/step"
+Environment="DOCKER_STEPCA_INIT_NAME=Ansible-Test"
+Environment="DOCKER_STEPCA_INIT_DNS_NAMES=localhost,step-ca"
+
+User=step
+Group=step
+ExecStart=/usr/local/bin/step-ca.sh
+
+[Install]
+WantedBy=multi-user.target
