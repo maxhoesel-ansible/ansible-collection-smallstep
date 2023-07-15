@@ -13,23 +13,29 @@ filters: &semver-tagged
 workflows:
   ci:
     jobs:
-      - collection-testing/pre-commit-lint
-      - collection-testing/antsibull-docs
+      - collection-testing/pre-commit-lint:
+          name: Lint
+      - collection-testing/antsibull-docs:
+          name: Generate Docs
       - collection-testing/run-tox-environments:
+          name: Test Modules
           match-environments: modules
           parallelism: 4
           resource-class: medium
           retries: 1
           retry-delay: 60
       - collection-testing/run-tox-environments:
+          name: Test Roles
           match-environments: roles
           parallelism: 16
           resource-class: large
           retries: 1
           retry-delay: 60
       - collection-testing/publish-github:
+          name: Publish Github Release
           context: collection-publishing
           filters: *semver-tagged
       - collection-testing/publish-galaxy:
+          name: Publish to Galaxy
           context: collection-publishing
           filters: *semver-tagged

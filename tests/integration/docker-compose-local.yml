@@ -32,4 +32,7 @@ services:
       context: ./docker/local-ca
       tags:
         - step-ansible-local-ca
+      args:
+        STEP_CA_VERSION: ${STEP_CA_VERSION}
+        PYTHON_VERSION: ${NODE_PYTHON_VERSION}
     entrypoint: ["echo", "local-ca built"]
