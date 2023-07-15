@@ -6,7 +6,7 @@
 # Remote CA access options - this could be a VM somewhere or a local container
 # Use these variables for normal module integration tests
 ca_url: ${STEP_REMOTE_CA_URL}
-# Use this provisioner to create certs/tokens/etc. The password file is already present after calling `setup_remote_provisioner`
+# Use this provisioner to create certs/tokens/etc. The password file is already present after calling "setup_remote_provisioner"
 ca_provisioner: ${STEP_REMOTE_CA_PROVISIONER_NAME}
 ca_provisioner_password: ${STEP_REMOTE_CA_PROVISIONER_PASSWORD}
 ca_provisioner_password_file: /tmp/provisioner_passfile
