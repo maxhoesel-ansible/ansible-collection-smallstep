@@ -32,7 +32,7 @@ workflows:
           retries: 1
           retry-delay: 60
       - collection-testing/publish-github:
-          name: Publish Github Release
+          name: Publish Release to GitHub
           context: collection-publishing
           filters: *semver-tagged
       - collection-testing/publish-galaxy:
