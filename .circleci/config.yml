@@ -20,7 +20,7 @@ workflows:
       - collection-testing/run-tox-environments:
           name: Test Modules
           match-environments: modules
-          parallelism: 4
+          parallelism: 3
           resource-class: medium
           retries: 1
           retry-delay: 60
