@@ -27,7 +27,7 @@ workflows:
       - collection-testing/run-tox-environments:
           name: Test Roles
           match-environments: roles
-          parallelism: 16
+          parallelism: 12
           resource-class: large
           retries: 1
           retry-delay: 60
