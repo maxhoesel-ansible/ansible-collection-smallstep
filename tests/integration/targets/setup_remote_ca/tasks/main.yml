@@ -1,9 +1,17 @@
 - name: Install JQ
   ansible.builtin.apt:
     name: jq # needed to get root certificate
+  retries: 3
+  delay: 5
+  register: _task
+  until: _task is not failed
 - name: Install step-cli
   ansible.builtin.apt:
     deb: "https://github.com/smallstep/cli/releases/download/v{{ cli_version }}/step-cli_{{ cli_version }}_amd64.deb"
+  retries: 3
+  delay: 5
+  register: _task
+  until: _task is not failed
 
 # the stuff of itsec nightmares
 # the step-ca container genreates its root CA dynamically when started, but we retrieve its CA fingerprint to bootstrap from it.

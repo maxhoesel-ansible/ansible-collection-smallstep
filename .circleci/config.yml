@@ -19,7 +19,7 @@ workflows:
           name: Generate Docs
       - collection-testing/run-tox-environments:
           name: Test Modules
-          match-environments: modules
+          match-environments: \-test\-
           parallelism: 3
           resource-class: medium
           retries: 1
