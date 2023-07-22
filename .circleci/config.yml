@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  collection-testing: maxhoesel-ansible/ansible-collection-testing@dev:alpha
+  collection-testing: maxhoesel-ansible/ansible-collection-testing@0.4.0
 
 filters: &semver-tagged
   tags:
@@ -27,6 +27,7 @@ workflows:
       - collection-testing/run-tox-environments:
           name: Test Roles
           match-environments: roles
+          # number of scenarios * ansible versions to test
           parallelism: 12
           resource-class: large
           retries: 1

@@ -1,11 +1,4 @@
----
-dependency:
-  name: galaxy
-driver:
-  name: podman
 platforms:
-  # We use the images provided by geerlingguy where possible, as they provide out-of-the-box
-  # support for Ansible (pre_build_image=true, speeds up testing).
   - name: step-ca-ubuntu-22
     groups:
       - ubuntu
@@ -80,18 +73,8 @@ platforms:
 
 
 provisioner:
-  name: ansible
-  env:
-    # This is required for podman to function: https://github.com/ansible-community/molecule-podman/issues/2
-    ANSIBLE_PIPELINING: false
-    #ANSIBLE_VERBOSITY: 3 # enable for debugging
   inventory:
     group_vars:
-      all:
-        # These will be set to a concrete version if running from tox,
-        # fallback on the latest version if running molecule directly
-        step_cli_version: ${STEP_CLI_VERSION:-latest}
-        step_ca_version: ${STEP_CA_VERSION:-latest}
       ca:
         step_ca_name: Molecule Test CA
         step_ca_user: step-ca-molecule
@@ -105,20 +88,3 @@ provisioner:
         step_ca_existing_key: local
         step_ca_existing_key_file: files/molecule-ca.key
         step_ca_existing_key_password: molecule
-
-scenario:
-  test_sequence:
-    - destroy
-    - dependency
-    - syntax
-    - create
-    - prepare
-    - converge
-    - idempotence
-    - check # also run check mode in regular tests
-    - side_effect
-    - verify
-    - destroy
-
-verifier:
-  name: ansible

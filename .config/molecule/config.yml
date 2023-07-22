@@ -1,0 +1,36 @@
+---
+dependency:
+  name: galaxy
+
+driver:
+  name: podman
+
+provisioner:
+  name: ansible
+  env: {}
+    # Cannot enable pipelining for podman at this time:
+    # https://github.com/ansible-community/molecule-podman/issues/2
+    #ANSIBLE_PIPELINING: false
+  inventory:
+    group_vars:
+      all:
+        # Versions to use, passed in from Tox
+        step_cli_version: ${STEP_CLI_VERSION}
+        step_ca_version: ${STEP_CA_VERSION}
+
+scenario:
+  test_sequence:
+    - destroy
+    - dependency
+    - syntax
+    - create
+    - prepare
+    - converge
+    - idempotence
+    - check  # also run check mode in regular tests
+    - side_effect
+    - verify
+    - destroy
+
+verifier:
+  name: ansible
