@@ -128,12 +128,11 @@
       - ["tests-Amazon", "AWS"]
       - ["tests-Google", "GCP"]
 
-
   - name: Get Server PID
-    command: pgrep -f step-ca
+    shell: pgrep -fa step-ca | grep -v step-ca.sh | cut -d ' ' -f 1
     register: _pid
-  - name: Restart Server
-    command: "kill -1 {{ _pid.stdout }}"
+  - name: Reload Server
+    command: "kill -1 {{ _pid.stdout_lines[0] }}"
     become: false
 
   - name: Check server health

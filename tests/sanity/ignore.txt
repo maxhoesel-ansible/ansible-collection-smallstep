@@ -1,1 +1,2 @@
 plugins/modules/step_ca_provisioner.py validate-modules:doc-default-does-not-match-spec # Can't always rely on $STEPPATH being set
+tests/integration/docker/local-ca/step-ca.sh shebang # Integration test, don't care

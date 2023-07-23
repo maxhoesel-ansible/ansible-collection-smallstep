@@ -1,4 +1,5 @@
-# Don't automatically install roles from galaxy to prevent flaky tests
+---
+# Don't automatically install roles from galaxy
 offline: true
 
 exclude_paths:

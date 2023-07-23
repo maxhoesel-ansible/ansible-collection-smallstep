@@ -1,0 +1,4 @@
+# Dependencies for executing the role scenarios.
+# We pin molecule to prevent issues with breaking changes
+molecule==5.1.0
+molecule-plugins[podman]==23.4.1

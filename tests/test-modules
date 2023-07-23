@@ -1,7 +1,0 @@
-#!/usr/bin/env bash
-
-set -eu
-set -o pipefail
-
-source ./tests/test-modules-sanity
-source ./tests/test-modules-integration

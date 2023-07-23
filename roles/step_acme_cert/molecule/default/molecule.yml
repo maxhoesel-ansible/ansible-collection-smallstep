@@ -1,14 +1,9 @@
-driver:
-  name: podman
 platforms:
-  # We use the images provided by geerlingguy where possible, as they provide out-of-the-box
-  # support for Ansible (pre_build_image=true, speeds up testing).
-
-  # Use the smallstep-provided CA image for testing
+  # Use the smallstep-provided CA image so that we don't have to set up the CA ourselves
   - name: step-ca
     groups:
       - ca
-    image: "docker.io/smallstep/step-ca:${STEP_CA_VERSION:-latest}"
+    image: "docker.io/smallstep/step-ca:${STEP_CA_VERSION}"
     # we don't actually use the container with ansible, leave it as is
     override_command: false
     pre_build_image: true
@@ -98,37 +93,11 @@ platforms:
     network: molecule-step-acme-cert
 
 provisioner:
-  name: ansible
-  env:
-    # This is required for podman to function: https://github.com/ansible-community/molecule-podman/issues/2
-    ANSIBLE_PIPELINING: false
-    #ANSIBLE_VERBOSITY: 3 # enable for debugging
   inventory:
     group_vars:
       ca:
         step_ca_user: step-ca
       all:
-        step_cli_version: ${STEP_CLI_VERSION:-latest}
-        step_ca_version: ${STEP_CA_VERSION:-latest}
         step_cli_steppath: /etc/step-cli-molecule
-
         step_acme_cert_ca_provisioner: ACME
         step_bootstrap_ca_url: https://step-ca:9000
-
-scenario:
-  test_sequence:
-    - lint
-    - destroy
-    - dependency
-    - syntax
-    - create
-    - prepare
-    - converge
-    - idempotence
-    - check # also run check mode in regular tests
-    - side_effect
-    - verify
-    - destroy
-
-verifier:
-  name: ansible

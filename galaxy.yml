@@ -3,28 +3,27 @@ authors:
 build_ignore:
 - .circleci
 - .github
+- .config
+- .vscode
+- dist
 - CODE_OF_CONDUCT.md
 - CONTRIBUTING.md
-- pyproject.toml
-- tox.ini
 - .yamllint
-- .ansible-lint
-- .pre-commit-config.yaml
 - '*.tar.gz'
 - .venv
 - .tox
 - .pytest_cache
 - scripts
+- .pre-commit-config.yaml
+- .readthedocs.yaml
+- pyproject.toml
 - requirements.txt
-- requirements-molecule.txt
-- '**/requirements-molecule.txt'
+- tox.ini
 - '**/requirements.txt'
 dependencies: {}
-description: Mangage Smallstep CA servers
+description: Install, configure and use the Smallstep CA server and CLI tool
 issues: https://github.com/maxhoesel-ansible/ansible-collection-smallstep/issues
-license:
-- GPL-3.0-or-later
-license_file: ''
+license_file: LICENSE
 name: smallstep
 namespace: maxhoesel
 readme: README.md
@@ -32,5 +31,6 @@ repository: https://github.com/maxhoesel-ansible/ansible-collection-smallstep
 tags:
 - smallstep
 - ca
+- application
 - certificates
 version: 0.24.1
