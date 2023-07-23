@@ -85,3 +85,7 @@ provisioner:
         step_ca_intermediate_password: molecule-intermediate
         step_ca_path: /etc/step-ca-molecule
         step_ca_ssh: yes
+
+        step_ca_existing_root_file: /tmp/molecule-ca.crt
+        step_ca_existing_key_file: /tmp/molecule-ca.key
+        step_ca_existing_key_password: wvTfbyADhoowLZp3RsJ9

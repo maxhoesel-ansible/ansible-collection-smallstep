@@ -1,0 +1,29 @@
+- hosts: "ubuntu:debian"
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+- hosts: rockylinux:fedora
+  tasks:
+    # Required to prevent issues with ansible_default_ipv4 missing
+    - name: Install iproute
+      package:
+        name: iproute
+
+- hosts: all
+  tasks:
+    - name: Root cert is present # noqa no-relative-paths
+      ansible.builtin.copy:
+        src: "../files/molecule-ca.crt"
+        dest: "{{ step_ca_existing_root_file }}"
+        owner: root
+        group: root
+        mode: "644"
+    - name: Root key is present # noqa no-relative-paths
+      ansible.builtin.copy:
+        src: "../files/molecule-ca.key"
+        dest: "{{ step_ca_existing_key_file }}"
+        owner: root
+        group: root
+        mode: "644"

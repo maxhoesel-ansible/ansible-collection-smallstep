@@ -35,7 +35,7 @@
       args:
         executable: /bin/bash
     # mv does not automatically set selinux labels, so we have to do it ourselves
-    - name: Restore SELinux context for binary
+    - name: Restore SELinux context for binary # noqa no-changed-when
       command: "restorecon -v {{ _step_cli_install_path }}"
       when: ansible_selinux is defined and ansible_selinux and ansible_selinux.status == 'enabled'
   always:
