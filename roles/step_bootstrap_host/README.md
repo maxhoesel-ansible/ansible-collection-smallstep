@@ -6,7 +6,7 @@ It will:
 
 1. Install `step-cli` if required (using the `step_cli` role)
 2. Install the CA root cert into the system trust store
-3. Configure the root user to automatically connect to your CA when running `step-cli`.
+3. Configure `step-cli` to trust your CA when run as root (or any other user).
 
 ## Requirements
 
@@ -52,12 +52,31 @@ It will:
 
 ### Bootstrap
 
-##### `step_cli_steppath`
-- Optionally set a custom `$STEPPATH` for bootstrapping.
-  All step configuration will be saved in this path instead of the default `$HOME/.step/`
-- **NOTE**: If set, you will have to supply your custom `$STEPPATH` in all future role/module/`step-cli` calls on this host that use the step config
-- Example: `/etc/step-cli`
-- Default: `$HOME/.step/`
+##### `step_bootstrap_users`
+- List of users that `step-cli` should be bootstrapped for
+- You can optionally set a custom `$STEPPATH` for each user to store the `step-cli` configuration in
+    - The default `$STEPPATH` for all users can be set with `step_boostrap_default_steppath`
+    - This role does *not* alter the users environment variables to load the custom `$STEPPATH` automatically.
+    If you set a non-standard `$STEPPATH`, you are responsible for including it in any future `step-cli` invocations
+- Example:
+    ```yaml
+    step_bootstrap_users:
+        - user: root
+          steppath: "/etc/step-cli"
+        - user: johnsmith
+          steppath: "$HOME/.step"
+    ```
+- ⚠️ Deprecated ⚠️ If `step_bootstrap_users` only contains `root` without a path and `step_cli_steppath` is set, this role will use the value of `step_cli_steppath` for the `root` user when bootstrapping.
+  This behavior only exists to preserve backwards compatibility and will be removed in a future version.
+- Default:
+    ```yaml
+    step_bootstrap_users:
+        - user: root
+    ```
+
+##### `step_boostrap_default_steppath`
+- The default `$STEPPATH` to use if no path is given for the user in `step_bootstrap_users`
+- Default: `$HOME/.step`
 
 ##### `step_bootstrap_ca_url`
 - URL of the `step-ca` CA
@@ -74,6 +93,7 @@ It will:
 - If set to false, this role only installs `step-cli` and configures the root user to run `step-cli` against your CA.
   Other applications on your system will **not** trust the CA, as the certificate won't be in the system trust store.
 - Default: Yes
+
 
 ##### `step_bootstrap_force`
 - Whether to force bootstrapping of the CA configuration.
