@@ -8,12 +8,12 @@
   ansible.builtin.set_fact:
     _root_legacy_steppath: "{{ step_bootstrap_users | length == 1 and step_bootstrap_users.0.user == 'root' and step_bootstrap_users.0.steppath is not defined and step_cli_steppath is defined | ternary(step_cli_steppath,'') }}"
 
-- name: User STEPPATHS are present
+# File permissions are handled by step itself, only make sure that the directory exists
+- name: User STEPPATHS are present # noqa risky-file-permissions
   ansible.builtin.file:
     path: "{{ item.user == 'root' and _root_legacy_steppath | ternary(step_cli_steppath, item.steppath | d(step_boostrap_default_steppath)) }}"
     owner: "{{ item.user }}"
     group: "{{ item.user }}"
-    mode: "750"
     state: directory
   loop: "{{ step_bootstrap_users }}"
 
