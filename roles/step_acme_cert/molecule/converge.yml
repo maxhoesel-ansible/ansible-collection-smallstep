@@ -22,19 +22,13 @@
       include_role:
         name: step_acme_cert
       vars:
-        step_service_user: step
         step_acme_cert_webroot_path: "{{ webroots[ansible_os_family] }}"
         step_acme_cert_duration: 1h
         step_acme_cert_certfile:
-          # Lazy evaluation testing
-          #path: /etc/ssl/step.crt
           mode: "644"
-          owner: root
           group: "{{ webgroup[ansible_os_family] }}"
         step_acme_cert_keyfile:
-          #path: /etc/ssl/step.key
           mode: "640"
-          owner: root
           group: "{{ webgroup[ansible_os_family] }}"
         step_acme_cert_renewal_service: step-renew-webroot
         step_acme_cert_renewal_when: 59m # force renewal to happen every minute
@@ -42,7 +36,7 @@
 
     - name: Install Nginx site [Debian]
       copy:
-        src: nginx_site.conf
+        src: ../files/nginx_site.conf
         dest: /etc/nginx/sites-enabled/default
         owner: root
         group: root
@@ -51,7 +45,7 @@
       when: ansible_os_family == "Debian"
     - name: Install Nginx config [RedHat]
       copy:
-        src: nginx.conf
+        src: ../files/nginx.conf
         dest: /etc/nginx/nginx.conf
         owner: root
         group: root

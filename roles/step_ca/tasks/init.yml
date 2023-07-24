@@ -89,12 +89,10 @@
         {% if step_ca_ra_credentials_file is defined %} --credentials-file={{ step_ca_ra_credentials_file | quote }}{% endif %}
       environment:
         STEPPATH: "{{ step_ca_path }}"
-      become: yes
       become_user: "{{ step_ca_user }}"
 
     - name: Change password for intermediate and ssh keys # noqa no-changed-when
       command: "{{ step_cli_executable }} crypto change-pass {{ step_ca_path }}/secrets/{{ item }} -f --password-file={{ step_ca_root_password_file }} -new-password-file={{ step_ca_intermediate_password_file }}"
-      become: yes
       become_user: "{{ step_ca_user }}"
       loop: "{{ _item_list | select | list }}"
       vars:
@@ -110,7 +108,6 @@
         state: absent
       environment:
         STEPPATH: "{{ step_ca_path }}"
-      become: yes
       become_user: "{{ step_ca_user }}"
   always:
     - name: Root password file is absent

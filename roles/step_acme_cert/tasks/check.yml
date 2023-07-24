@@ -1,10 +1,3 @@
-- name: Verify that required parameters are set
-  assert:
-    that:
-      - step_acme_cert_ca_provisioner is defined
-      - step_acme_cert_ca_provisioner | length > 0
-  when: ansible_version.string is version('2.11.1', '<')
-
 - name: Look for step_cli_executable # noqa command-instead-of-shell
   #"command" is a shell builtin, hence the need for the shell module
   shell: "command -v {{ step_cli_executable }}"

@@ -5,6 +5,11 @@ Get a certificate from a CA with ACME and setup automatic renewal using `step-cl
 This role uses `step-cli` to request and save a certificate from the configured CA,
 before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 
+Note that this is not the only way to use ACME with step-ca!
+You can also configure a traditional ACME client such as certbot, Caddy or acme.sh to talk to step-ca.
+[This post](https://smallstep.com/blog/private-acme-server/) shows some examples, you can use other Ansible content to automate this.
+The advantage of the `step` method is that no additional tools are required.
+
 ## Requirements
 
 - The following distributions are currently supported:
@@ -13,7 +18,7 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
   - Fedora 36 or newer
   - A CentOS-compatible distribution like RockyLinux/AlmaLinux 8 or newer. RockyLinux is used for testing
 - This role requires root access. Make sure to run this role with `become: yes` or equivalent
-- The host must be bootstrapped with `step_bootstrap_host` and the root user must be able to access the CA.
+- The host must be bootstrapped with `step_bootstrap_host` and at least one user must be able to access the CA.
 
 ## Role Variables
 
@@ -24,8 +29,15 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 - Can be an absolute path or a command (make sure the executable is in $PATH) for all users
 - Default: `step-cli`
 
-##### `step_cli_steppath`
-- Optionally set a custom `$STEPPATH` from which to read the step config
+##### `step_acme_cert_user`
+- The user account that will generate, own and renew the certificate
+- This user must have been boostrapped with `step_bootstrap_host` before
+- Default: `root`
+
+##### `step_acme_cert_steppath`
+- Set this if `step_acme_cert_user` requires a custom `$STEPPATH` from which to read the step config
+- ⚠️ Deprecated ⚠️ If `step_acme_cert_user` ir `root` and `step_cli_steppath` is set, this role will read the users steppath from it.
+  This behavior exists to preserve backwards-compatibility with older role versions that could only use the root user and will be removed in a future release.
 - Example: `/etc/step-cli`
 - Default: `$HOME/.step/`
 
@@ -65,9 +77,13 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 - Is a dict with the following elements:
   - `path`: Absolute path to the cert/key file. Defaults to `/etc/ssl/step.crt|step.key`. The directory must already exist.
   - `mode`: File mode for the cert/key file. Defaults to `644` for the cert and `600` for the key
-  - `owner`/`group`: Owner and group of the file. Defaults to root.
+  - `owner`/`group`: Owner and group of the file. Defaults to `step_acme_cert_user`.
 
 ### Renewal
+
+This role configures automatic cert renewal using a systemd service.
+The service will monitor the certificate using `step-cli ca renew`s deamon mode and renew it when its expiry time approaches.
+The daemon will run as the user defined in `step_acme_cert_user`.
 
 ##### `step_acme_cert_renewal_service`
 - Name of the systemd service that will handle cert renewals
@@ -81,6 +97,8 @@ before setting up a renewal service using `step-cli ca renew`s `--daemon` mode.
 ##### `step_acme_cert_renewal_reload_services`
 - Reload or restart these systemd services after a cert renewal
 - Must be a list of systemd units
+- If `step_acme_cert_user` is not root, a sudoers entry will be added to permit the user to reload-restart these service units.
+  This sudoers policy is restricted to the single command needed to achieve this. Requires `sudo` to be installed
 - Example: `["nginx", "mysqld"]`
 - Default: `[]`
 

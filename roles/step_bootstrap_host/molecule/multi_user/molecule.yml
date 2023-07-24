@@ -99,7 +99,9 @@ provisioner:
   inventory:
     group_vars:
       clients:
-        # Root-only config, test legacy steppath behavior
-        step_cli_steppath: /etc/step-cli-molecule
+        step_bootstrap_users:
+          - user: max
+            steppath: "/home/max/custom-steppath"
+          - user: ari
       all:
         step_bootstrap_ca_url: https://step-ca:9000

@@ -52,7 +52,8 @@ argument_specs:
           - The directory must already exist
           - Ignored if I(step_cli_executable) contains a directory already
       step_bootstrap_users:
-        type: dict
+        type: list
+        elements: dict
         default:
           - user: root
         description:
@@ -60,7 +61,7 @@ argument_specs:
           - You can optionally set a custom C($STEPPATH) for each user to store the C(step-cli) configuration in
           - The default C($STEPPATH) for all users can be set with I(step_boostrap_default_steppath)
           - This role does *not* alter the users environment variables to load the custom C($STEPPATH) automatically. If you set a non-standard C($STEPPATH), you are responsible for including it in any future C(step-cli) invocations
-          - ⚠️ Deprecated ⚠️ If I(step_bootstrap_users) only contains C(root) without a path and I(step_cli_steppath) is set, this role will use the value of I(tep_cli_steppath) instead of I(step_boostrap_default_steppath) for the C(root) user when bootstrapping. This behavior only exists to preserve backwards compatibility and will be removed in a future version.
+          - ⚠️ Deprecated ⚠️ If I(step_bootstrap_users) only contains C(root) without a path and I(step_cli_steppath) is set, this role will use the value of I(tep_cli_steppath) instead of I(step_boostrap_default_steppath) for the C(root) user when bootstrapping. This behavior exists to preserve backwards-compatibility with older role versions that could only bootstrap the root user and will be removed in a future release.
       step_boostrap_default_steppath:
         type: path
         default: $HOME/.step
@@ -89,4 +90,6 @@ argument_specs:
         default: no
         description:
           - Whether to force bootstrapping of the CA configuration.
-          - If true, will cause an overwrite of any existing CA configuration, including root certificate. Useful to change the CA URL, or even change to a new CA entirely.
+          - If true, will cause an overwrite of any existing CA configuration, including root certificate.
+          - This should only be used in exceptional circumstances, such as when changing the CA or CA URL.
+          - Applies to all users

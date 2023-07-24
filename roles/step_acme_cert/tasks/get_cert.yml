@@ -11,9 +11,9 @@
     standalone: "{{ step_acme_cert_webroot_path | bool }}"
     step_cli_executable: "{{ step_cli_executable }}"
     webroot: "{{ step_acme_cert_webroot_path }}"
-  become: yes
+  become_user: "{{ step_acme_cert_user }}"
   environment:
-    STEPPATH: "{{ step_cli_steppath }}"
+    STEPPATH: "{{ _resolved_steppath }}"
 
 - name: Cert and key permissions are set
   file:

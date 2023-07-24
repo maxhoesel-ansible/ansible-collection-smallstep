@@ -93,11 +93,15 @@ platforms:
     network: molecule-step-acme-cert
 
 provisioner:
+  playbooks:
+    verify: ../verify.yml
+    converge: ../converge.yml
   inventory:
     group_vars:
       ca:
         step_ca_user: step-ca
       all:
+        # Test legacy steppath behavior
         step_cli_steppath: /etc/step-cli-molecule
         step_acme_cert_ca_provisioner: ACME
         step_bootstrap_ca_url: https://step-ca:9000
