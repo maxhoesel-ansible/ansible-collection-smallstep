@@ -1,35 +1,79 @@
 ---
-- ansible.builtin.include_tasks: check.yml
+- name: Install step_cli # always run this (if desired), to ensure our cli version is up-to-date
+  include_role:
+    name: maxhoesel.smallstep.step_cli
+  when: step_cli_install
 
-- name: STEPPATH is present
+- name: "Compatibility: Respect step_cli_steppath is only root is bootstrapped"
+  ansible.builtin.set_fact:
+    _root_legacy_steppath: "{{ (step_bootstrap_users | length == 1 and step_bootstrap_users.0.user == 'root' and step_bootstrap_users.0.steppath is not defined and step_cli_steppath is defined) | ternary(step_cli_steppath,'') }}"
+
+# File permissions are handled by step itself, only make sure that the directory exists
+- name: Custom user STEPPATHS are present # noqa risky-file-permissions
   ansible.builtin.file:
-    path: "{{ step_cli_steppath }}"
-    owner: "{{ ansible_user_id }}"
-    group: "{{ ansible_user_id }}"
-    mode: "750"
+    path: "{{ path }}"
+    owner: "{{ item.user }}"
+    group: "{{ item.user }}"
     state: directory
+  loop: "{{ step_bootstrap_users }}"
+  when: path | length > 0
+  vars:
+    path: "{{ (item.user == 'root' and _root_legacy_steppath) | ternary(step_cli_steppath, item.steppath | d('')) }}"
 
-- name: Host is bootstrapped
+- name: step-cli is bootstrapped (default STEPPATH)
   maxhoesel.smallstep.step_ca_bootstrap:
     ca_url: "{{ step_bootstrap_ca_url }}"
     fingerprint: "{{ step_bootstrap_fingerprint }}"
     step_cli_executable: "{{ step_cli_executable }}"
     force: "{{ step_bootstrap_force | d(omit) }}"
   become: yes
-  environment:
-    STEPPATH: "{{ step_cli_steppath }}"
+  become_user: "{{ item.user }}"
+  loop: "{{ step_bootstrap_users }}"
+  when: not item.steppath is defined and (not _root_legacy_steppath or item.user != "root")
 
-- name: Check if cert is already installed
-  ansible.builtin.command: "{{ step_cli_executable }} certificate verify {{ step_cli_steppath }}/certs/root_ca.crt"
+- name: step-cli is bootstrapped (custom STEPPATH)
+  maxhoesel.smallstep.step_ca_bootstrap:
+    ca_url: "{{ step_bootstrap_ca_url }}"
+    fingerprint: "{{ step_bootstrap_fingerprint }}"
+    step_cli_executable: "{{ step_cli_executable }}"
+    force: "{{ step_bootstrap_force | d(omit) }}"
   become: yes
-  changed_when: no
-  check_mode: no
-  failed_when: step_bootstrap_installed.rc not in [0,1]
-  register: step_bootstrap_installed
-  when: step_bootstrap_install_cert
+  become_user: "{{ item.user }}"
+  environment:
+    STEPPATH: "{{ steppath }}"
+  loop: "{{ step_bootstrap_users }}"
+  when: steppath
+  vars:
+    steppath: "{{ (item.user == 'root' and _root_legacy_steppath) | ternary(step_cli_steppath, item.steppath | d('')) }}"
 
-- name: Install CA cert into trust stores
-  ansible.builtin.command: "{{ step_cli_executable }} certificate install {{ step_cli_steppath }}/certs/root_ca.crt --all"
+- name: Install certificate into system trust store
   when:
     - step_bootstrap_install_cert
-    - step_bootstrap_force or step_bootstrap_installed.rc != 0
+  block:
+    # the system install needs to be performed as the root user, regardless of which users were actually bootstrapped.
+    # Use one of the bootstrapped users to get the cert, then install it as root
+    - name: Collect bootstrapped user information
+      ansible.builtin.getent:
+        database: passwd
+        key: "{{ step_bootstrap_users.0.user }}"
+        split: ":"
+
+    - name: Set steppath for checking system install
+      ansible.builtin.set_fact:
+        _install_check_user: "{{ step_bootstrap_users.0.user }}"
+        _install_check_steppath: "{{ (step_bootstrap_users.0.user == 'root' and _root_legacy_steppath) | ternary(step_cli_steppath, step_bootstrap_users.0.steppath | d(ansible_facts.getent_passwd[step_bootstrap_users.0.user][4] + '/.step')) }}"
+
+    - name: Check if cert is already installed
+      ansible.builtin.command: "{{ step_cli_executable }} certificate verify {{ _install_check_steppath }}/certs/root_ca.crt"
+      become: yes
+      become_user: "{{ _install_check_user }}"
+      changed_when: no
+      check_mode: no
+      failed_when: step_bootstrap_installed.rc not in [0,1]
+      register: step_bootstrap_installed
+
+    - name: Install CA cert into trust stores
+      changed_when: true
+      ansible.builtin.command: "{{ step_cli_executable }} certificate install {{ _install_check_steppath }}/certs/root_ca.crt --all"
+      when:
+        - step_bootstrap_force or step_bootstrap_installed.rc != 0

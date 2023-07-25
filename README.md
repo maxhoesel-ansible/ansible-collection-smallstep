@@ -131,21 +131,9 @@ Below are some examples to showcase the different options. These examples assume
       become_user: step-ca
 ```
 
-### About `$STEPPATH`
-
-All modules in this collection respect the `$STEPPATH` environment variable used to customize the step-cli config directory.
-If you want to use a custom `$STEPPATH` for your environment, you can use the `step_cli_steppath` role variables
-and the `environment` ansible parameter for modules:
-
+All modules in this collection respect the `$STEPPATH` environment variable used to customize the step-cli config directory:
 
 ```yaml
-  - name: Initialize a host with a custom STEPPATH
-    maxhoesel.smallstep.step_bootstrap_host:
-    vars:
-      step_bootstrap_ca_url: https://my-ca.localdomain
-      step_bootstrap_fingerprint: "your root CA certs fingerprint"
-      step_cli_steppath: /etc/step-cli
-
   - name: Use the custom $STEPPATH in a module
     maxhoesel.smallstep.step_ca_certificate:
       # params go here

@@ -1,0 +1,23 @@
+---
+- name: Verify
+  hosts: clients
+  tasks:
+    - name: Verify that both users are able to access the CA
+      command: "step-cli ca health"
+      become: yes
+      become_user: "{{ item.user }}"
+      changed_when: no
+      environment:
+        STEPPATH: "{{ item.steppath }}"
+      loop:
+        - user: max
+          steppath: /home/max/custom-steppath
+        - user: ari
+          steppath: "" # default
+
+    - name: Attempt to access CA URL to ensure cert got installed into system truststore
+      uri:
+        url: "{{ step_bootstrap_ca_url }}"
+      failed_when: ca_query.status != 404
+      register: ca_query
+      become: yes

@@ -2,6 +2,10 @@
 - name: Load Distribution-specific vars
   ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
 
+- name: Set step-cli install path
+  ansible.builtin.set_fact:
+    _step_cli_install_path: "{{ ('/' in step_cli_executable) | ternary(step_cli_executable, step_cli_install_dir + '/' + step_cli_executable) }}"
+
 - name: Get step-cli install information
   block:
     - name: Get latest step-cli release information
@@ -22,3 +26,19 @@
   check_mode: no
 
 - ansible.builtin.include_tasks: "install.yml"
+
+- name: Ensure libcap binary is installed
+  ansible.builtin.package:
+    name: "{{ step_cli_libcap_package }}"
+# needed due to community.general.capabilities not being idempotent on all systems
+- name: Check if step-cli has cap_net_bind_service capability
+  ansible.builtin.command: getcap "{{ _step_cli_install_path }}"
+  changed_when: no
+  check_mode: no
+  register: _getcap_output
+
+- name: Ensure step-cli can bind to ports <1024 (for acme standalone mode)
+  community.general.capabilities:
+    path: "{{ _step_cli_install_path }}"
+    capability: cap_net_bind_service=+ep
+  when: '"cap_net_bind_service" not in _getcap_output.stdout'
