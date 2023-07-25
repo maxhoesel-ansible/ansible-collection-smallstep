@@ -1,3 +1,15 @@
+# the stuff of itsec nightmares
+# the step-ca container genreates its root CA dynamically when started, but we retrieve its CA fingerprint to bootstrap from it.
+# since there is no way to pre-seed the fingerprint and root CA cert, we instead use the internal step-ca API to retrieve all root certificates,
+# then generate the fingerprint from that.
+# This hack may stop working if smallstep decides to change their ca API structure in the future. but it works for now
+- name: Get remote fingerprint
+  ansible.builtin.shell: "curl -k {{ ca_url }}/roots | jq -rj '.crts[0]' > /tmp/root_cert && step-cli certificate fingerprint /tmp/root_cert"
+  register: _ca_fp
+- name: Set fingerprint
+  set_fact:
+    ca_fp: "{{ _ca_fp.stdout }}"
+
 - name: Bootstrap Host
   maxhoesel.smallstep.step_ca_bootstrap:
     ca_url: "{{ ca_url }}"

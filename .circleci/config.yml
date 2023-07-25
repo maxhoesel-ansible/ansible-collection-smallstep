@@ -1,31 +1,7 @@
 version: 2.1
 
 orbs:
-  collection-testing: maxhoesel-ansible/ansible-collection-testing@0.3.8
-
-jobs:
-  modules-sanity:
-    executor: collection-testing/default
-    steps:
-      - checkout
-      - collection-testing/install-podman-on-ubuntu
-      - collection-testing/install-requirements-txt
-      - run:
-          command: tests/test-modules-sanity
-          environment:
-            TEST_RETRIES: 3
-            TEST_RETRY_DELAY: 300
-  modules-integration:
-    executor: collection-testing/default
-    steps:
-      - checkout
-      - collection-testing/install-podman-on-ubuntu
-      - collection-testing/install-requirements-txt
-      - run:
-          command: tests/test-modules-integration
-          environment:
-            TEST_RETRIES: 3
-            TEST_RETRY_DELAY: 300
+  collection-testing: maxhoesel-ansible/ansible-collection-testing@0.4.0
 
 filters: &semver-tagged
   tags:
@@ -37,18 +13,30 @@ filters: &semver-tagged
 workflows:
   ci:
     jobs:
-      - collection-testing/pre-commit-lint
-      - collection-testing/antsibull-docs
-      - collection-testing/tox-role-scenarios:
-          parallelism: 16
+      - collection-testing/pre-commit-lint:
+          name: Lint
+      - collection-testing/antsibull-docs:
+          name: Generate Docs
+      - collection-testing/run-tox-environments:
+          name: Test Modules
+          match-environments: \-test\-
+          parallelism: 3
+          resource-class: medium
+          retries: 1
+          retry-delay: 60
+      - collection-testing/run-tox-environments:
+          name: Test Roles
+          match-environments: roles
+          # number of scenarios * ansible versions to test
+          parallelism: 12
           resource-class: large
-          retries: 3
-          retry-delay: 300
+          retries: 1
+          retry-delay: 60
       - collection-testing/publish-github:
+          name: Publish Release to GitHub
           context: collection-publishing
           filters: *semver-tagged
       - collection-testing/publish-galaxy:
+          name: Publish to Galaxy
           context: collection-publishing
           filters: *semver-tagged
-      - modules-sanity
-      - modules-integration

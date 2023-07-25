@@ -12,20 +12,6 @@ and the [CLI tool](https://github.com/smallstep/cli). Possible uses for this col
 - Token or certificate creation from within your Ansible playbooks
 - [Complete configuration of client certificates via ACME, including automatic renewal](roles/step_acme_cert/README.md)
 
----
-**⚠️ SUPPORTED SMALLSTEP VERSION NOTICE ⚠️**
-
-The smallstep tools (and this collection) are constantly changing and breaking changes may be introduced in each minor version (e.g. from `0.20` to `0.21`).
-To help maintain compatibility, you should use the version of this collection that corresponds to your `step-cli` version.
-
-For example, if you are using `step-cli==0.20`, you should use the collection version `>=0.20,<0.21`.
-Newer and older collection versions *may* work, but are not supported.
-
-**For step-cli versions `<0.20`:** Use the collection version `>=0.4,<0.5`.
-This was the last collection version released under the old versioning scheme.
-
----
-
 ## Components
 
 ---
@@ -47,15 +33,6 @@ This was the last collection version released under the old versioning scheme.
 
 ### Modules
 
-#### CA Modules
-
----
-**NOTE**
-
-To learn more about the differences between Online/Offline/Local-Only Modules, see [this section](#module-usage)
-
----
-
 | Module  | Description | Remote (Online mode) | Local (Offline mode) |
 |---------|-------------|--------|---------------|
 | [`step_ca_bootstrap`](https://ansible-collection-smallstep.readthedocs.io/en/latest/collections/maxhoesel/smallstep/step_ca_bootstrap_module.html) | Initialize `step-cli` to trust a step-ca server | ✅ | ❌ |
@@ -65,19 +42,25 @@ To learn more about the differences between Online/Offline/Local-Only Modules, s
 | [`step_ca_revoke`](https://ansible-collection-smallstep.readthedocs.io/en/latest/collections/maxhoesel/smallstep/step_ca_revoke_module.html) | Revoke a Certificate | ✅ | `offline` parameter |
 | [`step_ca_token`](https://ansible-collection-smallstep.readthedocs.io/en/latest/collections/maxhoesel/smallstep/step_ca_token_module.html) | Generate an OTT granting access to the CA | ✅ | `offline` parameter |
 
-#### Standalone Modules
-
-None so far
-
 ## Installation
 
 ### Dependencies
 
-- A recent release of Ansible. This collection officially supports the 3 most recent Ansible releases.
+- A recent release of Ansible. This collection is tested against the 3 most recent Ansible releases.
   Older versions might still work, but are not supported
-- Python 3.6 or newer on the target host
+- Python 3.6 or newer on the target nodes
 
 Individual roles or modules may have additional dependencies, please check their respective documentation.
+
+### Versioning Policy and Node Requirements
+
+Each minor version of this collection designed to be compatible with the corresponding minor release of the `step-cli` utility.
+For example, The collection releases with version `0.24.x` are compatible with the `step-cli` utility versions `0.24.x`.
+This coupling is needed as newer minor versions of the `step-cli` tool may introduce breaking changes and affect this collection.
+
+To install the correct collection version, check your `step-cli` version (`step-cli --version`), then use that value when installing the collection.
+
+**For step-cli versions `<0.20`:** Use the collection version `>=0.4,<0.5`.
 
 ### Install
 
@@ -85,13 +68,7 @@ Via ansible-galaxy (recommended):
 
 `ansible-galaxy collection install maxhoesel.smallstep>=your-step-cli-version,<next-major-version`
 
-For more information about supported step-cli versions, see the support notice at the top of this file.
-
 Alternatively, you can download a collection archive from a [previous release](hhttps://github.com/maxhoesel-ansible/ansible-collection-smallstep/releases).
-
-You can also clone this repository directly if you want a slightly more up-to-date (and potentially buggy) version.
-
-`ansible-galaxy collection install git+https://github.com/maxhoesel-ansible/ansible-collection-smallstep`
 
 ## Module Usage
 
@@ -154,21 +131,9 @@ Below are some examples to showcase the different options. These examples assume
       become_user: step-ca
 ```
 
-### About `$STEPPATH`
-
-All modules in this collection respect the `$STEPPATH` environment variable used to customize the step-cli config directory.
-If you want to use a custom `$STEPPATH` for your environment, you can use the `step_cli_steppath` role variables
-and the `environment` ansible parameter for modules:
-
+All modules in this collection respect the `$STEPPATH` environment variable used to customize the step-cli config directory:
 
 ```yaml
-  - name: Initialize a host with a custom STEPPATH
-    maxhoesel.smallstep.step_bootstrap_host:
-    vars:
-      step_bootstrap_ca_url: https://my-ca.localdomain
-      step_bootstrap_fingerprint: "your root CA certs fingerprint"
-      step_cli_steppath: /etc/step-cli
-
   - name: Use the custom $STEPPATH in a module
     maxhoesel.smallstep.step_ca_certificate:
       # params go here

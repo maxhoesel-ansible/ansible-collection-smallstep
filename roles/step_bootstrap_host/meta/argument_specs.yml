@@ -51,13 +51,16 @@ argument_specs:
           - Sets the directory to install I(step_cli_executable) into
           - The directory must already exist
           - Ignored if I(step_cli_executable) contains a directory already
-      step_cli_steppath:
-        type: path
-        default: $HOME/.step
+      step_bootstrap_users:
+        type: list
+        elements: dict
+        default:
+          - user: root
         description:
-          - Optionally set a custom C($STEPPATH) for bootstrapping
-          - "B(NOTE): If set, you will have to supply your custom C($STEPPATH) in all future role/module/C(step-cli) calls on this host that use the step config"
-          - "Example: C(/etc/step-cli)"
+          - List of users that C(step-cli) should be bootstrapped for
+          - You can optionally set a custom C($STEPPATH) for each user to store the C(step-cli) configuration in
+          - Note that this role does *not* alter the users environment variables to load the custom C($STEPPATH) automatically. If you set a non-standard C($STEPPATH), you are responsible for including it in any future C(step-cli) invocations
+          - ⚠️ Deprecated ⚠️ If I(step_bootstrap_users) only contains C(root) without a path and I(step_cli_steppath) is set, this role will use the value of I(tep_cli_steppath) instead of I(step_boostrap_default_steppath) for the C(root) user when bootstrapping. This behavior exists to preserve backwards-compatibility with older role versions that could only bootstrap the root user and will be removed in a future release.
       step_bootstrap_ca_url:
         type: str
         required: yes
@@ -81,4 +84,6 @@ argument_specs:
         default: no
         description:
           - Whether to force bootstrapping of the CA configuration.
-          - If true, will cause an overwrite of any existing CA configuration, including root certificate. Useful to change the CA URL, or even change to a new CA entirely.
+          - If true, will cause an overwrite of any existing CA configuration, including root certificate.
+          - This should only be used in exceptional circumstances, such as when changing the CA or CA URL.
+          - Applies to all users
