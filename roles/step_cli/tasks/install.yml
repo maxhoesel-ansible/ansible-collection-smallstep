@@ -20,10 +20,7 @@
 
 - name: Install step-cli
   block:
-    - name: Set step-cli install path
-      ansible.builtin.set_fact:
-        _step_cli_install_path: "{{ step_cli_install_dir }}/{{ step_cli_executable }}"
-      when: "'/' not in step_cli_executable"
+
     - name: Download and extract step-cli archive
       unarchive:
         src: "https://github.com/smallstep/cli/releases/download/v{{ step_cli_version }}/step_linux_{{ step_cli_version }}_{{ step_cli_arch[ansible_architecture] }}.tar.gz"
@@ -34,7 +31,7 @@
     - name: Install step-cli binary # noqa no-changed-when
       shell: >
         set -o pipefail &&
-        mv -Z /tmp/step_{{ step_cli_version }}/bin/step {{ _step_cli_install_path | d(step_cli_executable) }}
+        mv -Z /tmp/step_{{ step_cli_version }}/bin/step {{ _step_cli_install_path }}
       args:
         executable: /bin/bash
     # mv does not automatically set selinux labels, so we have to do it ourselves

@@ -20,7 +20,8 @@ build_ignore:
 - requirements.txt
 - tox.ini
 - '**/requirements.txt'
-dependencies: {}
+dependencies:
+  community.general: ">=1.0.0"
 description: Install, configure and use the Smallstep CA server and CLI tool
 issues: https://github.com/maxhoesel-ansible/ansible-collection-smallstep/issues
 license_file: LICENSE

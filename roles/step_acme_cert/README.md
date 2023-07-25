@@ -75,7 +75,7 @@ The advantage of the `step` method is that no additional tools are required.
 ##### `step_acme_cert_certfile`/`step_acme_cert_keyfile`
 - Details about the cert/key files on disk
 - Is a dict with the following elements:
-  - `path`: Absolute path to the cert/key file. Defaults to `/etc/ssl/step.crt|step.key`. The directory must already exist.
+  - `path`: Absolute path to the cert/key file. Defaults to `/etc/ssl/step.crt|step.key`. The directory must already exist and the user must have write access
   - `mode`: File mode for the cert/key file. Defaults to `644` for the cert and `600` for the key
   - `owner`/`group`: Owner and group of the file. Defaults to `step_acme_cert_user`.
 

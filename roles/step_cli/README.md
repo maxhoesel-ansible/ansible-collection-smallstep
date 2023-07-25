@@ -33,10 +33,10 @@ This role is used by `step_bootstrap_host` and `step_ca`, but can also be used s
 - Default: `latest` (same as the upstream step-cli packages)
 
 ##### `step_cli_install_dir`
-- Used if `step_cli_executable` is not found and contains a executable name
+- Used if `step_cli_executable` is a filename and not yet present
 - Sets the directory to install `step_cli_executable` into
 - The directory must already exist
-- Ignored if `step_cli_executable` contains a path already
+- Ignored if `step_cli_executable` contains a path
 - Default: `/usr/bin`
 
 ## Example Playbook

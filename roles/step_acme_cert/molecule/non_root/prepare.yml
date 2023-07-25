@@ -24,20 +24,11 @@
       ansible.builtin.command: "podman exec step-ca kill -1 {{ _step_ca_pid.stdout }}"
 
 - hosts: clients
+  vars:
+    webgroup:
+      Debian: www-data
+      RedHat: nginx
   tasks:
-    - name: Create test user
-      ansible.builtin.user:
-        name: max
-        create_home: yes
-
-    - name: Get CA fingerprint
-      ansible.builtin.command: podman exec step-ca step certificate fingerprint certs/root_ca.crt
-      register: _ca_fingerprint
-      changed_when: false
-      check_mode: false
-      run_once: true
-      delegate_to: localhost
-
     - name: Install nginx
       package:
         name: nginx
@@ -46,6 +37,26 @@
         name: nginx
         state: stopped
         enabled: no
+
+    - name: Create test user
+      ansible.builtin.user:
+        name: max
+        create_home: yes
+    - name: Create certificate directory
+      ansible.builtin.file:
+        state: directory
+        path: /etc/ssl/non-root
+        owner: max
+        group: "{{ webgroup[ansible_os_family] }}"
+        mode: "750"
+
+    - name: Get CA fingerprint
+      ansible.builtin.command: podman exec step-ca step certificate fingerprint certs/root_ca.crt
+      register: _ca_fingerprint
+      changed_when: false
+      check_mode: false
+      run_once: true
+      delegate_to: localhost
 
     - name: Bootstrap host
       include_role:
