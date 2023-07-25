@@ -54,10 +54,10 @@ version-resolver:
 
 template: |
   ---
-  **⚠️ Compatibility Warning ⚠️**
+  **Compatibility Note**
 
-  Releases of this collection are compatible with their corresponding `step-cli/ca` minor version.
-  In particular, this release (`$RESOLVED_VERSION`) is compatible with `step-cli/ca` `$NEXT_MINOR_VERSION`.
+  Releases of this collection are compatible with their corresponding `step-cli` minor version.
+  For example, collection releases `0.24.x` are compatible with step-cli `0.24.yy`
   Other versions may work, but are not supported.
 
   Please make sure to use the appropriate collection version for your version of the step tools.
