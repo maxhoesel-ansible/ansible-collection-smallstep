@@ -12,6 +12,7 @@
     step_cli_executable: "{{ step_cli_executable }}"
     webroot: "{{ step_acme_cert_webroot_path }}"
   become_user: "{{ step_acme_cert_user }}"
+  become: yes
   environment:
     STEPPATH: "{{ _resolved_steppath }}"
 

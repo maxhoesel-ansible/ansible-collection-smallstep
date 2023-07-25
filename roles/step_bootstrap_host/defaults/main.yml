@@ -10,6 +10,5 @@ step_cli_install_dir: /usr/bin
 step_bootstrap_install_cert: yes
 step_bootstrap_force: no
 
-step_boostrap_default_steppath: "{{ ansible_env.HOME }}/.step"
 step_bootstrap_users:
   - user: root

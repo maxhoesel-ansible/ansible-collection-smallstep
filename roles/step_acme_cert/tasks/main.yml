@@ -4,7 +4,7 @@
 
 - name: "Compatibility: Respect step_cli_steppath if step_acme_cert_user is root"
   ansible.builtin.set_fact:
-    _resolved_steppath: "{{ step_cli_steppath is defined and step_acme_cert_user == 'root' | ternary(step_cli_steppath, step_acme_cert_steppath) }}"
+    _resolved_steppath: "{{ (step_cli_steppath is defined and step_acme_cert_user == 'root') | ternary(step_cli_steppath, step_acme_cert_steppath) }}"
 
 - name: Update cert/keyfile dicts with defaults
   ansible.builtin.set_fact:
