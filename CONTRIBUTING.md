@@ -206,8 +206,9 @@ The CI also builds the docs to ensure they don't break silently.
     - The `envlist` in `tox.ini`
     - each `testenv:xxx` section header that deals with plugin tests
     - Set the correct environment variable in the main `testenv` section
-- ansible (for roles): Change
+- ansible (for roles): Change the version string in the `ansible` section in `tox.ini`
 
+### Versioning and Releases
 
 - This project uses sematic versioning. the collection version stays in sync with the `step-cli`` utility version to ensure compatibility.
   This means that any breaking changes can only be shipped when updates to the `step-cli` utility are released.
