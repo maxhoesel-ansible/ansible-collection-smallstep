@@ -1,4 +1,4 @@
-# Requirements for developing this collectio
+# Requirements for developing this collection
 # Includes utilities, CLI helpers and so on
 
 # Linting & Formatting
