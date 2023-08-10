@@ -18,7 +18,7 @@
   register: step_acme_cert_current_cert
 
 - name: Check if certificate is valid
-  ansible.builtin.command: "step-cli certificate verify {{ step_acme_cert_certfile_full.path }}"
+  ansible.builtin.command: "{{ step_cli_executable }} certificate verify {{ step_acme_cert_certfile_full.path }}"
   changed_when: no
   check_mode: no
   ignore_errors: true
