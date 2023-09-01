@@ -4,7 +4,7 @@
 # Linting & Formatting
 ansible-lint==6.18.0
 pylint==2.17.5
-autopep8==2.0.2
+autopep8==2.0.4
 pre-commit==3.3.3
 
 # Test scenario runner
