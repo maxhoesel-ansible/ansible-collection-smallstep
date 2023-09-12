@@ -1,6 +1,6 @@
 repos:
-  - repo: https://github.com/pre-commit/mirrors-autopep8
-    rev: v2.0.2
+  - repo: https://github.com/hhatto/autopep8
+    rev: v2.0.4
     hooks:
       - id: autopep8
   - repo: https://github.com/pre-commit/pre-commit-hooks.git
@@ -18,7 +18,7 @@ repos:
         args:
           - --py36-plus
   - repo: https://github.com/ansible/ansible-lint
-    rev: v6.17.2
+    rev: v6.19.0
     hooks:
       - id: ansible-lint
         args:
