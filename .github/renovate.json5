@@ -1,0 +1,5 @@
+{
+    "extends": [
+        "github>maxhoesel-ansible/.github:renovate-config"
+    ]
+}
