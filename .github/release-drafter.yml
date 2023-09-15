@@ -1,32 +1,25 @@
+---
 name-template: 'v$RESOLVED_VERSION'
 tag-template: 'v$RESOLVED_VERSION'
 categories:
-  - title: '⚠️ BREAKING CHANGES ⚠️'
+  - title: 'Major Changes'
     labels:
-      - 'pr-breaking'
-  - title: 'Features/Enhancements'
+      - 'pr-major'
+  - title: 'Features and Minor Changes'
     labels:
-      - 'pr-feature'
-  - title: 'Bug Fixes'
+      - 'pr-minor'
+  - title: 'Bug Fixes and Patches'
     labels:
-      - 'fix'
-      - 'pr-bugfix'
-      - 'bug'
+      - 'pr-patch'
   - title: 'Other'
     labels:
       - 'docs'
-      - 'enhancement'
 
 include-labels:
-  - pr-breaking
-  - pr-feature
-  - enhancement
-  - fix
-  - pr-bugfix
-  - bug
+  - pr-major
+  - pr-minor
+  - pr-patch
   - docs
-exclude-labels:
-  - pr-nochangelog
 exclude-contributors:
   - github-actions
   - github-actions[bot]
@@ -34,26 +27,31 @@ exclude-contributors:
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
 change-title-escapes: '\<*_&'
 
-# we are still in the 0.x phase, adjust release resolving accordingly
 version-resolver:
   major:
-    labels: []
-      #- 'pr-breaking'
+    labels:
+      - 'pr-major'
   minor:
     labels:
-      - 'pr-breaking'
-      #- 'pr-feature' # only up the minor version when step-cli versions change
+      - 'pr-minor'
   patch:
     labels:
-      - 'pr-feature'
-      - 'fix'
-      - 'pr-bugfix'
-      - 'bug'
-      - 'enhancement'
+      - 'pr-patch'
   default: patch
 
+
 template: |
+  ⚠️ **Release Checklist** ⚠️
+
+  Do **NOT** publish this release until you've completed these steps:
+
+  1. Merge any outstanding version update PRs
+  2. Verify that the collection version in galaxy.yml and other files corresponds to this releases version
+  3. Ensure that the release notes are correct
+  4. Delete this section
+
   ---
+
   **Compatibility Note**
 
   Releases of this collection are compatible with their corresponding `step-cli` minor version.

@@ -11,12 +11,6 @@ repos:
       - id: mixed-line-ending
       - id: check-executables-have-shebangs
       - id: debug-statements
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.10.1
-    hooks:
-      - id: pyupgrade
-        args:
-          - --py36-plus
   - repo: https://github.com/ansible/ansible-lint
     rev: v6.17.2
     hooks:
@@ -36,6 +30,9 @@ repos:
             "-sn", # Don't display the score
             "--disable=R",
           ]
+
 ci:
   skip:
     - pylint
+    # Ansible-lint has a tendency to timeout in the pre-commit CI, so skip it
+    - ansible-lint
