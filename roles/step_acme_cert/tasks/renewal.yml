@@ -1,3 +1,13 @@
+# Earlier versions of this collection used a single STEP_RENEW alias for all commands,
+# these files should be deleted
+- name: Old STEP_RENEW sudoers files and aliases are absent
+  file:
+    path: "/etc/sudoers.d/{{ item }}"
+    state: absent
+  loop:
+    - 99_step-renew
+    - step-renew
+
 # shell is required due to "command" being a shell builtin
 - name: Get absolute step command path # noqa command-instead-of-shell
   shell: "command -v {{ step_cli_executable }}"
@@ -12,15 +22,6 @@
       register: _step_systemctl_binary
       changed_when: no
       check_mode: no
-    # Earlier versions of this collection used a single STEP_RENEW alias for all commands,
-    # these files should be deleted
-    - name: Old STEP_RENEW sudoers files and aliases are absent
-      file:
-        path: "/etc/sudoers.d/{{ item }}"
-        state: absent
-      loop:
-        - 99_step-renew
-        - step-renew
     - name: Step user has sudo permissions to restart required systemd units
       template:
         src: sudo-renewal.j2
