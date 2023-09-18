@@ -17,7 +17,7 @@ The advantage of the `step` method is that no additional tools are required.
   - Debian 10 or newer
   - Fedora 36 or newer
   - A CentOS-compatible distribution like RockyLinux/AlmaLinux 8 or newer. RockyLinux is used for testing
-- This role requires root access. Make sure to run this role with `become: yes` or equivalent
+- Running this role requires root access. Make sure to run this role with `become: yes` or equivalent
 - The host must be bootstrapped with `step_bootstrap_host` and at least one user must be able to access the CA.
 
 ## Role Variables
@@ -36,7 +36,7 @@ The advantage of the `step` method is that no additional tools are required.
 
 ##### `step_acme_cert_steppath`
 - Set this if `step_acme_cert_user` requires a custom `$STEPPATH` from which to read the step config
-- ⚠️ Deprecated ⚠️ If `step_acme_cert_user` ir `root` and `step_cli_steppath` is set, this role will read the users steppath from it.
+- ⚠️ Deprecated ⚠️ If `step_acme_cert_user` is `root` and `step_cli_steppath` is set, this role will read the users steppath from it.
   This behavior exists to preserve backwards-compatibility with older role versions that could only use the root user and will be removed in a future release.
 - Example: `/etc/step-cli`
 - Default: `$HOME/.step/`

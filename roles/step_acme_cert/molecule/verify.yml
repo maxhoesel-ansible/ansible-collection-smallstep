@@ -11,6 +11,10 @@
           - ansible_facts.services["nginx.service"]["state"] == "running"
           - ansible_facts.services["step-renew.service"]["state"] == "running"
           - ansible_facts.services["step-renew-webroot.service"]["state"] == "running"
+      register: _res
+      retries: 3
+      delay: 5
+      until: _res is not failed
 
     - name: Wait for renewal to occur
       ansible.builtin.pause:
@@ -25,7 +29,15 @@
           - ansible_facts.services["nginx.service"]["state"] == "running"
           - ansible_facts.services["step-renew.service"]["state"] == "running"
           - ansible_facts.services["step-renew-webroot.service"]["state"] == "running"
+      register: _res
+      retries: 3
+      delay: 5
+      until: _res is not failed
 
     - name: Try to access the locally hosted site over HTTPS
       uri:
         url: "https://{{ ansible_fqdn }}"
+      register: _res
+      retries: 3
+      delay: 5
+      until: _res is not failed

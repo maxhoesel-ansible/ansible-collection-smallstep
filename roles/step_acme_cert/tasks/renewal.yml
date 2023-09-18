@@ -12,14 +12,25 @@
       register: _step_systemctl_binary
       changed_when: no
       check_mode: no
+    # Earlier versions of this collection used a single STEP_RENEW alias for all commands,
+    # these files should be deleted
+    - name: Old STEP_RENEW sudoers files and aliases are absent
+      file:
+        path: "/etc/sudoers.d/{{ item }}"
+        state: absent
+      loop:
+        - 99_step-renew
+        - step-renew
     - name: Step user has sudo permissions to restart required systemd units
       template:
         src: sudo-renewal.j2
-        dest: "/etc/sudoers.d/99_{{ step_acme_cert_renewal_service }}"
+        dest: "/etc/sudoers.d/99_{{ step_acme_cert_renewal_service }}_systemd"
         owner: root
         group: root
         mode: "600"
-  when: step_acme_cert_renewal_reload_services
+  when:
+    - step_acme_cert_renewal_reload_services | length > 0
+    - step_acme_cert_user != "root"
 
 - name: Renewal service is installed
   template:
