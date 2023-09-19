@@ -5,7 +5,7 @@
 ansible-lint==6.18.0
 pylint==2.17.5
 autopep8==2.0.4
-pre-commit==3.3.3
+pre-commit==3.4.0
 
 # Test scenario runner
 tox==3.28.0
