@@ -89,7 +89,7 @@ For example, the `step_ca_provisioner_(claims)` modules(s) need to run in offlin
 See [this table](#ca-modules) for details.
 
 In order to talk to your CA in online mode, `step-cli` needs to already trust it. You can achieve this by:
-- Running the module on a host that was configured with `step_bootstrap_host` as root (recommended).
+- Running the module on a host that was configured with `step_bootstrap_host` (recommended).
 - Pasing the `ca_url` and `root` parameters to the module.
 
 For offline mode, you need to:
