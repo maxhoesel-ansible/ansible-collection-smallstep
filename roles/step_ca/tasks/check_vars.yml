@@ -57,8 +57,3 @@
     step_ca_intermediate_password: "{{ step_ca_root_password }}"
   when: not step_ca_intermediate_password is defined
   no_log: yes
-
-- name: Install step_cli # always run this (if desired), to ensure our cli version is also up-to-date
-  include_role:
-    name: maxhoesel.smallstep.step_cli
-  when: step_cli_install
