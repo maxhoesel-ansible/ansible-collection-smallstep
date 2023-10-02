@@ -1,0 +1,12 @@
+# needed due to community.general.capabilities not being idempotent on all systems
+- name: Check if step-cli has cap_net_bind_service capability
+  ansible.builtin.command: getcap "{{ step_cli_install_path }}"
+  changed_when: no
+  check_mode: no
+  register: _getcap_output
+
+- name: Ensure step-cli can bind to ports <1024 (for ACME standalone mode)
+  community.general.capabilities:
+    path: "{{ step_cli_install_path }}"
+    capability: cap_net_bind_service=+ep
+  when: '"cap_net_bind_service" not in _getcap_output.stdout'

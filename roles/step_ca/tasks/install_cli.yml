@@ -1,4 +1,0 @@
-- name: Install step_cli # always run this (if desired), to ensure our cli version is also up-to-date
-  include_role:
-    name: maxhoesel.smallstep.step_cli
-  when: step_cli_install

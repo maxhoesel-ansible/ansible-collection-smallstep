@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+import os
+import sys
+from packaging import version
+
+import requests
+
+OWNER = "smallstep"
+REPO = "cli"
+COLLECTION_VERSION = "{{ smallstep_collection_version }}"
+TARGET_MINOR_VERSION = f"{version.parse(COLLECTION_VERSION).major}.{version.parse(COLLECTION_VERSION).minor}."
+GITHUB_TOKEN = "{{ step_cli_github_token }}"
+
+def get_latest_release_with_minor_version():
+    base_url = f"https://api.github.com/repos/{OWNER}/{REPO}/releases"
+    headers = {"Accept": "application/vnd.github.v3+json"}
+
+    if GITHUB_TOKEN:
+        headers["Authorization"] = f"Bearer {github_token}"
+
+    page = 1
+    while True:
+        response = requests.get(
+            base_url,
+            params={"page": page, "per_page": 100},
+            headers=headers,
+            timeout=10
+        )
+
+        response.raise_for_status()
+        release_data = response.json()
+        if not release_data:
+            raise ValueError(f"No Release found for minor version {TARGET_MINOR_VERSION}")
+
+        for release in release_data:
+            release_tag = release.get("tag_name", "")
+            if release_tag.startswith("v"):
+                release_tag = release_tag[1:]  # Remove the 'v' prefix
+
+            release_version = version.parse(release_tag)
+            desired_minor_version = f"{TARGET_MINOR_VERSION}"
+
+            if (
+                not release_version.is_prerelease
+                and not release_version.is_devrelease
+                and release_version.base_version.startswith(desired_minor_version)
+            ):
+                return release_tag
+
+        page += 1
+
+def main():
+    try:
+        latest_release = get_latest_release_with_minor_version()
+        if latest_release:
+            print(str(latest_release))
+        else:
+            sys.exit(f"No matching release found for minor version {COLLECTION_VERSION}")
+    except Exception as e: # pylint: disable=broad-exception-caught
+        sys.exit(f"Error while retrieving latest compatible release: {e}")
+
+if __name__ == "__main__":
+    main()

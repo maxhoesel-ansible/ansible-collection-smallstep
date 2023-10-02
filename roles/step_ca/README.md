@@ -4,16 +4,16 @@ Install and initialize a Smallstep certificates server (`step-ca`).
 
 This role performs the following actions:
 
-1. Install `step-cli` if required
+1. Install `step-cli` (required to initialize the CA)
 2. Install `step-ca`
-3. Create a user to run the step-ca server, if it doesn't already exist
+3. Create a user to run the`step-ca`server, if it doesn't already exist
 4. Initialize a fresh ca server with no provisioners using `step ca init`
-5. Daemonize step-ca using a systemd service
+5. Daemonize`step-ca`using a systemd service
 
 ---
 **NOTE**
 
-Please make sure that you have read the [considerations](https://smallstep.com/docs/step-ca/certificate-authority-server-production) for running a step-ca server in production.
+Please make sure that you have read the [considerations](https://smallstep.com/docs/step-ca/certificate-authority-server-production) for running a`step-ca`server in production.
 `step_ca` follows these considerations where possible, but you should still be familiar with the basic operation of the `step-ca` server.
 
 ---
@@ -39,21 +39,47 @@ It is thus **very** important that you **back up your root key and password** in
 
 ## Role Variables
 
+### Installation (step-ca)
+
+##### `step_ca_version`
+- Set the version of `step-ca` to install
+- Can be a version tag (e.g. `0.15.3`), `latest-compatible` or `latest`.
+- If set to `latest-compatible`, the most recent compatible release is installed, that is, the most recent minor release that matches the collection minor version.
+  - For example, if the collection version is `0.24.x`, then the most recent release from the `0.24` series will be installed.
+  - See the [versioning policy](https://github.com/maxhoesel-ansible/ansible-collection-smallstep/tree/main#versioning-policy) for more details.
+- If set to `latest`, the most recent version of `step-cli` is installed, regardless of compatibility with the collection
+    - This can be useful if you just want to install `step-ca`, but don't plan on using it with this collection (set `step_ca_init` to `false` in this case)
+    - Using minor versions of `step-cli`/`step-ca` that don't match the collection minor version is not supported!
+- Note that the role will query the GitHub API if this value is set to `latest-compatible` or `latest`. If you are getting rate limit errors, you can:
+    - set `step_ca_version` to a specific value
+    - set `step_ca_github_token` to a token with higher rate limits
+- Default: `latest-compatible`
+
+##### `step_ca_executable`
+- Where to put the `step-ca` executable that will be installed by this role
+- Must be an absolute path
+- Default: `/usr/bin/step-ca`
+
+##### `step_ca_user`
+- User under which the`step-ca`server will run
+- Default: `step-ca`
+
+##### `step_ca_path`
+- Directory under which to place`step-ca`configuration files
+- Default: `/etc/step-ca`
+
 ### Installation (step-cli)
 
-##### `step_cli_install`
-- Whether to install the `step-cli` utility
-- Set this to `false` if the utility is already installed via other means (in this case, the role will use `step_cli_executable`)
-- Default: `true`
-
 ##### `step_cli_version`
-- Set the version of step to install
-- Can be a version tag (e.g. `0.15.3`), or `latest` to always install the most recent version
-- It is **highly** recommended that your cli version matches the collection version
-  (e.g. if you are using the collection version 0.20.x you should be installing step-cli version 0.20.x as well)
-- Note that the role will query the GitHub API if this value is set to `latest`. Try setting
-  a specific version if you are running into rate limiting issues
-- Default: `latest` (same as the upstream step-cli packages)
+- Set the version of `step-cli` to install
+- Can be a version tag (e.g. `0.15.3`) or `latest-compatible`.
+- If set to `latest-compatible`, the most recent compatible release is installed, that is, the most recent minor release that matches the collection minor version.
+  - For example, if the collection version is `0.24.x`, then the most recent release from the `0.24` series will be installed.
+  - See the [versioning policy](https://github.com/maxhoesel-ansible/ansible-collection-smallstep/tree/main#versioning-policy) for more details.
+- Note that the role will query the GitHub API if this value is set to `latest-compatible`. If you are getting rate limit errors, you can:
+  - Set `step_cli_version` to a specific value
+  - Set `step_cli_github_token` to a token with higher rate limits
+- Default: `latest-compatible`
 
 ##### `step_cli_executable`
 - What to name and where to put the `step-cli` executable that will be installed by this role
@@ -63,41 +89,21 @@ It is thus **very** important that you **back up your root key and password** in
 - Default: `step-cli`
 
 ##### `step_cli_install_dir`
-- Used if `step_cli_executable` is not found and contains a executable name
+- Used if `step_cli_executable` is a filename and not yet present
 - Sets the directory to install `step_cli_executable` into
 - The directory must already exist
-- Ignored if `step_cli_executable` contains a path already
+- Ignored if `step_cli_executable` contains a path
 - Default: `/usr/bin`
 
-### Installation (step-ca)
-
-##### `step_ca_executable`
-- Where to put the `step-ca` executable that will be installed by this role
-- Must be an absolute path
-- Default: `/usr/bin/step-ca`
-
-##### `step_ca_version`
-- Set the version of step-ca to install
-- Can be a version tag (e.g. `0.15.3`), or `latest` to always install the most recent version
-- It is **highly** recommended that your ca version matches the collection version
-  (e.g. if you are using the collection version 0.20.x you should be installing step-ca version 0.20.x as well)
-- Note that the role will query the GitHub API if this value is set to `latest`. Try setting
-  a specific version if you are running into rate limiting issues
-- Default: `latest`
-
-##### `step_ca_user`
-- User under which the step-ca server will run
-- Default: `step-ca`
-
-##### `step_ca_path`
-- Directory under which to place step-ca configuration files
-- Default: `/etc/step-ca`
-
-
-### CA Initialization
+### CA Configuration
 
 These variables correspond to the arguments passed to `step ca init`.
 See the [step docs](https://smallstep.com/docs/step-cli/reference/ca/init) for more information.
+
+#### `step_ca_configure`
+- If `false`, this role will only install `step-ca` and skip CA creation, initialization and service installation
+- This can be useful if you are only installing `step-ca` using this role but don't plan on using it with this collection.
+- Default `true`
 
 ##### `step_ca_name`
 - The name of the new PKI

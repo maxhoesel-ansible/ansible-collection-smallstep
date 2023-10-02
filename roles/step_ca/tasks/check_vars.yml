@@ -57,3 +57,8 @@
     step_ca_intermediate_password: "{{ step_ca_root_password }}"
   when: not step_ca_intermediate_password is defined
   no_log: yes
+
+- name: Check that step-cli version is valid
+  ansible.builtin.assert:
+    that: step_cli_version != "latest"
+    fail_msg: Cannot use a potentially incompatible version of step-cli to bootstrap the ca. Please set step_cli_version to a compatible version or latest-compatible

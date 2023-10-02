@@ -22,19 +22,16 @@ It will:
 
 ### Install
 
-##### `step_cli_install`
-- Whether to install the `step-cli` utility
-- Set this to `false` if the utility is already installed via other means (in this case, the role will use `step_cli_executable`)
-- Default: `true`
-
 ##### `step_cli_version`
-- Set the version of step to install
-- Can be a version tag (e.g. `0.15.3`), or `latest` to always install the most recent version
-- It is **highly** recommended that your cli version matches the collection version
-  (e.g. if you are using the collection version 0.20.x you should be installing step-cli version 0.20.x as well)
-- Note that the role will query the GitHub API if this value is set to `latest`. Try setting
-  a specific version if you are running into rate limiting issues
-- Default: `latest`
+- Set the version of step-cli to install
+- Can be a version tag (e.g. `0.15.3`) or `latest-compatible`
+- If set to `latest-compatible`, the most recent compatible release is installed, that is, the most recent minor release that matches the collection minor version.
+  - For example, if the collection version is `0.24.x`, then the most recent release from the `0.24` series will be installed.
+  - See the [versioning policy](https://github.com/maxhoesel-ansible/ansible-collection-smallstep/tree/main#versioning-policy) for more details.
+- Note that the role will query the GitHub API if this value is set to `latest`. If you are getting rate limit errors, you can:
+    - Set `step_cli_version` to a specific value
+    - Set `step_cli_github_token` to a token with higher rate limits
+- Default: `latest-compatible`
 
 ##### `step_cli_executable`
 - What to name and where to put the `step-cli` executable that will be installed by this role

@@ -1,11 +1,14 @@
 ---
+step_ca_github_token: ""
+
 # Installation vars
 step_ca_executable: /usr/bin/step-ca
-step_ca_version: latest
+step_ca_version: latest-compatible
 step_ca_user: step-ca
 step_ca_path: /etc/step-ca
 
 # CA Initialization vars
+step_ca_configure: true
 #step_ca_name:
 #step_ca_root_password:
 #step_ca_intermediate_password:
@@ -25,6 +28,6 @@ step_ca_ssh: false
 #step_ca_ra_credentials_file:
 
 # CLI vars
-step_cli_install: true
 step_cli_executable: step-cli
-#step_cli_version: latest
+step_cli_version: latest-compatible
+step_cli_install_dir: /usr/bin

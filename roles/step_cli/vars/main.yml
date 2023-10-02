@@ -1,4 +1,7 @@
 ---
+# used to determine the more recent compatible step-ca version
+smallstep_collection_version: "0.24.5"
+
 step_cli_arch:
   x86_64: "amd64"
   aarch64: "arm64"

@@ -1,41 +1,36 @@
 ---
-- include_tasks: check.yml
+- name: Check role variables
+  ansible.builtin.include_tasks: check_vars.yml
 
+- name: Install dependencies
+  ansible.builtin.include_tasks: prepare_deps.yml
+- name: Determine latest compatible version
+  ansible.builtin.include_tasks: prepare_latest_compat_release.yml
+  when: step_ca_version == "latest-compatible"
+- name: Determine latest version
+  ansible.builtin.include_tasks: prepare_latest_release.yml
+  when: step_ca_version == "latest"
 
+- name: Install step-cli # ensures that our cli version is also up-to-date
+  include_role:
+    name: maxhoesel.smallstep.step_cli
 
+- name: Install step-ca
+  ansible.builtin.include_tasks: install_ca.yml
 
+- name: Configure CA
+  block:
+  - name: Configure CA user
+    ansible.builtin.include_tasks: configure_ca_user.yml
 
-- ansible.builtin.include_tasks: "install.yml"
+  - name: Look for existing install
+    stat:
+      path: "{{ step_ca_path }}/config/ca.json"
+    register: step_ca_config
+  - name: Initialize CA
+    ansible.builtin.include_tasks: configure_ca_init.yml
+    when: not step_ca_config.stat.exists
 
-- name: step_ca_user is present
-  ansible.builtin.user:
-    name: "{{ step_ca_user }}"
-    password: "*"
-    home: "{{ step_ca_path }}"
-    shell: /usr/sbin/nologin
-    system: yes
-  no_log: true
-- name: Paths are present
-  ansible.builtin.file:
-    path: "{{ item }}"
-    state: directory
-    owner: "{{ step_ca_user }}"
-    group: "{{ step_ca_user }}"
-    mode: 0700
-  loop:
-    - "{{ step_ca_path }}"
-    - "{{ step_ca_path }}/db"
-# This symlink is needed so that step-cli can find
-# the ca configuration files without needing to set STEPPATH
-- name: .step symlink is present
-  ansible.builtin.file:
-    src: "{{ step_ca_path }}"
-    dest: "{{ step_ca_path }}/.step"
-    state: link
-    owner: "{{ step_ca_user }}"
-    group: "{{ step_ca_user }}"
-    mode: 0700
-
-- ansible.builtin.include_tasks: init.yml
-
-- ansible.builtin.include_tasks: service.yml
+  - name: Configure CA service
+    ansible.builtin.include_tasks: configure_ca_service.yml
+  when: step_ca_configure

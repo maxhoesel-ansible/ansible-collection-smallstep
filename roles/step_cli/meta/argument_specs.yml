@@ -26,12 +26,18 @@ argument_specs:
         default: step-cli
       step_cli_version:
         type: str
-        default: latest
+        default: latest-compatible
         description:
-          - Set the version of step to install
-          - Can be a version tag (e.g. C(0.15.3)), or C(latest) to always install the most recent version
-          - It is B(highly) recommended that your cli version matches the collection version (e.g. if you are using the collection version C(0.20.x) you should be installing step-cli version C(0.20.x) as well)
-          - Note that the role will query the GitHub API if this value is set to C(latest). Try setting a specific version if you are running into rate limiting issues
+          - Set the version of C(step-cli) to install
+          - Can be a version tag (e.g. C(0.15.3)), C(latest), or C(latest-compatible)
+          - If set to C(latest-compatible), the most recent compatible release is installed, that is, the most recent minor release that matches the collection minor version.
+            For example, if the collection version is C(0.24.x), then the most recent release from the C(0.24) series will be installed.
+            See U(https://github.com/maxhoesel-ansible/ansible-collection-smallstep/tree/main#versioning-policy) for more details.
+          - If set to C(latest), the most recent version of C(step-cli) is installed, regardless of compatibility with the collection.
+            This can be useful if you just want to install C(step-cli), but don't plan on using it with this collection.
+            Using minor versions of C(step-cli)/C(step-cli) that don't match the collection minor version is not supported!
+          - Note that the role will query the GitHub API if this value is set to C(latest) or C(latest-compatible).
+            If you are getting rate limit errors, you can set I(step_cli_version) to a specific value or set I(step_cli_github_token) to a token with higher rate limits
       step_cli_install_dir:
         type: path
         default: "/usr/bin"

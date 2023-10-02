@@ -1,44 +1,21 @@
 ---
 - name: Load Distribution-specific vars
   ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
-
-- name: Set step-cli install path
+- name: Set variables
   ansible.builtin.set_fact:
-    _step_cli_install_path: "{{ ('/' in step_cli_executable) | ternary(step_cli_executable, step_cli_install_dir + '/' + step_cli_executable) }}"
+    step_cli_install_path: "{{ ('/' in step_cli_executable) | ternary(step_cli_executable, step_cli_install_dir + '/' + step_cli_executable) }}"
 
-- name: Get step-cli install information
-  block:
-    - name: Get latest step-cli release information
-      ansible.builtin.uri:
-        url: https://api.github.com/repos/smallstep/cli/releases/latest
-        body_format: json
-        return_content: yes
-      register: step_cli_latest_release
-      delegate_to: localhost
-      become: no
-      run_once: yes
-      retries: 3
-      delay: 5
-    - name: Set latest release version
-      ansible.builtin.set_fact:
-        step_cli_version: "{{ (step_cli_latest_release.json.tag_name)[1:] }}"
-  when: step_cli_version == 'latest'
-  check_mode: no
+- name: Install dependencies
+  ansible.builtin.include_tasks: prepare_deps.yml
+- name: Determine latest compatible version
+  ansible.builtin.include_tasks: prepare_latest_compat_release.yml
+  when: step_cli_version == "latest-compat"
+- name: Determine latest version
+  ansible.builtin.include_tasks: prepare_latest_release.yml
+  when: step_cli_version == "latest"
 
-- ansible.builtin.include_tasks: "install.yml"
+- name: Install step-cli
+  ansible.builtin.include_tasks: install_cli.yml
 
-- name: Ensure libcap binary is installed
-  ansible.builtin.package:
-    name: "{{ step_cli_libcap_package }}"
-# needed due to community.general.capabilities not being idempotent on all systems
-- name: Check if step-cli has cap_net_bind_service capability
-  ansible.builtin.command: getcap "{{ _step_cli_install_path }}"
-  changed_when: no
-  check_mode: no
-  register: _getcap_output
-
-- name: Ensure step-cli can bind to ports <1024 (for acme standalone mode)
-  community.general.capabilities:
-    path: "{{ _step_cli_install_path }}"
-    capability: cap_net_bind_service=+ep
-  when: '"cap_net_bind_service" not in _getcap_output.stdout'
+- name: Configure step-cli capabilities
+  ansible.builtin.include_tasks: configure_capabilities.yml

@@ -1,0 +1,13 @@
+- name: Get latest compatible step-ca release
+  ansible.builtin.shell: |
+    python3 - << 'EOF'
+    {{ lookup('template', 'get_compatible_release.py.j2') }}
+    EOF
+  run_once: true
+  become: no
+  register: _latest_release
+  check_mode: false
+  changed_when: false
+- name: Set step_ca_version
+  ansible.builtin.set_fact:
+    step_ca_version: "{{ _latest_release.stdout }}"

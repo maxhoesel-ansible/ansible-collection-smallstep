@@ -1,0 +1,7 @@
+- name: Install dependencies
+  ansible.builtin.package:
+    name:
+      # needed for the latest_compatible_release script
+      - python3-requests
+      # needed so that step-cli can bind to 80 for ACME without running as root
+      - "{{ step_cli_libcap_package }}"

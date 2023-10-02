@@ -1,0 +1,3 @@
+- name: Install dependencies
+  ansible.builtin.package:
+    name: python3-requests # needed for the latest_compatible_release script

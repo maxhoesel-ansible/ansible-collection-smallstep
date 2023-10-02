@@ -1,6 +1,8 @@
 ---
-step_ca_root_password_file: "{{ step_ca_path }}/.password_root.txt"
+# used to determine the more recent compatible step-ca version
+smallstep_collection_version: "0.24.5"
 
+step_ca_root_password_file: "{{ step_ca_path }}/.password_root.txt"
 step_ca_intermediate_password_file: "{{ step_ca_path }}/.password.txt"
 step_ca_existing_key_password_file: "{{ step_ca_path }}/.password_existing_root.txt"
 
@@ -8,7 +10,6 @@ step_ca_root_temp_file: "{{ step_ca_path }}/.step_ca_root.crt"
 step_ca_key_temp_file: "{{ step_ca_path }}/.step_ca_root.key"
 
 step_ca_tmp_provisioner: "tmp_provisioner"
-
 
 step_ca_arch:
   x86_64: "amd64"

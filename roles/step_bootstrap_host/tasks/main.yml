@@ -1,10 +1,14 @@
 ---
+- name: Check that step-cli version is valid
+  ansible.builtin.assert:
+    that: step_cli_version != "latest"
+    fail_msg: Cannot use a potentially incompatible version of step-cli with this collection. If you just want to install step-cli, please use the step_cli role.
+
 - name: Install step_cli # always run this (if desired), to ensure our cli version is up-to-date
   include_role:
     name: maxhoesel.smallstep.step_cli
-  when: step_cli_install
 
-- name: "Compatibility: Respect step_cli_steppath is only root is bootstrapped"
+- name: "Compatibility: Respect step_cli_steppath if only root is bootstrapped"
   ansible.builtin.set_fact:
     _root_legacy_steppath: "{{ (step_bootstrap_users | length == 1 and step_bootstrap_users.0.user == 'root' and step_bootstrap_users.0.steppath is not defined and step_cli_steppath is defined) | ternary(step_cli_steppath,'') }}"
 

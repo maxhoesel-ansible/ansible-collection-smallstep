@@ -25,9 +25,32 @@ def update_util_collection_version(ver):
     with open("plugins/module_utils/constants.py", encoding="utf-8") as f:
         data = f.readlines()
 
-    data = map(lambda line: f'COLLECTION_VERSION = "{ver}"' if line.startswith("COLLECTION_VERSION") else line, data)
+    data = list(map(lambda line: f'COLLECTION_VERSION = "{ver}"' if line.startswith(
+        "COLLECTION_VERSION") else line.rstrip(), data))
 
     with open("plugins/module_utils/constants.py", "w", encoding="utf-8") as f:
+        f.write("{}\n".format('\n'.join(data).rstrip()))
+
+
+def update_step_ca_collection_version(ver):
+    with open("roles/step_ca/vars/main.yml", encoding="utf-8") as f:
+        data = f.readlines()
+
+    data = map(lambda line: f'smallstep_collection_version: "{ver}"' if line.startswith(
+        "smallstep_collection_version: ") else line.rstrip(), data)
+
+    with open("roles/step_ca/vars/main.yml", "w", encoding="utf-8") as f:
+        f.write("{}\n".format('\n'.join(data).rstrip()))
+
+
+def update_step_cli_collection_version(ver):
+    with open("roles/step_cli/vars/main.yml", encoding="utf-8") as f:
+        data = f.readlines()
+
+    data = map(lambda line: f'smallstep_collection_version: "{ver}"' if line.startswith(
+        "smallstep_collection_version: ") else line.rstrip(), data)
+
+    with open("roles/step_cli/vars/main.yml", "w", encoding="utf-8") as f:
         f.write("{}\n".format('\n'.join(data).rstrip()))
 
 
@@ -40,6 +63,8 @@ def main():
 
     update_galaxy_yml(ver)
     update_util_collection_version(ver)
+    update_step_ca_collection_version(ver)
+    update_step_cli_collection_version(ver)
 
 
 if __name__ == "__main__":

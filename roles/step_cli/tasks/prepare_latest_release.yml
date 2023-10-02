@@ -1,0 +1,12 @@
+- name: Get latest step-cli release information
+  ansible.builtin.uri:
+    url: https://api.github.com/repos/smallstep/cli/releases/latest
+    body_format: json
+    return_content: yes
+  register: step_cli_latest_release
+  delegate_to: localhost
+  become: no
+  run_once: yes
+- name: Set latest release version
+  ansible.builtin.set_fact:
+    step_cli_version: "{{ (step_cli_latest_release.json.tag_name)[1:] }}"

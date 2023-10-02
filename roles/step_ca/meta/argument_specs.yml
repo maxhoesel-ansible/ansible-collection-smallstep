@@ -32,20 +32,17 @@ argument_specs:
 
         Storing your root key unencrypted (even just temporarily!) is strongly discouraged and poses a great security risk. This role will only decrypt the root key for as long as strictly neccessary.
     options:
-      step_cli_install:
-        type: bool
-        default: true
-        description:
-          - Whether to install the C(step-cli) utility
-          - Set this to C(false) if the utility is already installed via other means (in this case, the role will use C(step_cli_executable)
       step_cli_version:
         type: str
-        default: latest
+        default: latest-compatible
         description:
-          - Set the version of step to install
-          - Can be a version tag (e.g. C(0.15.3)), or C(latest) to always install the most recent version
-          - It is B(highly) recommended that your cli version matches the collection version (e.g. if you are using the collection version C(0.20.x) you should be installing step-cli version C(0.20.x) as well)
-          - Note that the role will query the GitHub API if this value is set to C(latest). Try setting a specific version if you are running into rate limiting issues
+          - Set the version of C(step-cli) to install
+          - Can be a version tag (e.g. C(0.15.3)) or C(latest-compatible)
+          - If set to C(latest-compatible), the most recent compatible release is installed, that is, the most recent minor release that matches the collection minor version.
+            For example, if the collection version is C(0.24.x), then the most recent release from the C(0.24) series will be installed.
+            See U(https://github.com/maxhoesel-ansible/ansible-collection-smallstep/tree/main#versioning-policy) for more details.
+          - Note that the role will query the GitHub API if this value is set to C(latest-compatible).
+            If you are getting rate limit errors, you can set I(step_cli_version) to a specific value or set I(step_cli_github_token) to a token with higher rate limits
       step_cli_executable:
         type: path
         description:
@@ -63,20 +60,26 @@ argument_specs:
           - The directory must already exist
           - Ignored if I(step_cli_executable) contains a directory already
       # Install options (step-ca)
+      step_ca_version:
+        type: str
+        default: latest-compatible
+        description:
+          - Set the version of C(step-ca) to install
+          - Can be a version tag (e.g. C(0.15.3)), C(latest), or C(latest-compatible)
+          - If set to C(latest-compatible), the most recent compatible release is installed, that is, the most recent minor release that matches the collection minor version.
+            For example, if the collection version is C(0.24.x), then the most recent release from the C(0.24) series will be installed.
+            See U(https://github.com/maxhoesel-ansible/ansible-collection-smallstep/tree/main#versioning-policy) for more details.
+          - If set to C(latest), the most recent version of C(step-cli) is installed, regardless of compatibility with the collection.
+            This can be useful if you just want to install C(step-ca), but don't plan on using it with this collection (set I(step_ca_init) to C(false) in this case).
+            Using minor versions of C(step-cli)/C(step-ca) that don't match the collection minor version is not supported!
+          - Note that the role will query the GitHub API if this value is set to C(latest) or C(latest-compatible).
+            If you are getting rate limit errors, you can set I(step_ca_version) to a specific value or set I(step_ca_github_token) to a token with higher rate limits
       step_ca_executable:
         type: path
         default: "/usr/bin/step-ca"
         description:
-          - Where to put the `step-ca` executable that will be installed by this role
+          - Where to put the C(step-ca) executable that will be installed by this role
           - Must be an absolute path
-      step_ca_version:
-        type: str
-        default: latest
-        description:
-          - Version of step-ca to install
-          - Can be a version tag (e.g. C(0.15.3)), or C(latest) to always install the most recent version
-          - It is B(highly) recommended that your ca version matches the collection version (e.g. if you are using the collection version C(0.20.x) you should be installing step-ca version C(0.20.x) as well)
-          - Note that the role will query the GitHub API if this value is set to C(latest). Try setting a specific version if you are running into rate limiting issues
       step_ca_user:
         type: str
         default: step-ca
@@ -86,6 +89,12 @@ argument_specs:
         default: /etc/step-ca
         description: Directory under which to place step-ca configuration files
       # CA Init options
+      step_ca_configure:
+        type: bool
+        default: true
+        description:
+          - If C(false), this role will only install C(step-ca) and skip CA creation, initialization and service installation.
+          - This can be useful if you are only installing C(step-ca) using this role but don't plan on using it with this collection.
       step_ca_name:
         type: str
         required: yes

@@ -1,0 +1,39 @@
+---
+- name: step_ca_user is present
+  ansible.builtin.user:
+    name: "{{ step_ca_user }}"
+    password: "*"
+    home: "{{ step_ca_path }}"
+    shell: /usr/sbin/nologin
+    system: yes
+  no_log: true
+- name: Paths are present
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_user }}"
+    mode: 0700
+  loop:
+    - "{{ step_ca_path }}"
+    - "{{ step_ca_path }}/db"
+# This symlink is needed so that step-cli can find
+# the ca configuration files without needing to set STEPPATH
+- name: .step symlink is present
+  ansible.builtin.file:
+    src: "{{ step_ca_path }}"
+    dest: "{{ step_ca_path }}/.step"
+    state: link
+    owner: "{{ step_ca_user }}"
+    group: "{{ step_ca_user }}"
+    mode: 0700
+
+# Always create the intermediate password file as it is needed for CA operation
+- name: Intermediate password file is present
+  copy:
+    content: "{{ step_ca_intermediate_password }}"
+    dest: "{{ step_ca_intermediate_password_file }}"
+    owner: "{{ step_ca_user }}"
+    mode: 0600
+    group: "{{ step_ca_user }}"
+  no_log: yes

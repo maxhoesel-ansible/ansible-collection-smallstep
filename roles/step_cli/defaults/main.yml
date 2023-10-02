@@ -1,4 +1,5 @@
 ---
+step_cli_github_token: ""
 step_cli_executable: step-cli
-step_cli_version: latest
+step_cli_version: latest-compatible
 step_cli_install_dir: /usr/bin

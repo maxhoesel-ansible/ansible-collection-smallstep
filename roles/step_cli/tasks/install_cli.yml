@@ -20,7 +20,6 @@
 
 - name: Install step-cli
   block:
-
     - name: Download and extract step-cli archive
       unarchive:
         src: "https://github.com/smallstep/cli/releases/download/v{{ step_cli_version }}/step_linux_{{ step_cli_version }}_{{ step_cli_arch[ansible_architecture] }}.tar.gz"
@@ -31,12 +30,12 @@
     - name: Install step-cli binary # noqa no-changed-when
       shell: >
         set -o pipefail &&
-        mv -Z /tmp/step_{{ step_cli_version }}/bin/step {{ _step_cli_install_path }}
+        mv -Z /tmp/step_{{ step_cli_version }}/bin/step {{ step_cli_install_path }}
       args:
         executable: /bin/bash
     # mv does not automatically set selinux labels, so we have to do it ourselves
-    - name: Restore SELinux context for binary
-      command: "restorecon -v {{ _step_cli_install_path }}"
+    - name: Restore SELinux context for binary # noqa no-changed-when
+      command: "restorecon -v {{ step_cli_install_path }}"
       when: ansible_selinux is defined and ansible_selinux and ansible_selinux.status == 'enabled'
   always:
     - name: Remove step release archive

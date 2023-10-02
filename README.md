@@ -52,15 +52,16 @@ and the [CLI tool](https://github.com/smallstep/cli). Possible uses for this col
 
 Individual roles or modules may have additional dependencies, please check their respective documentation.
 
-### Versioning Policy and Node Requirements
+### Versioning Policy
 
-Each minor version of this collection designed to be compatible with the corresponding minor release of the `step-cli` utility.
-For example, The collection releases with version `0.24.x` are compatible with the `step-cli` utility versions `0.24.x`.
-This coupling is needed as newer minor versions of the `step-cli` tool may introduce breaking changes and affect this collection.
+As the upstream `step-cli/step-ca` packages do not have stable releases (and thus no stability guarantees), each release of this collection is only compatible with a narrow range of Smallstep packages.
 
-To install the correct collection version, check your `step-cli` version (`step-cli --version`), then use that value when installing the collection.
+Each minor version of this collection (`0.x`) is compatible with the corresponding minor release of the `step-cli` and `step-ca` utilities.
+For example, the collection releases with version `0.24.x` are compatible with the `step-cli` and `step-ca` versions `0.24.x`.
 
-**For step-cli versions `<0.20`:** Use the collection version `>=0.4,<0.5`.
+The `step_ca` and `step_cli` roles can automatically install the lastest compatible releases of `step-cli` and `step-ca`, see their documentation for details.
+
+**For step-cli/step-ca versions `<0.20`:** Use the collection version `>=0.4,<0.5`.
 
 ### Install
 
