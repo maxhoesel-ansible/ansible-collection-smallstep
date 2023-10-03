@@ -2,7 +2,7 @@
 # Includes utilities, CLI helpers and so on
 
 # Linting & Formatting
-ansible-lint==6.20.2
+ansible-lint==6.20.3
 pylint==3.0.0
 autopep8==2.0.4
 pre-commit==3.4.0
