@@ -48,7 +48,7 @@ and the [CLI tool](https://github.com/smallstep/cli). Possible uses for this col
 
 - A recent release of Ansible. This collection is tested against the 2 most recent Ansible releases.
   Older versions might still work, but are not supported
-- Python 3.6 or newer on the target nodes
+- Python 3.7 or newer on the target nodes
 
 Individual roles or modules may have additional dependencies, please check their respective documentation.
 
