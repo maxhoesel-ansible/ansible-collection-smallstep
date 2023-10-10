@@ -17,4 +17,4 @@ packaging==23.2
 # Also include a version of ansible-core for IDE hints and such.
 # Note that this version is independent of the one used in tests, see tox.ini
 # and /tests
-ansible-core==2.15.4
+ansible-core==2.15.5
