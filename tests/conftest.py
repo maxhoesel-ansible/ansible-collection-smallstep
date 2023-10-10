@@ -9,6 +9,10 @@ import pytest
 from pytest_virtualenv import VirtualEnv
 import yaml
 
+NODE_PYTHON_DEFAULT_VERSION = "3.7"
+STEP_CLI_DEFAULT_VERSION = "latest"
+STEP_CA_DEFAULT_VERSION = "latest"
+
 with open("galaxy.yml", encoding="utf-8") as f:
     GALAXY_YML = yaml.safe_load(f)
 
@@ -32,12 +36,15 @@ def get_ansible_version():
 def pytest_addoption(parser):
     parser.addoption("--ansible-version", action="store", default=get_ansible_version(),
                      help="Version of ansible to use for tests, in the format '2.xx'. Default: see requirements.txt")
-    parser.addoption("--step-cli-version", action="store", default="latest",
-                     help="Version of step-cli to use for tests, either 'latest' (default) or a version ('0.24.0')")
-    parser.addoption("--step-ca-version", action="store", default="latest",
-                     help="Version of step-ca to use for tests, either 'latest' (default) or a version ('0.24.0')")
-    parser.addoption("--node-python-version", action="store", default="3.6",
-                     help="Python version to test Ansible modules with, in the format '3.x'. Default: '3.6'")
+    parser.addoption("--step-cli-version", action="store", default=STEP_CLI_DEFAULT_VERSION,
+                     help="Version of step-cli to use for tests, "
+                     f"either '{STEP_CLI_DEFAULT_VERSION}' (default) or a version ('0.24.0')")
+    parser.addoption("--step-ca-version", action="store", default=STEP_CA_DEFAULT_VERSION,
+                     help="Version of step-ca to use for tests, "
+                     f"either '{STEP_CA_DEFAULT_VERSION}' (default) or a version ('0.24.0')")
+    parser.addoption("--node-python-version", action="store", default=NODE_PYTHON_DEFAULT_VERSION,
+                     help="Python version to test Ansible modules with, "
+                     f"in the format '3.x'. Default: '{NODE_PYTHON_DEFAULT_VERSION}'")
 
 
 @pytest.fixture(scope="session")

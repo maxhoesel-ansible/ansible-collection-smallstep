@@ -178,6 +178,11 @@ The CI also builds the docs to ensure they don't break silently.
 
 1. Update the versions in the [CI config](./.circleci/config.yml)
 
+### Bumping node python version
+
+1. Update the version in [`tests/conftest.py`](./tests/conftest.py)
+2. Update the version in the [CI config](./.circleci/config.yml)
+
 ### Versioning and Releases
 
 - Releases are automatically drafted by `release-drafter`, with a changelog generated from PR labels

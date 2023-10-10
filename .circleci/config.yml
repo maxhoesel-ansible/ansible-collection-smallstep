@@ -68,7 +68,7 @@ workflows:
             parameters:
               ansible-version: ["2.15", "2.14"]
               step-version: ["latest", "compat"]
-              node-python-version: ["3.6"]
+              node-python-version: ["3.7"]
       - collection-testing/pre-commit-lint:
           name: Lint
       - collection-testing/antsibull-docs:
