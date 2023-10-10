@@ -18,7 +18,6 @@ build_ignore:
 - .readthedocs.yaml
 - pyproject.toml
 - requirements.txt
-- tox.ini
 - '**/requirements.txt'
 dependencies:
   community.general: '>=1.0.0'

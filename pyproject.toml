@@ -4,20 +4,24 @@ ignore = "E402"
 
 # Pylint settings
 [tool.pylint.'NESSAGES CONTROL']
-disable=[
+disable = [
     "logging-fstring-interpolation", # See https://github.com/PyCQA/pylint/issues/2354
     "missing-module-docstring",
     "missing-class-docstring",
-    "missing-function-docstring", # also triggers on abstract functions
-    "consider-using-enumerate", # not for simple loops
+    "missing-function-docstring",    # also triggers on abstract functions
+    "consider-using-enumerate",      # not for simple loops
     "consider-using-dict-items",
     "no-else-return",
     "invalid-name",
     "too-many-boolean-expressions",
     "too-few-public-methods",
-    'wrong-import-position', # Ansible module best practices
+    'wrong-import-position',         # Ansible module best practices
     "I",
 ]
 
 [tool.pylint.'FORMAT']
-max-line-length=120
+max-line-length = 120
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ['ignore:AnsibleCollectionFinder has already been configured']

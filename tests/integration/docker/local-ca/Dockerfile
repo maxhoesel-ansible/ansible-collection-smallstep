@@ -3,9 +3,9 @@ ARG ANSIBLE_VERSION
 
 FROM docker.io/smallstep/step-ca:${STEP_CA_VERSION} as ca
 
-# This is only a target, the exact ansible version does not matter
-# as long as that image has our required python lib
-FROM quay.io/ansible/default-test-container:stable-2.15
+# The stable test containers already come with all required python versions preinstalled
+# in /usr/local/bin/ (pyython3.6, 3.7, etc)
+FROM quay.io/ansible/default-test-container:stable-${ANSIBLE_VERSION}
 
 # Get binaries from step-ca container
 COPY --from=ca /usr/local/bin/step /usr/local/bin/step

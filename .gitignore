@@ -150,3 +150,8 @@ docs/ansible_collections/
 
 # Don't commit ephermal integration config
 tests/integration/integration_config.yml
+collections
+
+# CI files
+results
+split-tests

@@ -1,0 +1,10 @@
+pytest-ansible, get familiar with test syntax
+1. fixture to set up a dev container with step installed (can be dockerfiled)
+2. fixture to set up a ca (per-test maybe?)
+3. test uses ansible inventory with container
+4. cleanup?
+
+CI, get nox scenarios (or pytest? circleci integration? coverage?)
+
+ansible-test local-ca, ensure python version matches
+actually check node python in general

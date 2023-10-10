@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  collection-testing: maxhoesel-ansible/ansible-collection-testing@0.4.0
+  collection-testing: maxhoesel-ansible/ansible-collection-testing@0.5.3
 
 filters: &semver-tagged
   tags:
@@ -10,28 +10,69 @@ filters: &semver-tagged
   branches:
     ignore: /.*/
 
+executors:
+  pytest:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large
+
+jobs:
+  test:
+    parameters:
+      parallelism:
+        description: Number of parallel runners
+        type: integer
+      ansible-version:
+        description: Version of Ansible to use for testing
+        type: string
+      step-version:
+        type: enum
+        enum:
+          - latest
+          - compat
+        description: Version of smallstep to test
+      node-python-version:
+        description: Version of python to use for module tests
+        type: string
+    executor: pytest
+    parallelism: << parameters.parallelism >>
+    steps:
+      - when:
+          condition:
+            equal: ["<< parameters.step-version >>", "latest"]
+          steps:
+            - collection-testing/pytest:
+                pytest-args: >
+                  --ansible-version << parameters.ansible-version >>
+                  --step-cli-version "latest"
+                  --step-ca-version "latest"
+                  --node-python-version << parameters.node-python-version >>
+      - when:
+          condition:
+            equal: ["<< parameters.step-version >>", "compat"]
+          steps:
+            - collection-testing/pytest:
+                pytest-args: >
+                  --ansible-version << parameters.ansible-version >>
+                  --step-cli-version "0.24.0"
+                  --step-ca-version "0.24.0"
+                  --node-python-version << parameters.node-python-version >>
+
 workflows:
   ci:
     jobs:
+      - test:
+          name: Test (ansible-<< matrix.ansible-version >>, step-<< matrix.step-version >>)
+          parallelism: 3
+          matrix:
+            parameters:
+              ansible-version: ["2.15", "2.14"]
+              step-version: ["latest", "compat"]
+              node-python-version: ["3.6"]
       - collection-testing/pre-commit-lint:
           name: Lint
       - collection-testing/antsibull-docs:
           name: Generate Docs
-      - collection-testing/run-tox-environments:
-          name: Test Modules
-          match-environments: \-test\-
-          parallelism: 3
-          resource-class: medium
-          retries: 1
-          retry-delay: 60
-      - collection-testing/run-tox-environments:
-          name: Test Roles
-          match-environments: roles
-          # number of scenarios * ansible versions to test
-          parallelism: 12
-          resource-class: large
-          retries: 1
-          retry-delay: 60
       - collection-testing/publish-github:
           name: Publish Release to GitHub
           context: collection-publishing

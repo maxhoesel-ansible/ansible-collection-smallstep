@@ -15,18 +15,18 @@
   tasks:
     # Somewhat hacky way to customize the container image, but we make do with what we have
     - name: Add ACME provisioner # noqa no-changed-when
-      ansible.builtin.command: "podman exec step-ca step ca provisioner add {{ step_acme_cert_ca_provisioner }} --type=ACME"
+      ansible.builtin.command: "docker exec step-ca step ca provisioner add {{ step_acme_cert_ca_provisioner }} --type=ACME"
     - name: Get CA PID
-      ansible.builtin.command: podman exec step-ca pgrep -f step-ca
+      ansible.builtin.command: docker exec step-ca pgrep -f step-ca
       register: _step_ca_pid
       changed_when: false
     - name: Reload step-ca # noqa no-changed-when
-      ansible.builtin.command: "podman exec step-ca kill -1 {{ _step_ca_pid.stdout }}"
+      ansible.builtin.command: "docker exec step-ca kill -1 {{ _step_ca_pid.stdout }}"
 
 - hosts: clients
   tasks:
     - name: Get CA fingerprint
-      ansible.builtin.command: podman exec step-ca step certificate fingerprint certs/root_ca.crt
+      ansible.builtin.command: docker exec step-ca step certificate fingerprint certs/root_ca.crt
       register: _ca_fingerprint
       changed_when: false
       check_mode: false
