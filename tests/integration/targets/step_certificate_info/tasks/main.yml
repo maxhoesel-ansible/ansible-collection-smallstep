@@ -1,0 +1,60 @@
+- block:
+    - name: Copy certificate # noqa risky-file-permissions
+      ansible.builtin.copy:
+        src: ca.crt
+        dest: /tmp/cert-info-sample.crt
+
+    - name: Read certificate info (text)
+      maxhoesel.smallstep.step_certificate_info:
+        path: /tmp/cert-info-sample.crt
+        format: text
+      register: text_return
+    - name: Ensure certificate is returned
+      ansible.builtin.assert:
+        that:
+          - '"root-ca" in text_return.text'
+          - not text_return.valid
+          - '"certificate signed by unknown authority" in text_return.validity_fail_reason'
+
+    - name: Read certificate info (text-short)
+      maxhoesel.smallstep.step_certificate_info:
+        path: /tmp/cert-info-sample.crt
+        format: text-short
+      register: text_short_return
+    - name: Ensure certificate is returned
+      ansible.builtin.assert:
+        that:
+          - '"root-ca" in text_short_return.text'
+          - not text_short_return.valid
+          - '"certificate signed by unknown authority" in text_short_return.validity_fail_reason'
+
+    - name: Read certificate info (pem)
+      maxhoesel.smallstep.step_certificate_info:
+        path: /tmp/cert-info-sample.crt
+        format: pem
+      register: pem_return
+    - name: Ensure certificate is returned
+      ansible.builtin.assert:
+        that:
+          - pem_return.pem | trim == cert_data
+          - not pem_return.valid
+          - '"certificate signed by unknown authority" in pem_return.validity_fail_reason'
+      vars:
+        cert_data: "{{ lookup('file', 'files/ca.crt') | trim }}"
+
+    - name: Read certificate info (json)
+      maxhoesel.smallstep.step_certificate_info:
+        path: /tmp/cert-info-sample.crt
+      register: json_return
+    - name: Ensure certificate is returned
+      ansible.builtin.assert:
+        that:
+          - json_return.json.serial_number == "20212204927442395631918112613040808579"
+          - not json_return.valid
+          - '"certificate signed by unknown authority" in json_return.validity_fail_reason'
+
+  always:
+    - name: Delete copied certificate
+      ansible.builtin.file:
+        path: /tmp/cert-info-sample.crt
+        state: absent
