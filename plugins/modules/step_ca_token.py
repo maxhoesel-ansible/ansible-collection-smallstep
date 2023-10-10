@@ -118,8 +118,8 @@ options:
     type: path
 
 extends_documentation_fragment:
-  - maxhoesel.smallstep.step_cli
-  - maxhoesel.smallstep.connection
+  - maxhoesel.smallstep.cli_executable
+  - maxhoesel.smallstep.ca_connection
 """
 
 EXAMPLES = r"""
@@ -135,17 +135,19 @@ token:
   type: str
   no_log: yes
 """
+from typing import cast, Dict
 
 from ansible.module_utils.common.validation import check_required_one_of
 from ansible.module_utils.common.validation import check_mutually_exclusive
 from ansible.module_utils.basic import AnsibleModule
 
-from ..module_utils.step_cli_wrapper import CLIWrapper
-from ..module_utils import connection
+from ..module_utils.cli_wrapper import CLIWrapper
+from ..module_utils.params.ca_connection import CaConnectionParams
+from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
 
 def run_module():
-    module_args = dict(
+    argument_spec = dict(
         cert_not_after=dict(type="str"),
         cert_not_before=dict(type="str"),
         force=dict(type="bool"),
@@ -170,13 +172,16 @@ def run_module():
         sshpop_key=dict(type="path"),
         x5c_cert=dict(type="str"),
         x5c_key=dict(type="path"),
-        step_cli_executable=dict(type="path", default="step-cli")
+        step_cli_executable=dict(type="path", default=DEFAULT_STEP_CLI_EXECUTABLE)
     )
 
     result = dict(changed=False, stdout="", stderr="", msg="")
-    module = AnsibleModule(argument_spec={**connection.args, **module_args}, supports_check_mode=True)
-
-    connection.check_argspec(module, result)
+    module = AnsibleModule(argument_spec={
+        **CaConnectionParams.argument_spec,
+        **argument_spec
+    }, supports_check_mode=True)
+    CaConnectionParams(module).check()
+    module_params = cast(Dict, module.params)
 
     try:
         check_mutually_exclusive(["return_token", "output_file"], module.params)
@@ -189,22 +194,27 @@ def run_module():
         result["msg"] = "At least one of return_token and output_file must be specified"
         module.fail_json(**result)
 
-    cli = CLIWrapper(module, result, module.params["step_cli_executable"])
+    cli = CLIWrapper(module, module_params["step_cli_executable"])
+
+    # Regular args
+    token_cliargs = ["cert_not_after", "cert_not_before", "force", "host", "k8ssa_token_path", "key", "kid",
+                     "not_after", "not_before", "output_file", "principal", "provisioner", "provisioner_password_file",
+                     "revoke", "renew", "rekey", "san", "ssh", "sshpop_cert", "sshpop_key", "x5c_cert",
+                     "x5c_key"]
+    # All parameters can be converted to a mapping by just appending -- and replacing the underscores
+    token_cliarg_map = {arg: f"--{arg.replace('_', '-')}" for arg in token_cliargs}
 
     # Positional Parameters
-    params = ["ca", "token", module.params["name"]]
-    # Regular args
-    args = ["cert_not_after", "cert_not_before", "force", "host", "k8ssa_token_path", "key", "kid",
-            "not_after", "not_before", "output_file", "principal", "provisioner", "provisioner_password_file",
-            "revoke", "renew", "rekey", "san", "ssh", "sshpop_cert", "sshpop_key", "x5c_cert",
-            "x5c_key"]
-    # All parameters can be converted to a mapping by just appending -- and replacing the underscores
-    args = {arg: f"--{arg.replace('_', '-')}" for arg in args}
+    cli_params = [
+        "ca", "token", module_params["name"]
+    ] + cli.build_params({
+        **token_cliarg_map,
+        **CaConnectionParams.cliarg_map
+    })
 
-    # pylint: disable=unbalanced-tuple-unpacking
-    result["stdout"], result["stderr"] = cli.run_command(params, {**args, **connection.param_spec})[1:3]
+    result["stdout"], result["stderr"] = cli.run_command(cli_params)[1:3]
     result["changed"] = True
-    if module.params["return_token"]:
+    if module_params["return_token"]:
         result["token"] = result["stdout"]
     result["stdout"] = ""
     result["stdout_lines"] = ""

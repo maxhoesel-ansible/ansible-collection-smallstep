@@ -38,8 +38,8 @@ options:
     ##no_log
 
 extends_documentation_fragment:
-  - maxhoesel.smallstep.step_cli
-  - maxhoesel.smallstep.connection
+  - maxhoesel.smallstep.cli_executable
+  - maxhoesel.smallstep.ca_connection
 """
 
 EXAMPLES = r"""
@@ -58,42 +58,54 @@ EXAMPLES = r"""
     token: "{{ ca_token }}"
 """
 
+from typing import Dict, cast
+
 from ansible.module_utils.basic import AnsibleModule
 
-from ..module_utils.step_cli_wrapper import CLIWrapper
-from ..module_utils import connection
+from ..module_utils.cli_wrapper import CLIWrapper
+from ..module_utils.params.ca_connection import CaConnectionParams
+from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
 
 def run_module():
-    module_args = dict(
+    argument_spec = dict(
         cert=dict(type="path"),
         key=dict(type="path"),
         reason=dict(type="str"),
         reason_code=dict(type="int"),
         serial_number=dict(type="int"),
         token=dict(type="str", no_log=True),
-        step_cli_executable=dict(type="path", default="step-cli"),
+        step_cli_executable=dict(type="path", default=DEFAULT_STEP_CLI_EXECUTABLE),
     )
     result = dict(changed=False, stdout="", stderr="", msg="")
-    module = AnsibleModule(argument_spec={**connection.args, **module_args}, supports_check_mode=True)
+    module = AnsibleModule(argument_spec={
+        **CaConnectionParams.argument_spec,
+        **argument_spec
+    }, supports_check_mode=True)
+    CaConnectionParams(module).check()
+    module_params = cast(Dict, module.params)
 
-    connection.check_argspec(module, result)
+    cli = CLIWrapper(module, module_params["step_cli_executable"])
 
-    cli = CLIWrapper(module, result, module.params["step_cli_executable"])
+    # Regular args
+    revoke_cliargs = ["cert", "key", "reason", "reason_code",
+                      "token"]
+    # Most parameters can be converted to a mapping by just appending -- and replacing the underscores
+    revoke_cliarg_map = {arg: f"--{arg.replace('_', '-')}" for arg in revoke_cliargs}
+    # This step-cli argument uses camelCase for some reason
+    revoke_cliarg_map["reason_code"] = "--reasonCode"
 
     # Positional Parameters
-    params = ["ca", "revoke"]
-    if module.params["serial_number"]:
-        params.append([module.params["serial_number"]])
-    # Regular args
-    args = ["cert", "key", "reason", "reason_code",
-            "token"]
-    # All parameters can be converted to a mapping by just appending -- and replacing the underscores
-    args = {arg: f"--{arg.replace('_', '-')}" for arg in args}
-    # This step-cli argument uses camelCase for some reason
-    args["reason_code"] = "--reasonCode"
+    cli_params = [
+        "ca", "revoke"
+    ] + cli.build_params({
+        **revoke_cliarg_map,
+        **CaConnectionParams.cliarg_map
+    })
+    if module_params["serial_number"]:
+        cli_params.append([module_params["serial_number"]])  # type: ignore
 
-    result["stdout"], result["stderr"] = cli.run_command(params, {**args, **connection.param_spec})[1:3]
+    result["stdout"], result["stderr"] = cli.run_command(cli_params)[1:3]
     result["changed"] = True
     module.exit_json(**result)
 

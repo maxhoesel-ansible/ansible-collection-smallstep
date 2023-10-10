@@ -13,7 +13,7 @@ description: Use this module to create and remove provisioners from a Smallstep 
 notes:
   - Existing provisioners will B(not) be modified by default, use the I(update) flag to force provisioner updates
   - Most of the options correspond to the command-line parameters for the C(step ca provisioner) command.
-    See the documentation for mode information (U(https://smallstep.com/docs/step-cli/reference/ca/provisioner)).
+    See the L(documentation,https://smallstep.com/docs/step-cli/reference/ca/provisioner) for more information.
   - Any files used to create the provisioner (e.g. root certificate chains) must already be present on the remote host.
   - Check mode is supported.
 options:
@@ -349,8 +349,8 @@ options:
       - x5c_root_file
 
 extends_documentation_fragment:
-  - maxhoesel.smallstep.step_cli
-  - maxhoesel.smallstep.admin
+  - maxhoesel.smallstep.cli_executable
+  - maxhoesel.smallstep.ca_admin
 """
 
 EXAMPLES = r"""
@@ -437,21 +437,23 @@ EXAMPLES = r"""
 
 import json
 import os
+from typing import cast, Dict, Any
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ..module_utils import admin
-from ..module_utils.step_cli_wrapper import CLIWrapper
+from ..module_utils.params.ca_admin import AdminParams
+from ..module_utils.cli_wrapper import CLIWrapper
+from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
 # We cannot use the default connection module util, as that one includes the --offline flag,
 # which is not valid for the provisioner API call
-CONNECTION_PARAM_SPEC = {
+CONNECTION_CLIARG_MAP = {
     "ca_config": "--ca-config",
     "ca_url": "--ca-url",
     "root": "--root"
 }
 
-CREATE_UPDATE_PARAM_SPEC = {
+CREATE_UPDATE_CLIARG_MAP = {
     "allow_renewal_after_expiry": "--allow-renewal-after-expiry",
     "aws_accounts": "--aws-account",
     "azure_audience": "--azure-audience",
@@ -502,33 +504,49 @@ CREATE_UPDATE_PARAM_SPEC = {
 }
 
 
-def add_provisioner(module, cli, result):
-    command = ["ca", "provisioner", "add", module.params["name"], "--type", module.params["type"]]
-    params = {**CREATE_UPDATE_PARAM_SPEC, **CONNECTION_PARAM_SPEC, **admin.param_spec}
-    result["stdout"], result["stderr"] = cli.run_command(command, params)[1:3]
+def add_provisioner(name: str, provisioner_type: str, cli: CLIWrapper) -> Dict[str, Any]:
+    cli_params = [
+        "ca", "provisioner", "add", name, "--type", provisioner_type
+    ] + cli.build_params({
+        **CREATE_UPDATE_CLIARG_MAP,
+        **CONNECTION_CLIARG_MAP,
+        **AdminParams.cliarg_map
+    })
+    result = {}
+    result["stdout"], result["stderr"] = cli.run_command(cli_params)[1:3]
     result["changed"] = True
     return result
 
 
-def update_provisioner(module, cli, result):
-    command = ["ca", "provisioner", "update", module.params["name"]]
-    params = {**CREATE_UPDATE_PARAM_SPEC, **CONNECTION_PARAM_SPEC, **admin.param_spec}
-    result["stdout"], result["stderr"] = cli.run_command(command, params)[1:3]
+def update_provisioner(name: str, cli: CLIWrapper) -> Dict[str, Any]:
+    cli_params = [
+        "ca", "provisioner", "update", name
+    ] + cli.build_params({
+        **CREATE_UPDATE_CLIARG_MAP,
+        **CONNECTION_CLIARG_MAP,
+        **AdminParams.cliarg_map
+    })
+    result = {}
+    result["stdout"], result["stderr"] = cli.run_command(cli_params)[1:3]
     result["changed"] = True
     return result
 
 
-def remove_provisioner(module, cli, result):
-    command = ["ca", "provisioner", "remove", module.params["name"]]
-    params = {**CONNECTION_PARAM_SPEC, **admin.param_spec}
-    result["stdout"], result["stderr"] = cli.run_command(command, params)[1:3]
+def remove_provisioner(name: str, cli: CLIWrapper) -> Dict[str, Any]:
+    cli_params = [
+        "ca", "provisioner", "remove", name
+    ] + cli.build_params({
+        **CONNECTION_CLIARG_MAP,
+        **AdminParams.cliarg_map
+    })
+    result = {}
+    result["stdout"], result["stderr"] = cli.run_command(cli_params)[1:3]
     result["changed"] = True
     return result
 
 
 def run_module():
-    # name, state, type
-    module_args = dict(
+    argument_spec = dict(
         allow_renewal_after_expiry=dict(type="bool"),
         aws_accounts=dict(type="list", elements="str", aliases=["aws_account"]),
         azure_audience=dict(type="str"),
@@ -584,65 +602,67 @@ def run_module():
         x509_max_dur=dict(type="str"),
         x509_default_dur=dict(type="str"),
         x5c_root=dict(type="path", aliases=["x5c_root_file"]),
-        step_cli_executable=dict(type="path", default="step-cli"),
+        step_cli_executable=dict(type="path", default=DEFAULT_STEP_CLI_EXECUTABLE)
     )
-    result = dict(changed=False, stdout="", stderr="", msg="")
-    module = AnsibleModule(
-        argument_spec={**admin.args, **module_args},
-        supports_check_mode=True
-    )
+    module = AnsibleModule(argument_spec={
+        **AdminParams.argument_spec,
+        **argument_spec
+    }, supports_check_mode=True)
+    admin_params = AdminParams(module)
+    admin_params.check()
+    module_params = cast(Dict, module.params)
 
-    admin.check_argspec(module, result)
+    cli = CLIWrapper(module, module_params["step_cli_executable"])
 
-    cli = CLIWrapper(module, result, module.params["step_cli_executable"])
-
-    name = module.params["name"]
-    state = module.params["state"]
-    p_type = module.params["type"]
+    state = cast(str, module_params["state"])
+    p_type = cast(str, module_params["type"])
 
     if state == "present" and not p_type:
-        result["msg"] = "Provisioner type is required when state == present."
-        module.fail_json(**result)
+        module.fail_json("Provisioner type is required when state == present")
 
-    rc, stdout = cli.run_command(["ca", "provisioner", "list"], CONNECTION_PARAM_SPEC,
-                                 check_mode_safe=True, exit_on_error=False)[0:2]
+    rc, stdout = cli.run_command(
+        ["ca", "provisioner", "list"] + cli.build_params(CONNECTION_CLIARG_MAP),
+        check_mode_safe=True, check=False)[0:2]
     # Offline provisioner management is possible even if the CA is down.
     # ca provisioner list does depend on the CA being available however, so we need some backup strategies.
     if rc == 0:
         try:
             provisioners = json.loads(stdout)
         except (json.JSONDecodeError, OSError) as e:
-            result["msg"] = f"Error reading provisioner config: {e}"
-            module.fail_json(**result)
-    elif admin.is_present(module):
+            module.fail_json(f"Error reading provisioner config: {e}")
+    elif admin_params.is_defined():
         # Admin credentials means that the provisioners are managed remotely and are stored in the DB.
         # Combined with a connection failure, this means that we are unable to continue
-        result["msg"] = "Unable to contact CA to retrieve provisioner list remotely, and admin args are set."
-        module.fail_json(**result)
+        module.fail_json(
+            "Could not contact CA to retrieve provisioners and cannot fallback to direct manipulation "
+            "as remote admin parameters are set. Aborting"
+        )
     else:
         # Without admin, provisioners are always managed locally, so we can just read them as a fallback
-        with open(module.params["ca_config"], "rb") as f:
+        with open(module_params["ca_config"], "rb") as f:
             try:
                 provisioners = json.load(f).get("authority", {}).get("provisioners", [])
             except (json.JSONDecodeError, OSError) as e:
-                result["msg"] = f"Error reading provisioner config: {e}"
-                module.fail_json(**result)
+                module.fail_json(f"Error reading provisioner config: {e}")
 
-    for p in provisioners:
-        if p["name"] == name:
+    for p in provisioners:  # type: ignore
+        if p["name"] == module_params["name"]:
             if state == "present" and p["type"] == p_type:
-                result["msg"] = "Provisioner found in CA config - not modified"
-                module.exit_json(**result)
+                result = {"msg": "Provisioner found in CA config - not modified"}
             elif state == "updated":
-                result = update_provisioner(module, cli, result)
+                result = update_provisioner(module_params["name"], cli)
             elif state == "absent":
-                result = remove_provisioner(module, cli, result)
-                module.exit_json(**result)
+                result = remove_provisioner(module_params["name"], cli)
+            module.exit_json(**result)  # type: ignore - state is an enum verified by ansible
 
     # No matching provisioner found
     if state == "present":
-        result = add_provisioner(module, cli, result)
-    module.exit_json(**result)
+        result = add_provisioner(module_params["name"], module_params["type"], cli)
+    elif state == "updated":
+        module.fail_json(f"Provisioner {module_params['name']} not found but state is 'updated'")
+    else:
+        result = {}
+    module.exit_json(**result)  # type: ignore - state is an enum verified by ansible
 
 
 def main():

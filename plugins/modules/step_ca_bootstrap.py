@@ -35,7 +35,7 @@ options:
     description: Terminal OAuth redirect url.
     type: str
 
-extends_documentation_fragment: maxhoesel.smallstep.step_cli
+extends_documentation_fragment: maxhoesel.smallstep.cli_executable
 """
 
 EXAMPLES = r"""
@@ -53,30 +53,30 @@ EXAMPLES = r"""
 
 import json
 import os
+from typing import Dict, cast
 
 from ansible.module_utils.basic import AnsibleModule
-from ..module_utils.step_cli_wrapper import CLIWrapper
+from ..module_utils.cli_wrapper import CLIWrapper
 
 DEFAULTS_FILE = f"{os.environ.get('STEPPATH', os.environ['HOME'] + '/.step')}/config/defaults.json"
 
 
 def run_module():
-    module_args = dict(
-        step_cli_executable=dict(type="path", default="step-cli"),
+    argument_spec = dict(
         ca_url=dict(required=True),
         fingerprint=dict(required=True),
         force=dict(type="bool", default=False),
         install=dict(type="bool", default=False),
         redirect_url=dict(),
+        step_cli_executable=dict(type="path", default="step-cli")
     )
     result = dict(changed=False, stdout="", stderr="", msg="")
-    module = AnsibleModule(argument_spec=module_args, supports_check_mode=True)
+    module = AnsibleModule(argument_spec, supports_check_mode=True)
+    module_params = cast(Dict, module.params)
 
-    force = module.params["force"]
+    cli = CLIWrapper(module, module_params["step_cli_executable"])
 
-    cli = CLIWrapper(module, result, module.params["step_cli_executable"])
-
-    if not force:
+    if not module_params["force"]:  # type: ignore
         try:
             with open(DEFAULTS_FILE, "rb") as f:
                 config = json.load(f)
@@ -85,21 +85,21 @@ def run_module():
             config = {}
         current_fingerprint = config.get("fingerprint", "")
         if current_fingerprint != "":
-            if current_fingerprint == module.params["fingerprint"]:
+            if current_fingerprint == module_params["fingerprint"]:
                 result["msg"] = "Already bootstrapped and force not set."
             else:
                 result["msg"] = "Already bootstrapped to a different CA, and force not set."
                 result["failed"] = True
             module.exit_json(**result)
 
-    args = {
+    cli_params = ["ca", "bootstrap"] + cli.build_params({
         "ca_url": "--ca-url",
         "fingerprint": "--fingerprint",
         "force": "--force",
         "install": "--install",
         "redirect_url": "--redirect-url",
-    }
-    result["stdout"], result["stderr"] = cli.run_command(["ca", "bootstrap"], args)[1:3]
+    })
+    result["stdout"], result["stderr"] = cli.run_command(cli_params)[1:3]
     result["changed"] = True
     module.exit_json(**result)
 

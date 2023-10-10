@@ -15,6 +15,7 @@ import pytest
 from tests.conftest import TestEnv, GALAXY_YML
 
 REMOTE_CA_NETWORK = "ansible-collection-smallstep-test-remote-ca"
+REMOTE_CA_CONTAINER_NAME = "ansible-collection-smallstep-test-remote-ca"
 REMOTE_CA_HOSTNAME = "ca"
 REMOTE_CA_PROVISIONER_NAME = "ansible"
 REMOTE_CA_PROVISIONER_PASSWORD = "secret-secret-secret"
@@ -79,9 +80,17 @@ class RemoteCaContainerConfig:
 @pytest.fixture(scope="session")
 def remote_ca_container(remote_ca_network, test_versions) -> Generator[RemoteCaContainerConfig, None, None]:
     client = docker.from_env()
+    try:
+        # cleanup old container to ensure REMOTE_CA_HOSTNAME points to the right container
+        ct = cast(Container, client.containers.get(REMOTE_CA_CONTAINER_NAME))
+        ct.remove(force=True)
+    except NotFound:
+        pass
+
     ct = cast(Container, client.containers.run(
         f"docker.io/smallstep/step-ca:{test_versions.step_ca_version}", detach=True, remove=True,
-        hostname=REMOTE_CA_HOSTNAME, network=remote_ca_network.name,
+        name=REMOTE_CA_CONTAINER_NAME, hostname=REMOTE_CA_HOSTNAME,
+        network=remote_ca_network.name,
         environment={
             "DOCKER_STEPCA_INIT_NAME": "smallstep-test-remote",
             "DOCKER_STEPCA_INIT_DNS_NAMES": f"localhost,{REMOTE_CA_HOSTNAME}",
