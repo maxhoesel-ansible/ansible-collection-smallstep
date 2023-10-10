@@ -1,7 +1,7 @@
 version: 2.1
 
 orbs:
-  collection-testing: maxhoesel-ansible/ansible-collection-testing@0.4.0
+  collection-testing: maxhoesel-ansible/ansible-collection-testing@0.5.3
 
 filters: &semver-tagged
   tags:
