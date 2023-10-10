@@ -5,7 +5,10 @@ platforms:
       - ubuntu
     override_command: false
     pre_build_image: true
-    systemd: always
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
 
   - name: step-cli-ubuntu-20
     image: "docker.io/geerlingguy/docker-ubuntu2004-ansible"
@@ -13,7 +16,10 @@ platforms:
       - ubuntu
     override_command: false
     pre_build_image: true
-    systemd: always
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
 
   - name: step-cli-ubuntu-18
     image: "docker.io/geerlingguy/docker-ubuntu1804-ansible"
@@ -21,7 +27,10 @@ platforms:
       - ubuntu
     override_command: false
     pre_build_image: true
-    systemd: always
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
 
   - name: step-cli-debian-11
     image: "docker.io/geerlingguy/docker-debian11-ansible"
@@ -29,7 +38,10 @@ platforms:
       - debian
     override_command: false
     pre_build_image: true
-    systemd: always
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
 
   - name: step-cli-debian-10
     image: "docker.io/geerlingguy/docker-debian10-ansible"
@@ -37,7 +49,10 @@ platforms:
       - debian
     override_command: false
     pre_build_image: true
-    systemd: always
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
 
   - name: step-cli-rockylinux-9
     image: "docker.io/geerlingguy/docker-rockylinux9-ansible"
@@ -45,7 +60,10 @@ platforms:
       - rockylinux
     override_command: false
     pre_build_image: true
-    systemd: always
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
 
   - name: step-cli-rockylinux-8
     image: "docker.io/geerlingguy/docker-rockylinux8-ansible"
@@ -53,7 +71,10 @@ platforms:
       - rockylinux
     override_command: false
     pre_build_image: true
-    systemd: always
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
 
   - name: step-cli-fedora-36
     image: "docker.io/geerlingguy/docker-fedora36-ansible"
@@ -61,7 +82,10 @@ platforms:
       - fedora
     override_command: false
     pre_build_image: true
-    systemd: always
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
 
 provisioner:
   inventory:

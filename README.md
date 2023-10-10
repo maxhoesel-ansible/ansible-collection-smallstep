@@ -46,7 +46,7 @@ and the [CLI tool](https://github.com/smallstep/cli). Possible uses for this col
 
 ### Dependencies
 
-- A recent release of Ansible. This collection is tested against the 3 most recent Ansible releases.
+- A recent release of Ansible. This collection is tested against the 2 most recent Ansible releases.
   Older versions might still work, but are not supported
 - Python 3.6 or newer on the target nodes
 

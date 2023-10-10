@@ -1,7 +1,4 @@
-To test module functionality, we need a ready-to-go docker image serving the smallstep CA to our target container in a docker network.
-For most tests, we can simply use the upstream image for this (see the test-modules-integration script).
+Some modules, such as `step_ca_provisioner` need to be run on the same host as the `step-ca` server.
+To enable this in ansible integration tests, we use a custom Docker image based on the official ansible test image that also runs `step-ca`.
 
-However, there are modules that need direct access to the CA resources (like, on the same host) and the upstream image does not work as an ansible target by default (big surprise).
-
-The Dockerfile in this directory modifies the upstream image to support Ansible connections made from ansible-test, so that our local-only targets can be run on the container directly.
-Note that this container is launched by ansible-test, so a lot of typical `docker run` options aren't available, hence the hardcoded values in the Dockerfile.
+This dockerfile is built automatically by pytest when module tests are executed

@@ -9,9 +9,8 @@ Note that by contributing to this collection, you agree with the code of conduct
 
 Prerequisites:
 
-- A recent version of Python supported by `ansible-core` (see [here](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#control-node-requirements))
-- For role tests: `podman` 4 or newer set up as shown [below](#setting-up-podman) (note that Docker will *not* work for role tests!)
-- For plugin tests: A recent version of Docker
+- A recent version of Python supported by the current release of `ansible-core` (see [here](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#control-node-requirements))
+- Docker (for running Tests)
 
 Steps:
 
@@ -50,78 +49,54 @@ Some general guidelines:
 - Keep the configuration for the user simple and try to provide sensible defaults where possible
 - Try to avoid using complex data structures as role variables/parameters, use simple values that can be composed easily instead.
 - Make sure to document any role variables in both the `README.md` and in the `meta/argument_specs.yml` file.
-  Te latter is used to generate role documentation programmatically.
+  The latter is used to generate role documentation programmatically.
 
 ## Testing Changes
 
-We aim to test all of the components in this collection as thoroughly as possible.
-We currently test all components using the following testing matrix:
+We aim to test every part of this collection as thoroughly as reasonable to ensure correct behavior.
+We use `pytest` to run all of our tests, both for plugins and roles.
+If you set up the test environment as described in [the Getting Started guide](#getting-started), you should be able to see all available tests:
 
-- Ansible version: The three most recent major releases (such as 6,7,8), with a compatible host Python
-- Node Python: The minimum supported Python version (see `tox.ini`)
-- Step-CLI/CA version: The most recent minor release corresponding to the collections version (e.g. collection version `0.24.X` is teated with `step-cli/ca` `0.24.y`)
-- For each entry in this matrix, we test all roles on all of their supported platforms, as well as all modules/plugins
+`pytest --co`
 
-To make testing all these permutations easier, we use `tox`to manage test scenarios.
-If you set up the test environment as described in [the Getting Started guide](#getting-started), you should be able to run `tox -l` from the collection root:
+You can run these tests using `pytest` and limit execution to specific test with `pytest -k 'test_pattern'` (or just use your editors testing plugin).
+Please note that running the full test suite executes all molecule scenarios and may take **up to an hour** to complete.
 
-This should print a list of test environments (scenarios) that you can run.
-To run a specific environment, just use `tox -e {environment}`.
-You can also use substitution syntax to run multiple environments at once:
+### Testing different App Versions
 
-```bash
-# Will run the py3-ansible7-roles-step_cli environment
-tox -e py3-ansible7-roles-step_cli
+When you run the collection tests using `ptytest`, they are executed with the current stable Ansible version in `requirements.txt` and the latest smallstep tools.
+To ensure that this collection remains backwards-compatible, we also test against older versions of both ansible and the smallstep tools.
+Our testing Matrix currently looks like this:
 
-# Will run XXX-roles-step_cli environment with ansible versions 6,7 and 8
-# Note the single quotes around the string!
-tox -e 'py3-ansible{6,7,8}-roles-step_cli'
+| Component | Module Tests | Role Tests | Versions |
+|-----------|--------------|------------|----------|
+| `ansible-core` | ✅ | ✅ | Three most recent releases (e.g. `2.13`, `2.14`, `2.15`) |
+| Node Python Version | ✅ | ❌ | Collection-supported Python version (see [README](./README.md))
+| `step-ca`, `step-cli` | ✅ | ✅ | `latest` and the minimum collection-supported version (see [README](./README.md))
+
+All possible permutations are automatically tested in CI.
+You can change the tested versions locally by supplying additional arguments to `pytest`:
+
 ```
-
-### Plugins (and Modules)
-
-Modules (and plugins in general) are verified using `ansible-test`, specifically sanity, unit (TBD) and integration tests, all run from tox.
-Since many plugins in this collection need access to a step-ca server, the `tox` environments spin up additional docker containers as needed -
-see [`tox.ini`](./tox.ini) and the `docker-compose.yml` files in `tests/{integration/sanity}` for details.
-
-You should always run the plugin tests after making changes to one (sanity, unit (TBD), integration):
-
-```bash
-tox -e 'py3-ansible215-test-{sanity,integration,#add other environments here}'
+$ pytest --help
+# truncated output
+Custom options:
+  --ansible-version=ANSIBLE_VERSION
+                        Version of ansible to use for tests, in the format '2.xx'. Default: see requirements.txt
+  --step-cli-version=STEP_CLI_VERSION
+                        Version of step-cli to use for tests, either 'latest' (default) or a version ('0.24.0')
+  --step-ca-version=STEP_CA_VERSION
+                        Version of step-ca to use for tests, either 'latest' (default) or a version ('0.24.0')
+  --node-python-version=NODE_PYTHON_VERSION
+                        Python version to test Ansible modules with, in the format '3.x'. Default: '3.6'
 ```
-
-### Roles
-
-We use the `tox-ansible` plugin (v1) to integrate molecule scenarios into tox.
-You can run these scenarios using `tox -e`, just like for module tests.
-
-Molecule itself runs the subject role against several containers to verify its functionality across target systems.
-Since some roles involve the management of systemd services, we need a container runtime with good systemd support,
-something which `docker` sadly doesn't offer on [modern linux distros](https://gist.github.com/pinkeen/bba0a6790fec96d6c8de84bd824ad933).
-
-Instead, we use `podman`, a daemonless, rootless container runtime developed by RedHat to be (mostly) compatible to docker, but with better support for certain features such as systemd.
-See below for setup instructions.
-Once podman is installed and running, you can use `tox` to run the molecule scenarios.
-
-#### Setting up Podman
-
-1. Ensure that you have the following packages installed:
-    - `podman` version 4+ (as it comes with the new netvark networking stack)
-    - `aardvark-dns`, a plugin for netvark which provides DNS between containers in the same network
-    - **NOTE:** If you previously used an older (`<=3.x`) version of `podman`, you will have to migrate to the new networking stack fist. This can be done with `podman system reset`
-2. Ensure that your user has a subuid/subguid configuration associated with them so that you can run rootless containers
-    - Check the `/etc/subuid` and `/etc/subgid` files for entries corresponding to your username.
-    - If there is nothing, you can add them like so: `sudo usermod --add-subuids 100000-165535 --add-subgids 100000-165535 <USERNAME>` (make sure that the range is not  already taken by another user in `/etc/subuid`/`/etc/subgid`).
-3. Once you have applied your changes, run `podman system migrate` to force `podman` to pick up the new configuration.
-
-That's it! Podman should now be working! To test it, you can run a container just like with docker: `podman run --rm -it ubuntu bash`
 
 ## Writing Tests
 
 Any new new component or change to an existing one should be covered by tests to ensure that the code works, and that it keeps working into the future.
 This section will help you in adding your own tests to this collection.
 
-#### Plugins
+### Plugins
 
 Unit tests are currently not used in this collection, this section will be filled once the need for them arises.
 
@@ -136,30 +111,28 @@ tasks/
   main.yml
 ```
 
-Since many plugins need to connect to a CA to verify functionality, you can set up your target to connect to either a remote (network) or a local CA:
+Since many plugins need to connect to a CA to verify functionality, `pytest` will automatically start a CA container that you can connect to.
+You can configure your target to use this CA like so:
 
 ```yaml
 # in meta/main.yml:
 dependencies:
-  # Setup the target role for accessing a CA over the network, this is the default
   - setup_remote_ca
-  # Setup the target role for accessing a CA that is installed locally.
-  # This is needed for certain plugins/modules such as step_ca_provisioner.
-  # Mutually exclusive with setup_remote_ca
-  #- setup_local_ca
 ```
+Check out the [`integration_config_remote.yml` template](./tests/integration/integration_config_remote.yml.j2) for all available variables.
 
-Your target will then be set up for accessing the selected CA.
-For more details, see the integration config templates for the [remote]() and the [local]() CA.
+---
 
-```yaml
-# in tasks/main.yml:
-- name: Get a certificate from the remote CA
-  maxhoesel.smallstep.step_ca_certificate:
-    # parameters go here
-```
+**Note on local-ca tests**
 
-#### Roles
+A few plugins (such as `step_ca_provisioner`) need to be run on the same host as the CA.
+For this purpose, a second test case (`integration_local`) is run on a separate container prepared to run both `step-ca` and Ansible (see the Dockerfile [here](./tests/integration/docker/local-ca/)).
+Only tasks tagged with `local-ca` are run on this test container.
+See the [`step_ca_provisioner`](./tests/integration/targets/step_ca_provisioner/) target for more details
+
+---
+
+### Roles
 
 There are tons of good guides online for how to write tests using molecule.
 Alternatively, you can always look at the existing molecule scenarios in this collection
@@ -175,16 +148,12 @@ some_role/
       converge.yml
       molecule.yml
       prepare.yml
-      requirements.txt # --> symlink to /tests/roles/requirements.txt
       verify.yml
     another-scenario/
       ...
   tasks
   ...
 ```
-
-The `requirements.txt` symlink is used by `tox-ansible` when running tests via `tox` to install a specific, known-good version of `molecule` and the `molecule-podman` driver.
-That way, all roles and scenarios in this collection can use the same version of `molecule`.
 
 The [root molecule config](./.config/molecule/config.yml) contains the basic settings for molecule, such as driver setup and the step utility versions.
 In addition, your roles molecule scenario must define a set of platforms to test on, as well as any inventory configuration that you may need.
@@ -199,21 +168,20 @@ The CI also builds the docs to ensure they don't break silently.
 
 ## Maintainer information
 
-### Updating Tested Versions
+### Raising minimum supported step versions
 
-- Smallstep CLI/CA and Node Python: Bump the values in `tox.ini` (`consts` section)
-- ansible-core (for plugins): Add the new core version to the following places in `tox.ini`:
-    - The `envlist` in `tox.ini`
-    - each `testenv:xxx` section header that deals with plugin tests
-    - Set the correct environment variable in the main `testenv` section
-- ansible (for roles): Change the version string in the `ansible` section in `tox.ini`
+1. Change the versions in [`plugins/module_utils/constants.py`](./plugins/module_utils/constants.py)
+2. Update the versions in the [CI config](./.circleci/config.yml)
+3. Update the table in `README.md`
+
+### Bumping supported ansible-core versions
+
+1. Update the versions in the [CI config](./.circleci/config.yml)
 
 ### Versioning and Releases
 
-- This project uses sematic versioning. the collection version stays in sync with the `step-cli`` utility version to ensure compatibility.
-  This means that any breaking changes can only be shipped when updates to the `step-cli` utility are released.
-  Version numbers and releases/changelogs are automatically generated using [release-drafter](https://github.com/release-drafter/release-drafter), utilizing pull request labels.
+- Releases are automatically drafted by `release-drafter`, with a changelog generated from PR labels
 - When merging a pull request, make sure to select an appropriate label (pr-bugfix, pr-feature, etc.).
-  Release-drafter will automatically update the draft release changelog and the galaxy.yml version will be bumped if needed.
-- Once a draft release is actually published, collection packages will be added to the release and ansible-galaxy automatically.
-- If you need to manually bump the collection version, run the `update-version` script and adjust the test versions if required.
+  Release-drafter will automatically update the draft release changelog and a PR will be opened with bumped collection versions.
+- Once a draft release is actually published, collection packages will be published to the release and ansible-galaxy automatically.
+- If you need to manually bump the collection version, run the `update-version` script

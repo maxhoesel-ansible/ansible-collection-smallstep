@@ -1,29 +1,32 @@
-- name: Install JQ
-  ansible.builtin.apt:
-    name: jq # needed to get root certificate
-  retries: 3
-  delay: 5
-  register: _task
-  until: _task is not failed
-- name: Install step-cli
+- name: Install step-cli (specific version)
   ansible.builtin.apt:
     deb: "https://github.com/smallstep/cli/releases/download/v{{ cli_version }}/step-cli_{{ cli_version }}_amd64.deb"
   retries: 3
   delay: 5
   register: _task
   until: _task is not failed
-
-# the stuff of itsec nightmares
-# the step-ca container genreates its root CA dynamically when started, but we retrieve its CA fingerprint to bootstrap from it.
-# since there is no way to pre-seed the fingerprint and root CA cert, we instead use the internal step-ca API to retrieve all root certificates,
-# then generate the fingerprint from that.
-# This hack may stop working if smallstep decides to change their ca API structure in the future. but it works for now
-- name: Get remote fingerprint
-  ansible.builtin.shell: "curl -k {{ ca_url }}/roots | jq -rj '.crts[0]' > /tmp/root_cert && step-cli certificate fingerprint /tmp/root_cert"
-  register: _ca_fp
-- name: Set fingerprint
-  set_fact:
-    ca_fp: "{{ _ca_fp.stdout }}"
+  when: cli_version != "latest"
+- block:
+  - name: Get latest step-cli release information
+    ansible.builtin.uri:
+      url: https://api.github.com/repos/smallstep/cli/releases/latest
+      body_format: json
+      return_content: yes
+    register: step_cli_latest_release
+    no_log: true # super noisy
+    delegate_to: localhost
+    become: no
+    run_once: yes
+    retries: 3
+    delay: 5
+  - name: Install step-cli (latest)
+    ansible.builtin.apt:
+      deb: "https://github.com/smallstep/cli/releases/download/v{{ (step_cli_latest_release.json.tag_name)[1:] }}/step-cli_{{ (step_cli_latest_release.json.tag_name)[1:] }}_amd64.deb"
+    retries: 3
+    delay: 5
+    register: _task
+    until: _task is not failed
+  when: cli_version == "latest"
 
 - name: Bootstrap host
   maxhoesel.smallstep.step_ca_bootstrap:

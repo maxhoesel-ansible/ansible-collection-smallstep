@@ -11,16 +11,12 @@ source .venv/bin/activate
 printf "Installing development requirements..."
 python3 -m pip install --upgrade pip --quiet
 python3 -m pip install --quiet -r requirements.txt --upgrade
-# Also install molecule if we need to debug something manually
+# Also install the scenario requirements so we can run them directly
 python3 -m pip install --quiet -r tests/roles/requirements.txt --upgrade
 printf "OK\n"
 
 printf "Installing pre-commit hook..."
 pre-commit install > /dev/null
-printf "OK\n"
-
-printf "Initializing tox..."
-tox -l > /dev/null
 printf "OK\n"
 
 printf "Development venv initialized!\n"

@@ -10,87 +10,120 @@ platforms:
     env:
       DOCKER_STEPCA_INIT_NAME: "Molecule_Bootstrap_CA"
       DOCKER_STEPCA_INIT_DNS_NAMES: "step-ca,localhost"
-    network: molecule-step-acme-cert
+    networks:
+      - name: molecule-step-acme-cert
 
   - name: step-host-ubuntu-22
     groups:
       - clients
       - ubuntu
     image: "docker.io/geerlingguy/docker-ubuntu2204-ansible"
-    systemd: always
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
     override_command: false
     pre_build_image: true
-    network: molecule-step-acme-cert
+    networks:
+      - name: molecule-step-acme-cert
 
   - name: step-host-ubuntu-20
     groups:
       - clients
       - ubuntu
     image: "docker.io/geerlingguy/docker-ubuntu2004-ansible"
-    systemd: always
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
     override_command: false
     pre_build_image: true
-    network: molecule-step-acme-cert
+    networks:
+      - name: molecule-step-acme-cert
 
   - name: step-host-ubuntu-18
     groups:
       - clients
       - ubuntu
     image: "docker.io/geerlingguy/docker-ubuntu1804-ansible"
-    systemd: always
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
     override_command: false
     pre_build_image: true
-    network: molecule-step-acme-cert
+    networks:
+      - name: molecule-step-acme-cert
 
   - name: step-host-debian-11
     groups:
       - clients
       - debian
     image: "docker.io/geerlingguy/docker-debian11-ansible"
-    systemd: always
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
     override_command: false
     pre_build_image: true
-    network: molecule-step-acme-cert
+    networks:
+      - name: molecule-step-acme-cert
 
   - name: step-host-debian-10
     groups:
       - clients
       - debian
     image: "docker.io/geerlingguy/docker-debian10-ansible"
-    systemd: always
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
     override_command: false
     pre_build_image: true
-    network: molecule-step-acme-cert
+    networks:
+      - name: molecule-step-acme-cert
 
   - name: step-host-rockylinux-9
     groups:
       - clients
       - rockylinux
     image: "docker.io/geerlingguy/docker-rockylinux9-ansible"
-    systemd: always
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
     override_command: false
     pre_build_image: true
-    network: molecule-step-acme-cert
+    networks:
+      - name: molecule-step-acme-cert
 
   - name: step-host-rockylinux-8
     groups:
       - clients
       - rockylinux
     image: "docker.io/geerlingguy/docker-rockylinux8-ansible"
-    systemd: always
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
     override_command: false
     pre_build_image: true
-    network: molecule-step-acme-cert
+    networks:
+      - name: molecule-step-acme-cert
 
   - name: step-host-fedora-36
     groups:
       - clients
       - fedora
     image: "docker.io/geerlingguy/docker-fedora36-ansible"
-    systemd: always
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
     override_command: false
     pre_build_image: true
-    network: molecule-step-acme-cert
+    networks:
+      - name: molecule-step-acme-cert
 
 provisioner:
   playbooks:

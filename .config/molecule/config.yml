@@ -3,20 +3,18 @@ dependency:
   name: galaxy
 
 driver:
-  name: podman
+  name: docker
 
 provisioner:
   name: ansible
-  env: {}
-    # Cannot enable pipelining for podman at this time:
-    # https://github.com/ansible-community/molecule-podman/issues/2
-    #ANSIBLE_PIPELINING: false
+  env:
+    ANSIBLE_PIPELINING: true
   inventory:
     group_vars:
       all:
-        # Versions to use, passed in from Tox
-        step_cli_version: ${STEP_CLI_VERSION}
-        step_ca_version: ${STEP_CA_VERSION}
+        # Versions to use, can be passed in from Nox
+        step_cli_version: ${STEP_CLI_VERSION:-latest}
+        step_ca_version: ${STEP_CA_VERSION:-latest}
 
 scenario:
   test_sequence:

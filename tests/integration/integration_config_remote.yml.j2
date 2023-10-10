@@ -1,0 +1,17 @@
+---
+# Configuration for the smallstep module integration tests.
+# This template is rendered from pytest at the beginning of the integration tests
+# You can use these variable names in your module integration tests.
+
+# Currently tested versions
+ca_version: "{{ step_ca_version }}"
+cli_version: "{{ step_cli_version }}"
+
+# Remote CA access options - this could be a VM somewhere or a local container
+# Use these variables for normal module integration tests
+ca_url: "{{ step_remote_ca_url }}"
+ca_fp: "{{ step_remote_ca_fingerprint }}"
+# Use this provisioner to create certs/tokens/etc. The password file is already present after calling "setup_remote_provisioner"
+ca_provisioner: "{{ step_remote_ca_provisioner_name }}"
+ca_provisioner_password: "{{ step_remote_ca_provisioner_password }}"
+ca_provisioner_password_file: "/tmp/remote-ca-password"
