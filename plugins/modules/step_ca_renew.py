@@ -58,8 +58,8 @@ options:
     type: int
 
 extends_documentation_fragment:
-  - maxhoesel.smallstep.step_cli
-  - maxhoesel.smallstep.connection
+  - maxhoesel.smallstep.cli_executable
+  - maxhoesel.smallstep.ca_connection
 """
 
 EXAMPLES = r"""
@@ -73,14 +73,17 @@ EXAMPLES = r"""
     force: yes
 """
 
+from typing import Dict, cast
+
 from ansible.module_utils.basic import AnsibleModule
 
-from ..module_utils.step_cli_wrapper import CLIWrapper
-from ..module_utils import connection
+from ..module_utils.cli_wrapper import CLIWrapper
+from ..module_utils.params.ca_connection import CaConnectionParams
+from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
 
 def run_module():
-    module_args = dict(
+    argument_spec = dict(
         crt_file=dict(type="path", required=True),
         expires_in=dict(type="str"),
         force=dict(type="bool"),
@@ -91,25 +94,31 @@ def run_module():
         pid=dict(type="int"),
         pid_file=dict(type="path"),
         signal=dict(type="int"),
-        step_cli_executable=dict(type="path", default="step-cli"),
+        step_cli_executable=dict(type="path", default=DEFAULT_STEP_CLI_EXECUTABLE),
     )
     result = dict(changed=False, stdout="", stderr="", msg="")
-    module = AnsibleModule(argument_spec={**connection.args, **module_args}, supports_check_mode=True)
+    module = AnsibleModule(argument_spec={
+        **CaConnectionParams.argument_spec,
+        **argument_spec
+    }, supports_check_mode=True)
+    CaConnectionParams(module).check()
+    module_params = cast(Dict, module.params)
 
-    connection.check_argspec(module, result)
+    cli = CLIWrapper(module, module_params["step_cli_executable"])
 
-    cli = CLIWrapper(module, result, module.params["step_cli_executable"])
-
-    # Positional Parameters
-    params = ["ca", "renew", module.params["crt_file"],
-              module.params["key_file"]]
     # Regular args
-    args = ["expires_in", "force", "exec", "output_file", "password_file", "pid", "pid_file",
-            "signal"]
+    renew_cliargs = ["expires_in", "force", "exec", "output_file", "password_file", "pid", "pid_file", "signal"]
     # All parameters can be converted to a mapping by just appending -- and replacing the underscores
-    param_spec = {arg: f"--{arg.replace('_', '-')}" for arg in args}
+    renew_cliarg_map = {arg: f"--{arg.replace('_', '-')}" for arg in renew_cliargs}
 
-    result["stdout"], result["stderr"] = cli.run_command(params, {**param_spec, **connection.param_spec})[1:3]
+    cli_params = [
+        "ca", "renew", module_params["crt_file"], module_params["key_file"]
+    ] + cli.build_params({
+        **renew_cliarg_map,
+        **CaConnectionParams.cliarg_map
+    })
+
+    result["stdout"], result["stderr"] = cli.run_command(cli_params)[1:3]
     if "Your certificate has been saved in" in result["stderr"]:
         result["changed"] = True
     module.exit_json(**result)

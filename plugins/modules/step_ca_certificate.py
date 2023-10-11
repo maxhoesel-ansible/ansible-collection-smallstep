@@ -136,8 +136,8 @@ options:
     type: path
 
 extends_documentation_fragment:
-  - maxhoesel.smallstep.step_cli
-  - maxhoesel.smallstep.connection
+  - maxhoesel.smallstep.cli_executable
+  - maxhoesel.smallstep.ca_connection
 """
 
 EXAMPLES = r"""
@@ -161,14 +161,17 @@ EXAMPLES = r"""
     key_file: /tmp/mycert.key
 """
 
+from typing import cast, Dict
+
 from ansible.module_utils.basic import AnsibleModule
 
-from ..module_utils import connection
-from ..module_utils.step_cli_wrapper import CLIWrapper
+from ..module_utils.params.ca_connection import CaConnectionParams
+from ..module_utils.cli_wrapper import CLIWrapper
+from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
 
 def run_module():
-    module_args = dict(
+    argument_spec = dict(
         acme=dict(type="str"),
         contact=dict(type="list", elements="str"),
         crt_file=dict(type="path", required=True),
@@ -193,26 +196,34 @@ def run_module():
         webroot=dict(type="path"),
         x5c_cert=dict(type="str"),
         x5c_key=dict(type="path"),
-        step_cli_executable=dict(type="path", default="step-cli"),
+        step_cli_executable=dict(type="path", default=DEFAULT_STEP_CLI_EXECUTABLE)
     )
     result = dict(changed=False, stdout="", stderr="", msg="")
-    module = AnsibleModule(argument_spec={**connection.args, **module_args}, supports_check_mode=True)
+    module = AnsibleModule(argument_spec={
+        **CaConnectionParams.argument_spec,
+        **argument_spec,
+    }, supports_check_mode=True)
+    CaConnectionParams(module).check()
+    module_params = cast(Dict, module.params)
 
-    connection.check_argspec(module, result)
+    cli = CLIWrapper(module, module_params["step_cli_executable"])
 
-    cli = CLIWrapper(module, result, module.params["step_cli_executable"])
-
-    # Positional Parameters
-    params = ["ca", "certificate", module.params["name"],
-              module.params["crt_file"], module.params["key_file"]]
-    # Regular args
-    args = ["acme", "contact", "curve", "force", "http_listen", "k8ssa_token_path", "kty", "not_after",
-            "not_before", "provisioner", "provisioner_password_file", "san", "set", "set_file", "size",
-            "standalone", "token", "webroot", "x5c_cert", "x5c_key"]
+    # step ca certificate arguments
+    cert_cliargs = ["acme", "contact", "curve", "force", "http_listen", "k8ssa_token_path", "kty", "not_after",
+                    "not_before", "provisioner", "provisioner_password_file", "san", "set", "set_file", "size",
+                    "standalone", "token", "webroot", "x5c_cert", "x5c_key"]
     # All parameters can be converted to a mapping by just appending -- and replacing the underscores
-    param_spec = {arg: f"--{arg.replace('_', '-')}" for arg in args}
+    cert_cliarg_map = {arg: f"--{arg.replace('_', '-')}" for arg in cert_cliargs}
 
-    result["stdout"], result["stderr"] = cli.run_command(params, {**param_spec, **connection.param_spec})[1:3]
+    cli_params = [
+        "ca", "certificate", module_params["name"],
+        module_params["crt_file"], module_params["key_file"]
+    ] + cli.build_params({
+        **cert_cliarg_map,
+        **CaConnectionParams.cliarg_map
+    })
+
+    result["stdout"], result["stderr"] = cli.run_command(cli_params)[1:3]
     result["changed"] = True
     module.exit_json(**result)
 
