@@ -135,7 +135,7 @@ token:
   type: str
   no_log: yes
 """
-from typing import cast, Dict
+from typing import cast, Dict, Any
 
 from ansible.module_utils.common.validation import check_required_one_of
 from ansible.module_utils.common.validation import check_mutually_exclusive
@@ -174,8 +174,7 @@ def run_module():
         x5c_key=dict(type="path"),
         step_cli_executable=dict(type="path", default=DEFAULT_STEP_CLI_EXECUTABLE)
     )
-
-    result = dict(changed=False, stdout="", stderr="", msg="")
+    result: Dict[str, Any] = dict(changed=False)
     module = AnsibleModule(argument_spec={
         **CaConnectionParams.argument_spec,
         **argument_spec
@@ -212,12 +211,10 @@ def run_module():
         **CaConnectionParams.cliarg_map
     })
 
-    result["stdout"], result["stderr"] = cli.run_command(cli_params)[1:3]
+    stdout = cli.run_command(cli_params)[1]
     result["changed"] = True
     if module_params["return_token"]:
-        result["token"] = result["stdout"]
-    result["stdout"] = ""
-    result["stdout_lines"] = ""
+        result["token"] = stdout
     module.exit_json(**result)
 
 

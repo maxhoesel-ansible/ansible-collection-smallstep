@@ -58,7 +58,7 @@ EXAMPLES = r"""
     token: "{{ ca_token }}"
 """
 
-from typing import Dict, cast
+from typing import Dict, cast, Any
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -77,7 +77,7 @@ def run_module():
         token=dict(type="str", no_log=True),
         step_cli_executable=dict(type="path", default=DEFAULT_STEP_CLI_EXECUTABLE),
     )
-    result = dict(changed=False, stdout="", stderr="", msg="")
+    result: Dict[str, Any] = dict(changed=False)
     module = AnsibleModule(argument_spec={
         **CaConnectionParams.argument_spec,
         **argument_spec
@@ -105,8 +105,16 @@ def run_module():
     if module_params["serial_number"]:
         cli_params.append([module_params["serial_number"]])  # type: ignore
 
-    result["stdout"], result["stderr"] = cli.run_command(cli_params)[1:3]
-    result["changed"] = True
+    ret = cli.run_command(cli_params, check=False)
+    rc = ret[0]
+    stderr = ret[2]
+    if rc != 0 and "is already revoked" in stderr:
+        pass  # cert already revoked, fine
+    elif rc != 0:
+        module.fail_json(f"Error revoking certificate: {stderr}")
+    else:
+        # ran successfully => revoked
+        result["changed"] = True
     module.exit_json(**result)
 
 

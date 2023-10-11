@@ -15,10 +15,20 @@
     reason: "Testing cert revocation"
     reason_code: 1
   register: revocation
-
 - name: Verify that cert got revoked
   assert:
     that: revocation.changed
+
+- name: Try to revoke cert again
+  maxhoesel.smallstep.step_ca_revoke:
+    cert: /tmp/generated_certificate
+    key: /tmp/generated_key
+    reason: "Testing cert revocation"
+    reason_code: 1
+  register: revocation_again
+- name: Verify that nothing changed
+  assert:
+    that: not revocation_again.changed
 
 - name: Delete generated files
   file:

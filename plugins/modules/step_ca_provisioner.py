@@ -504,7 +504,7 @@ CREATE_UPDATE_CLIARG_MAP = {
 }
 
 
-def add_provisioner(name: str, provisioner_type: str, cli: CLIWrapper) -> Dict[str, Any]:
+def add_provisioner(name: str, provisioner_type: str, cli: CLIWrapper):
     cli_params = [
         "ca", "provisioner", "add", name, "--type", provisioner_type
     ] + cli.build_params({
@@ -512,13 +512,11 @@ def add_provisioner(name: str, provisioner_type: str, cli: CLIWrapper) -> Dict[s
         **CONNECTION_CLIARG_MAP,
         **AdminParams.cliarg_map
     })
-    result = {}
-    result["stdout"], result["stderr"] = cli.run_command(cli_params)[1:3]
-    result["changed"] = True
-    return result
+    cli.run_command(cli_params)
+    return
 
 
-def update_provisioner(name: str, cli: CLIWrapper) -> Dict[str, Any]:
+def update_provisioner(name: str, cli: CLIWrapper):
     cli_params = [
         "ca", "provisioner", "update", name
     ] + cli.build_params({
@@ -526,23 +524,18 @@ def update_provisioner(name: str, cli: CLIWrapper) -> Dict[str, Any]:
         **CONNECTION_CLIARG_MAP,
         **AdminParams.cliarg_map
     })
-    result = {}
-    result["stdout"], result["stderr"] = cli.run_command(cli_params)[1:3]
-    result["changed"] = True
-    return result
+    cli.run_command(cli_params)
+    return
 
 
-def remove_provisioner(name: str, cli: CLIWrapper) -> Dict[str, Any]:
+def remove_provisioner(name: str, cli: CLIWrapper):
     cli_params = [
         "ca", "provisioner", "remove", name
     ] + cli.build_params({
         **CONNECTION_CLIARG_MAP,
         **AdminParams.cliarg_map
     })
-    result = {}
-    result["stdout"], result["stderr"] = cli.run_command(cli_params)[1:3]
-    result["changed"] = True
-    return result
+    cli.run_command(cli_params)
 
 
 def run_module():
@@ -604,6 +597,7 @@ def run_module():
         x5c_root=dict(type="path", aliases=["x5c_root_file"]),
         step_cli_executable=dict(type="path", default=DEFAULT_STEP_CLI_EXECUTABLE)
     )
+    result: Dict[str, Any] = dict(changed=False)
     module = AnsibleModule(argument_spec={
         **AdminParams.argument_spec,
         **argument_spec
@@ -648,21 +642,22 @@ def run_module():
     for p in provisioners:  # type: ignore
         if p["name"] == module_params["name"]:
             if state == "present" and p["type"] == p_type:
-                result = {"msg": "Provisioner found in CA config - not modified"}
+                result["msg"] = "Provisioner found in CA config - not modified"
             elif state == "updated":
-                result = update_provisioner(module_params["name"], cli)
+                update_provisioner(module_params["name"], cli)
+                result["changed"] = True
             elif state == "absent":
-                result = remove_provisioner(module_params["name"], cli)
-            module.exit_json(**result)  # type: ignore - state is an enum verified by ansible
+                remove_provisioner(module_params["name"], cli)
+                result["changed"] = True
+            module.exit_json(**result)
 
     # No matching provisioner found
     if state == "present":
-        result = add_provisioner(module_params["name"], module_params["type"], cli)
+        add_provisioner(module_params["name"], module_params["type"], cli)
+        result["changed"] = True
     elif state == "updated":
         module.fail_json(f"Provisioner {module_params['name']} not found but state is 'updated'")
-    else:
-        result = {}
-    module.exit_json(**result)  # type: ignore - state is an enum verified by ansible
+    module.exit_json(**result)
 
 
 def main():

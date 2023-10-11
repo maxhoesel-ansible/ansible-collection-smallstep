@@ -53,7 +53,7 @@ EXAMPLES = r"""
 
 import json
 import os
-from typing import Dict, cast
+from typing import Dict, cast, Any
 
 from ansible.module_utils.basic import AnsibleModule
 from ..module_utils.cli_wrapper import CLIWrapper
@@ -70,7 +70,7 @@ def run_module():
         redirect_url=dict(),
         step_cli_executable=dict(type="path", default="step-cli")
     )
-    result = dict(changed=False, stdout="", stderr="", msg="")
+    result: Dict[str, Any] = dict(changed=False)
     module = AnsibleModule(argument_spec, supports_check_mode=True)
     module_params = cast(Dict, module.params)
 
@@ -99,7 +99,7 @@ def run_module():
         "install": "--install",
         "redirect_url": "--redirect-url",
     })
-    result["stdout"], result["stderr"] = cli.run_command(cli_params)[1:3]
+    cli.run_command(cli_params)
     result["changed"] = True
     module.exit_json(**result)
 
