@@ -161,7 +161,7 @@ EXAMPLES = r"""
     key_file: /tmp/mycert.key
 """
 
-from typing import cast, Dict
+from typing import cast, Dict, Any
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -198,7 +198,7 @@ def run_module():
         x5c_key=dict(type="path"),
         step_cli_executable=dict(type="path", default=DEFAULT_STEP_CLI_EXECUTABLE)
     )
-    result = dict(changed=False, stdout="", stderr="", msg="")
+    result: Dict[str, Any] = dict(changed=False)
     module = AnsibleModule(argument_spec={
         **CaConnectionParams.argument_spec,
         **argument_spec,
@@ -223,7 +223,7 @@ def run_module():
         **CaConnectionParams.cliarg_map
     })
 
-    result["stdout"], result["stderr"] = cli.run_command(cli_params)[1:3]
+    cli.run_command(cli_params)
     result["changed"] = True
     module.exit_json(**result)
 

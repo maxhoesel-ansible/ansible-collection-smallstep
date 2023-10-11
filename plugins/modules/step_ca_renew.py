@@ -73,7 +73,7 @@ EXAMPLES = r"""
     force: yes
 """
 
-from typing import Dict, cast
+from typing import Dict, cast, Any
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -96,7 +96,7 @@ def run_module():
         signal=dict(type="int"),
         step_cli_executable=dict(type="path", default=DEFAULT_STEP_CLI_EXECUTABLE),
     )
-    result = dict(changed=False, stdout="", stderr="", msg="")
+    result: Dict[str, Any] = dict(changed=False)
     module = AnsibleModule(argument_spec={
         **CaConnectionParams.argument_spec,
         **argument_spec
@@ -118,8 +118,8 @@ def run_module():
         **CaConnectionParams.cliarg_map
     })
 
-    result["stdout"], result["stderr"] = cli.run_command(cli_params)[1:3]
-    if "Your certificate has been saved in" in result["stderr"]:
+    stderr = cli.run_command(cli_params)[2]
+    if "Your certificate has been saved in" in stderr:
         result["changed"] = True
     module.exit_json(**result)
 
