@@ -24,4 +24,3 @@ max-line-length = 120
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-filterwarnings = ['ignore:AnsibleCollectionFinder has already been configured']
