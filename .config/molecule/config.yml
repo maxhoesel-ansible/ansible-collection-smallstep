@@ -12,7 +12,7 @@ provisioner:
   inventory:
     group_vars:
       all:
-        # Versions to use, can be passed in from Nox
+        # Versions to use, can be passed in from pytest
         step_cli_version: ${STEP_CLI_VERSION:-latest}
         step_ca_version: ${STEP_CA_VERSION:-latest}
 
