@@ -7,9 +7,15 @@ DOCUMENTATION = r"""
 ---
 module: step_ca_certificate
 author: Max Hösel (@maxhoesel)
-short_description: Generate a new private key and certificate signed by the root certificate
+short_description: Manage a step-ca-signed certificate on the target system
 version_added: '0.3.0'
-description: Calls step-cli to create new certificates from the local or remote CA.
+description: >
+    Creates, updates, revokes or deletes a CA-issued certificate on the target system.
+    This module exposes mostly the same parameters as the upstream
+    L(step ca certificate,https://smallstep.com/docs/step-cli/reference/ca/certificate),
+    L(step ca renew/rekey,https://smallstep.com/docs/step-cli/reference/ca/renew)
+    and L(step ca revoke https://smallstep.com/docs/step-cli/reference/ca/revoke/) commands, depending on the selected
+    certificate I(state).
 notes:
   - Check mode is supported.
 options:
@@ -19,6 +25,18 @@ options:
       Use this parameter to define an ACME server other than the Step CA.
       If this flag is absent and an ACME provisioner has been selected then the I(ca_url) parameter must be defined.
     type: str
+  attestation_ca_root:
+    description: The path to the PEM file with trusted roots when connecting to the Attestation CA.
+    type: path
+  attestation_ca_url:
+    description: The base url of the Attestation CA to use.
+    type: str
+  attestation_uri:
+    description: The KMS uri used for attestation.
+    type: str
+  console:
+    description: Complete the flow while remaining inside the terminal
+    type: bool
   contact:
     description: >
       The email-address used for contact as part of the ACME protocol.
@@ -43,7 +61,7 @@ options:
       - P-521
       - Ed25519
   force:
-    description: Force the overwrite of files without asking.
+    description: TODO REWORK THIS
     type: bool
   http_listen:
     description: >
@@ -58,6 +76,9 @@ options:
     description: File to write the private key (PEM format)
     type: path
     required: yes
+  kms:
+    description: The uri to configure a Cloud KMS or an HSM.
+    type: str
   kty:
     description: >
       The kty to build the certificate upon. If unset, default is EC. I(kty) is a case-sensitive string.
@@ -74,6 +95,14 @@ options:
       If no Subject Alternative Names (SANs) are configured (via the san parameter) then the subject will be set as the only SAN.
     type: str
     required: yes
+  nebula_cert:
+    description: Certificate file in PEM format to store in the 'nebula' header of a JWT.
+    type: path
+  nebula_key:
+    description: >
+      Private key file, used to sign a JWT,
+      corresponding to the certificate that will be stored in the 'nebula' header.
+    type: path
   not_after:
     description: >
       The time/duration when the certificate validity period ends. If a time is used it is expected to be in RFC 3339 format.
@@ -122,6 +151,9 @@ options:
   token:
     description: The one-time token used to authenticate with the CA in order to create the certificate.
     type: str
+  tpm_storage_directory:
+    description: The directory where TPM keys and certificates will be stored
+    type: path
   webroot:
     description: >
       Specify a path to use as a 'web root' for validation in the ACME protocol.
@@ -173,6 +205,10 @@ from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 def run_module():
     argument_spec = dict(
         acme=dict(type="str"),
+        attestation_ca_url=dict(type="str"),
+        attestation_ca_root=dict(type="path"),
+        attestation_uri=dict(type="str"),
+        console=dict(type="bool"),
         contact=dict(type="list", elements="str"),
         crt_file=dict(type="path", required=True),
         curve=dict(type="str", choices=[
@@ -181,8 +217,11 @@ def run_module():
         http_listen=dict(type="str"),
         k8ssa_token_path=dict(type="path"),
         key_file=dict(type="path", required=True),
+        kms=dict(type="str"),
         kty=dict(type="str", choices=["EC", "OKP", "RSA"]),
         name=dict(type="str", required=True, aliases=["subject"]),
+        nebula_cert=dict(type="path"),
+        nebula_key=dict(type="path"),
         not_after=dict(type="str"),
         not_before=dict(type="str"),
         provisioner=dict(type="str", aliases=["issuer"], required=True),
@@ -193,6 +232,7 @@ def run_module():
         size=dict(type="int"),
         standalone=dict(type="bool"),
         token=dict(type="str", no_log=True),
+        tpm_storage_directory=dict(type="path"),
         webroot=dict(type="path"),
         x5c_cert=dict(type="str"),
         x5c_key=dict(type="path"),
@@ -209,9 +249,10 @@ def run_module():
     cli = CLIWrapper(module, module_params["step_cli_executable"])
 
     # step ca certificate arguments
-    cert_cliargs = ["acme", "contact", "curve", "force", "http_listen", "k8ssa_token_path", "kty", "not_after",
+    cert_cliargs = ["acme", "attestation_ca_url", "attestation_ca_root", "console", "contact", "curve", "force",
+                    "http_listen", "k8ssa_token_path", "kms", "kty", "nebula_cert", "nebula_key", "not_after",
                     "not_before", "provisioner", "provisioner_password_file", "san", "set", "set_file", "size",
-                    "standalone", "token", "webroot", "x5c_cert", "x5c_key"]
+                    "standalone", "token", "tpm_storage_directory", "webroot", "x5c_cert", "x5c_key"]
     # All parameters can be converted to a mapping by just appending -- and replacing the underscores
     cert_cliarg_map = {arg: f"--{arg.replace('_', '-')}" for arg in cert_cliargs}
 
