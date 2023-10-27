@@ -12,20 +12,32 @@
     step_acme_cert_keyfile_full: "{{ step_acme_cert_keyfile_defaults | combine(step_acme_cert_keyfile) }}"
     step_acme_cert_certfile_full: "{{ step_acme_cert_certfile_defaults | combine(step_acme_cert_certfile) }}"
 
-- name: Look for existing certificate
-  ansible.builtin.stat:
-    path: "{{ step_acme_cert_certfile_full.path }}"
-  register: step_acme_cert_current_cert
+- name: Get certificate from CA
+  maxhoesel.smallstep.step_ca_certificate:
+    provisioner: "{{ step_acme_cert_ca_provisioner }}"
+    contact: "{{ step_acme_cert_contact }}"
+    crt_file: "{{ step_acme_cert_certfile_full.path }}"
+    key_file: "{{ step_acme_cert_keyfile_full.path }}"
+    state: present
+    name: "{{ step_acme_cert_name }}"
+    not_after: "{{ step_acme_cert_duration | default(omit) }}"
+    san: "{{ step_acme_cert_san }}"
+    standalone: "{{ step_acme_cert_webroot_path | bool }}"
+    step_cli_executable: "{{ step_cli_executable }}"
+    webroot: "{{ step_acme_cert_webroot_path }}"
+  become: yes
+  become_user: "{{ step_acme_cert_user }}"
+  environment:
+    STEPPATH: "{{ _resolved_steppath }}"
 
-- name: Check if certificate is valid
-  ansible.builtin.command: "{{ step_cli_executable }} certificate verify {{ step_acme_cert_certfile_full.path }}"
-  changed_when: no
-  check_mode: no
-  ignore_errors: true
-  register: _step_acme_cert_validity
-  when: step_acme_cert_current_cert.stat.exists
-
-- ansible.builtin.include_tasks: get_cert.yml
-  when: 'not step_acme_cert_current_cert.stat.exists or "failed to verify certificate" in _step_acme_cert_validity.stderr'
+- name: Cert and key permissions are set
+  file:
+    path: "{{ item.path }}"
+    mode: "{{ item.mode }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+  loop:
+    - "{{ step_acme_cert_keyfile_full }}"
+    - "{{ step_acme_cert_certfile_full }}"
 
 - ansible.builtin.include_tasks: renewal.yml

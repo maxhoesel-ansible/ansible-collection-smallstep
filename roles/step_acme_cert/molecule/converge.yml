@@ -5,28 +5,64 @@
     webroots:
       Debian: /var/www/html
       RedHat: /usr/share/nginx/html
-    webgroup:
+    web_user:
       Debian: www-data
       RedHat: nginx
+    # Shared parameters
+    step_acme_cert_duration: 1h
+    step_acme_cert_renewal_when: 59m # force renewal to happen every minute
+    step_acme_cert_renewal_reload_services: ["nginx"]
+    certs_directory: /etc/ssl/step-certs
   tasks:
-    - name: Test getting a standalone cert
+    - name: step-certs directory exists
+      ansible.builtin.file:
+        path: "{{ certs_directory }}"
+        owner: "{{ step_acme_cert_user }}"
+        group: "{{ web_user[ansible_os_family] }}"
+        mode: "750"
+        state: directory
+
+    # this is just to test standalone behavior, this certificate is not used by the nginx setup
+    - name: Test getting a standalone cert (not used by nginx)
       include_role:
         name: step_acme_cert
+      vars:
+        step_acme_cert_certfile:
+          path: "{{ certs_directory }}/standalone.cert"
+          mode: "644"
+          group: "{{ web_user[ansible_os_family] }}"
+        step_acme_cert_keyfile:
+          path: "{{ certs_directory }}/standalone.key"
+          mode: "640"
+          group: "{{ web_user[ansible_os_family] }}"
+        step_acme_cert_renewal_service: step-renew-standalone
 
+    # this is done so that we can write our ACME token as the nginx user while getting a certificate.
+    - name: Set .well-known directory permissions to nginx
+      ansible.builtin.file:
+        path: "{{ webroots[ansible_os_family] }}/.well-known"
+        owner: "{{ web_user[ansible_os_family] }}"
+        group: root
+        mode: "755"
+        state: directory
     - name: Start nginx
       systemd:
         name: nginx
         state: started
-
     - name: Get cert via webroot
       include_role:
         name: step_acme_cert
       vars:
+        step_acme_cert_certfile:
+          path: "{{ certs_directory }}/webroot.cert"
+          mode: "644"
+          group: "{{ web_user[ansible_os_family] }}"
+        step_acme_cert_keyfile:
+          path: "{{ certs_directory }}/webroot.key"
+          mode: "640"
+          group: "{{ web_user[ansible_os_family] }}"
         step_acme_cert_webroot_path: "{{ webroots[ansible_os_family] }}"
-        step_acme_cert_duration: 1h
         step_acme_cert_renewal_service: step-renew-webroot
-        step_acme_cert_renewal_when: 59m # force renewal to happen every minute
-        step_acme_cert_renewal_reload_services: ["nginx"]
 
     - name: Install Nginx site [Debian]
       template:

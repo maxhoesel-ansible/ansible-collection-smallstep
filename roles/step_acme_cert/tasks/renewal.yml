@@ -28,7 +28,7 @@
         dest: "/etc/sudoers.d/99_{{ step_acme_cert_renewal_service }}_systemd"
         owner: root
         group: root
-        mode: "600"
+        mode: "400"
   when:
     - step_acme_cert_renewal_reload_services | length > 0
     - step_acme_cert_user != "root"

@@ -14,10 +14,14 @@ description: >
     This module exposes mostly the same parameters as the upstream
     L(step ca certificate,https://smallstep.com/docs/step-cli/reference/ca/certificate),
     L(step ca renew/rekey,https://smallstep.com/docs/step-cli/reference/ca/renew)
-    and L(step ca revoke https://smallstep.com/docs/step-cli/reference/ca/revoke/) commands, depending on the selected
+    and L(step ca revoke,https://smallstep.com/docs/step-cli/reference/ca/revoke/) commands, depending on the selected
     certificate I(state).
 notes:
   - Check mode is supported.
+  - >
+      This module attempts to detect when a certificates parameters have changed, but may not detect all changes.
+      Currently, the following parameters are checked for changes: I(san, kty, curve, size).
+      Note that the key parameters are only checked if I(kty) is set
 options:
   acme:
     description: >
@@ -45,7 +49,7 @@ options:
     type: list
     elements: str
   crt_file:
-    description: File to write the certificate (PEM format)
+    description: File to write the certificate (PEM format).
     type: path
     required: yes
   curve:
@@ -53,7 +57,7 @@ options:
       - crv
     description: >
       The elliptic curve to use for EC and OKP key types. Corresponds to the "crv" JWK parameter.
-      Valid curves are defined in JWA [RFC7518]. If unset, default is P-256 for EC keys and Ed25519 for OKP keys.
+      Valid curves are defined in JWA RFC7518. If unset, default is P-256 for EC keys and Ed25519 for OKP keys.
     type: str
     choices:
       - P-256
@@ -61,7 +65,9 @@ options:
       - P-521
       - Ed25519
   force:
-    description: TODO REWORK THIS
+    description: >
+        If I(true) and I(state=present), a new certificate will be generated each time this module is executed,
+        regardless of existing certificates.
     type: bool
   http_listen:
     description: >
@@ -73,7 +79,7 @@ options:
     description: Configure the file from which to read the kubernetes service account token.
     type: path
   key_file:
-    description: File to write the private key (PEM format)
+    description: File to write the private key (PEM format).
     type: path
     required: yes
   kms:
@@ -93,8 +99,8 @@ options:
     description: >
       The Common Name, DNS Name, or IP address that will be set as the Subject Common Name for the certificate.
       If no Subject Alternative Names (SANs) are configured (via the san parameter) then the subject will be set as the only SAN.
+      Required if I(state=present).
     type: str
-    required: yes
   nebula_cert:
     description: Certificate file in PEM format to store in the 'nebula' header of a JWT.
     type: path
@@ -118,12 +124,26 @@ options:
   provisioner:
     aliases:
       - issuer
-    description: The provisioner name to use.
+    description: The provisioner name to use. Required if I(state=present).
     type: str
-    required: yes
   provisioner_password_file:
     description: The path to the file containing the password to decrypt the one-time token generating key.
     type: path
+  revoke_on_delete:
+    description: If I(state=absent), attempt to revoke the certificate before deleting it
+    type: bool
+    default: true
+  revoke_reason:
+    description: >
+        The string representing the reason for which the cert is being revoked.
+        Only has an effect if I(state=revoked) or I(state=absent) and I(revoke_on_delete=True)
+    type: str
+  revoke_reason_code:
+    description: >
+        The reasonCode specifies the reason for revocation - chose from a list of common revocation reasons.
+        If unset, the default is Unspecified.
+        See U(https://smallstep.com/docs/step-cli/reference/ca/revoke) for a list of codes
+    type: str
   san:
     description: >
       Add dns/ip/email/uri Subject Alternative Name(s) (SANs) that should be authorized.
@@ -148,12 +168,33 @@ options:
       Standalone is a mode in which the step process will run a server that will will respond to ACME challenge validation requests.
       Standalone is the default mode for serving challenge validation requests.
     type: bool
+  state:
+    description: >
+        State that the certificate should be in.
+        If I(state=present), the certificate will be (re-)issued if it doesn't exist, is invalid/expired or if its SAN/private key parameters change.
+        If I(state=revoked), the certificate will be revoked with the CA
+        If I(state=absent), the certificate will be removed from the host (and optionally revoked with the CA beforehand, see I(revoke_on_delete).
+    type: str
+    choices:
+      - present
+      - revoked
+      - absent
+    default: present
   token:
     description: The one-time token used to authenticate with the CA in order to create the certificate.
     type: str
   tpm_storage_directory:
     description: The directory where TPM keys and certificates will be stored
     type: path
+  verify_roots:
+    description: >
+        Root certificates to use when checking an existing certificates validity.
+        Only required if your CA root is not in the system truststore.
+        Case-sensitive string, may be one of:
+        Relative or full path to a file - All certificates in the file will be used for path validation.
+        Comma-separated list of relative or full file paths - Every PEM encoded certificate from each file will be used for path validation.
+        Relative or full path to a directory - Every PEM encoded certificate from each file in the directory will be used for path validation.
+    type: str
   webroot:
     description: >
       Specify a path to use as a 'web root' for validation in the ACME protocol.
@@ -174,32 +215,183 @@ extends_documentation_fragment:
 
 EXAMPLES = r"""
 # See https://smallstep.com/docs/step-cli/reference/ca/certificate for more examples
-
-- name: Request a new certificate for a given domain
+- name: Ensure valid certificate exists
   maxhoesel.smallstep.step_ca_certificate:
-    token: "{{ your_token_here }}"
-    name: internal.example.com
-    crt_file: /tmp/mycert.crt
-    key_file: /tmp/mycert.key
-
-- name: Request a new certificate with multiple Subject Alternative Names
-  maxhoesel.smallstep.step_ca_certificate:
-    name: foobar
+    name: "{{ ansible_fqdn }}"
+    crt_file: "/etc/ssl/my.cert"
+    key_file: "/etc/ssl/my.key"
+    provisioner: "jwk"
+    provisioner_password_file: "/path/to/password_file"
     san:
-      - hello.example.com
-      - 1.1.1.1
-      - 10.2.3.4
-    crt_file: /tmp/mycert.crt
-    key_file: /tmp/mycert.key
-"""
+    - foo.bar
+    kty: EC
+    crv: P-256
+    not_after: 24h
 
+- name: Use custom root to verify existing cert
+  maxhoesel.smallstep.step_ca_certificate:
+    name: "{{ ansible_fqdn }}"
+    crt_file: "/etc/ssl/my.cert"
+    key_file: "/etc/ssl/my.key"
+    provisioner: "jwk"
+    provisioner_password_file: "/path/to/password_file"
+    san:
+    - foo.bar
+    kty: EC
+    crv: P-256
+    not_after: 24h
+    # If the certificate already exists, this certificate will be used to validate it.
+    # If the validation fails, a new certificate will be created.
+    # Only required if your CA root is not in the system truststore
+    verify_roots: "/path/to/custom/root_ca.crt"
+
+- name: Ensure cert is revoked
+  maxhoesel.smallstep.step_ca_certificate:
+    name: "{{ ansible_fqdn }}"
+    crt_file: "/etc/ssl/my.cert"
+    key_file: "/etc/ssl/my.key"
+    state: revoked
+
+- name: Ensure cert is absent (and revoke if first if it isn't)
+  maxhoesel.smallstep.step_ca_certificate:
+    name: "{{ ansible_fqdn }}"
+    crt_file: "/etc/ssl/my.cert"
+    key_file: "/etc/ssl/my.key"
+    state: absent
+    revoke_on_delete: true
+"""
+import json
+from pathlib import Path
 from typing import cast, Dict, Any
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.validation import check_required_if
 
 from ..module_utils.params.ca_connection import CaConnectionParams
 from ..module_utils.cli_wrapper import CLIWrapper
 from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
+
+# maps the kty cli parameter to inspect outputs subject_key_info.key_algorithm.name
+CERTINFO_KEY_TYPES = {
+    "RSA": "RSA",
+    "EC": "ECDSA",
+    "OKP": "Ed25519"
+}
+CERTINFO_KEYINFO_KEY = {
+    "RSA": "rsa_public_key",
+    "ECDSA": "ecdsa_public_key"
+}
+
+
+def create_certificate(cli: CLIWrapper, params: Dict[str, Any], force: bool = False) -> Dict[str, Any]:
+    # step ca certificate arguments
+    cert_cliargs = ["acme", "attestation_ca_url", "attestation_ca_root", "console", "contact", "curve",
+                    "http_listen", "k8ssa_token_path", "kms", "kty", "nebula_cert", "nebula_key", "not_after",
+                    "not_before", "provisioner", "provisioner_password_file", "san", "set", "set_file", "size",
+                    "standalone", "token", "tpm_storage_directory", "webroot", "x5c_cert", "x5c_key"]
+    # All parameters can be converted to a mapping by just appending -- and replacing the underscores
+    cert_cliarg_map = {arg: f"--{arg.replace('_', '-')}" for arg in cert_cliargs}
+
+    cli_params = [
+        "ca", "certificate", params["name"],
+        params["crt_file"], params["key_file"]
+    ] + cli.build_params({
+        **cert_cliarg_map,
+        **CaConnectionParams.cliarg_map
+    })
+    if force:
+        cli_params.append("--force")
+
+    cli.run_command(cli_params)
+    return {"changed": True}
+
+
+def cert_needs_recreation(cli: CLIWrapper, params: Dict[str, Any]) -> str:
+    """Check whether a certificate needs to be recreated based on its validity and module parameters
+
+    Returns:
+        str: Reason for certificate recreation, or empty string if no recreation is needed
+    """
+    args = ["certificate", "verify", params["crt_file"]]
+    if params["verify_roots"]:
+        args.extend(["--roots", params["verify_roots"]])
+    rc, stdout, stderr = cli.run_command(
+        args, check=False, check_mode_safe=True)
+    if rc != 0:
+        return stderr
+
+    stdout = cli.run_command(["certificate", "inspect", params["crt_file"],
+                             "--format", "json"], check_mode_safe=True)[1]
+    cert_info = json.loads(stdout)
+    key_info = cert_info["subject_key_info"]
+    current_kty = key_info["key_algorithm"]["name"]
+
+    if params["san"]:
+        desired_sans = sorted(list(set([params["name"]] + params["san"])))
+        current_sans = sorted(cert_info["names"])
+        if current_sans != desired_sans:
+            return f"Certificate names have changed from {cert_info['names']} to {desired_sans}"
+
+    if params["kty"]:
+        if current_kty != CERTINFO_KEY_TYPES[params["kty"]]:
+            return f"Key type has changed from {current_kty} to {CERTINFO_KEY_TYPES[params['kty']]}"
+        if params["curve"] and current_kty == "ECDSA":
+            current_curve = key_info["ecdsa_public_key"]["curve"]
+            if current_curve != params["curve"]:
+                return f"ECDSA key curve has changed from {current_curve} to {params['curve']}"
+
+    # key type matches or is not specified, we can assume the current type is correct
+    if params["size"] and current_kty in ["RSA", "ECDSA"]:
+        current_length = key_info[CERTINFO_KEYINFO_KEY[current_kty]]["length"]
+        if current_length != params["size"]:
+            return f"Key size has changed from {current_length} to {params['size']}"
+    return ""
+
+
+def revoke_certificate(cli: CLIWrapper, params: Dict[str, Any], module: AnsibleModule) -> Dict[str, Any]:  # pylint: disable=unused-argument
+    revoke_cliarg_map = {
+        "crt_file": "--cert",
+        "key_file": "--key",
+        "revoke_reason": "--reason",
+        "revoke_reason_code": "--reasonCode",
+        "token": "--token"
+    }
+    # Positional Parameters
+    cli_params = [
+        "ca", "revoke"
+    ] + cli.build_params({
+        **revoke_cliarg_map,
+        **CaConnectionParams.cliarg_map
+    })
+
+    ret = cli.run_command(cli_params, check=False)
+    rc = ret[0]
+    stderr = ret[2]
+    if rc != 0 and "is already revoked" in stderr:
+        return {}
+    elif rc != 0:
+        module.fail_json(f"Error revoking certificate: {stderr}")
+        return {"changed": True}  # only here to satisfy the type checker, fail_json never returns
+    else:
+        # ran successfully => revoked
+        return {"changed": True}
+
+
+def delete_certificate(cli: CLIWrapper, params: Dict[str, Any], module: AnsibleModule, revoke: bool) -> Dict[str, Any]:
+    result = {}
+    if revoke:
+        result = revoke_certificate(cli, params, module)
+
+    for file in [Path(params["crt_file"]), Path(params["key_file"])]:
+        if file.exists():
+            try:
+                file.unlink()
+            except FileNotFoundError:
+                pass
+            except OSError as e:
+                module.fail_json(f"Could not delete file: {e}")
+            result["changed"] = True
+    return result
 
 
 def run_module():
@@ -219,20 +411,25 @@ def run_module():
         key_file=dict(type="path", required=True),
         kms=dict(type="str"),
         kty=dict(type="str", choices=["EC", "OKP", "RSA"]),
-        name=dict(type="str", required=True, aliases=["subject"]),
+        name=dict(type="str", aliases=["subject"]),
         nebula_cert=dict(type="path"),
         nebula_key=dict(type="path"),
         not_after=dict(type="str"),
         not_before=dict(type="str"),
-        provisioner=dict(type="str", aliases=["issuer"], required=True),
+        provisioner=dict(type="str", aliases=["issuer"]),
         provisioner_password_file=dict(type="path", no_log=False),
+        revoke_on_delete=dict(type="bool", default=True),
+        revoke_reason=dict(type="str"),
+        revoke_reason_code=dict(type="str"),
         san=dict(type="list", elements="str"),
         set=dict(type="list", elements="str"),
         set_file=dict(type="path"),
         size=dict(type="int"),
         standalone=dict(type="bool"),
+        state=dict(type="str", choices=["present", "revoked", "absent"], default="present"),
         token=dict(type="str", no_log=True),
         tpm_storage_directory=dict(type="path"),
+        verify_roots=dict(type="str"),
         webroot=dict(type="path"),
         x5c_cert=dict(type="str"),
         x5c_key=dict(type="path"),
@@ -245,27 +442,31 @@ def run_module():
     }, supports_check_mode=True)
     CaConnectionParams(module).check()
     module_params = cast(Dict, module.params)
-
+    check_required_if([
+        ["state", "present", ["name", "provisioner"], True],
+    ], module_params)
     cli = CLIWrapper(module, module_params["step_cli_executable"])
 
-    # step ca certificate arguments
-    cert_cliargs = ["acme", "attestation_ca_url", "attestation_ca_root", "console", "contact", "curve", "force",
-                    "http_listen", "k8ssa_token_path", "kms", "kty", "nebula_cert", "nebula_key", "not_after",
-                    "not_before", "provisioner", "provisioner_password_file", "san", "set", "set_file", "size",
-                    "standalone", "token", "tpm_storage_directory", "webroot", "x5c_cert", "x5c_key"]
-    # All parameters can be converted to a mapping by just appending -- and replacing the underscores
-    cert_cliarg_map = {arg: f"--{arg.replace('_', '-')}" for arg in cert_cliargs}
+    crt_exists = Path(module_params["crt_file"]).exists()
+    if module_params["state"] == "present":
+        if not crt_exists:
+            result.update(create_certificate(cli, module_params))
+        else:
+            if module_params["force"]:
+                recreate_reason = "force parameter enabled"
+            else:
+                recreate_reason = cert_needs_recreation(cli, module_params)
+            if recreate_reason:
+                result["recreate_reason"] = recreate_reason
+                result.update(create_certificate(cli, module_params, force=True))
+    elif module_params["state"] == "revoked":
+        if crt_exists:
+            result.update(revoke_certificate(cli, module_params, module))
+        else:
+            module.fail_json("Cannot revoke certificate as it does not exist")
+    elif module_params["state"] == "absent" and crt_exists:
+        result.update(delete_certificate(cli, module_params, module, module_params["revoke_on_delete"]))
 
-    cli_params = [
-        "ca", "certificate", module_params["name"],
-        module_params["crt_file"], module_params["key_file"]
-    ] + cli.build_params({
-        **cert_cliarg_map,
-        **CaConnectionParams.cliarg_map
-    })
-
-    cli.run_command(cli_params)
-    result["changed"] = True
     module.exit_json(**result)
 
 

@@ -25,7 +25,7 @@
 
 - hosts: clients
   vars:
-    webgroup:
+    web_user:
       Debian: www-data
       RedHat: nginx
   tasks:
@@ -38,19 +38,7 @@
         state: stopped
         enabled: no
 
-    - name: Create test user
-      ansible.builtin.user:
-        name: max
-        create_home: yes
-    - name: Create certificate directory
-      ansible.builtin.file:
-        state: directory
-        path: /etc/ssl/non-root
-        owner: max
-        group: "{{ webgroup[ansible_os_family] }}"
-        mode: "750"
-
-    - name: Get CA fingerprint
+    - name: Get CA fingerprint # noqa: run-once[task]
       ansible.builtin.command: docker exec step-ca step certificate fingerprint certs/root_ca.crt
       register: _ca_fingerprint
       changed_when: false
@@ -58,11 +46,11 @@
       run_once: true
       delegate_to: localhost
 
-    - name: Bootstrap host
+    - name: Bootstrap nginx host
       include_role:
         name: maxhoesel.smallstep.step_bootstrap_host
       vars:
         step_bootstrap_fingerprint: "{{ _ca_fingerprint.stdout }}"
         step_bootstrap_users:
-          - user: max
+          - user: "{{ web_user[ansible_os_family] }}"
             steppath: "{{ step_acme_cert_steppath }}"
