@@ -1,2 +1,2 @@
-Cmnd_Alias  {{ step_acme_cert_renewal_service | upper }} = {{ _step_systemctl_binary.stdout }} try-reload-or-restart {{ step_acme_cert_renewal_reload_services | join(' ') }}
-{{ step_acme_cert_user }} ALL=NOPASSWD: {{ step_acme_cert_renewal_service | upper }}
+Cmnd_Alias  {{ step_acme_cert_renewal_service | upper | replace("-", "_") }} = {{ _step_systemctl_binary.stdout }} try-reload-or-restart {{ step_acme_cert_renewal_reload_services | join(' ') }}
+{{ step_acme_cert_user }} ALL=NOPASSWD: {{ step_acme_cert_renewal_service | upper | replace("-", "_") }}

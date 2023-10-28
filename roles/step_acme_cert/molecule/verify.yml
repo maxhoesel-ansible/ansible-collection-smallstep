@@ -9,7 +9,7 @@
       assert:
         that:
           - ansible_facts.services["nginx.service"]["state"] == "running"
-          - ansible_facts.services["step-renew.service"]["state"] == "running"
+          - ansible_facts.services["step-renew-standalone.service"]["state"] == "running"
           - ansible_facts.services["step-renew-webroot.service"]["state"] == "running"
       register: _res
       retries: 3
@@ -27,7 +27,7 @@
       assert:
         that:
           - ansible_facts.services["nginx.service"]["state"] == "running"
-          - ansible_facts.services["step-renew.service"]["state"] == "running"
+          - ansible_facts.services["step-renew-standalone.service"]["state"] == "running"
           - ansible_facts.services["step-renew-webroot.service"]["state"] == "running"
       register: _res
       retries: 3

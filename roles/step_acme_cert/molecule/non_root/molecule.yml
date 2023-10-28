@@ -134,19 +134,7 @@ provisioner:
       ca:
         step_ca_user: step-ca
       all:
-        step_acme_cert_user: max
+        step_acme_cert_user: "{{ web_user[ansible_os_family] }}"
         step_acme_cert_steppath: "/home/max/custom-steppath"
         step_acme_cert_ca_provisioner: ACME
         step_bootstrap_ca_url: https://step-ca:9000
-
-        certfile: /etc/ssl/non-root/nginx-test.cert
-        keyfile: /etc/ssl/non-root/nginx-test.key
-
-        step_acme_cert_certfile:
-          path: /etc/ssl/non-root/nginx-test.cert
-          mode: "644"
-          group: "{{ webgroup[ansible_os_family] }}"
-        step_acme_cert_keyfile:
-          path: /etc/ssl/non-root/nginx-test.key
-          mode: "640"
-          group: "{{ webgroup[ansible_os_family] }}"
