@@ -60,11 +60,16 @@ class CLIWrapper():
             if param_name not in module_params:
                 raise CLIError(f"Could not build command parameters: "
                                f"param '{param_name}' not in module argspec, this is most likely a bug")
+            if param_type == "bool":
+                if bool(module_params[param_name]) is False:
+                    # some flags (such as --ssh in ca provisioner add/update are enabled by default),
+                    # this allows the user to disable them if needed
+                    args.append(f"{module_params_cliarg_map[param_name]}=false")
+                else:
+                    args.append(module_params_cliarg_map[param_name])
             elif not module_params[param_name]:
-                # param not set
+                # parameter is unset
                 pass
-            elif param_type == "bool" and bool(module_params[param_name]):
-                args.append(module_params_cliarg_map[param_name])
             elif param_type == "list":
                 for item in cast(List, module_params[param_name]):
                     args.extend([module_params_cliarg_map[param_name], str(item)])
