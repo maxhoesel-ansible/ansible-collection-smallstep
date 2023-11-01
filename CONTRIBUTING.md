@@ -164,6 +164,8 @@ To get started you can copy the `molecule.yml` configuration from an existing ro
 In addition to the `README.md`s, we use `antsibull-docs` to generate sphinx documentation for both plugins and roles (from the `meta/argument_specs.yml` file).
 See [here](https://docs.ansible.com/ansible/latest/dev_guide/developing_collections_documenting.html) for more information about the build process.
 
+To build the docs, ensure you have your `venv` set up, then run: `cd docs && ./build.sh`
+
 The CI also builds the docs to ensure they don't break silently.
 
 ## Maintainer information

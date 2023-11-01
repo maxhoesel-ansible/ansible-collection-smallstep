@@ -18,6 +18,8 @@ build_ignore:
 - pyproject.toml
 - requirements.txt
 - '**/requirements.txt'
+- docs/tmp
+- docs/build
 dependencies:
   community.general: '>=1.0.0'
 description: Install, configure and use the Smallstep CA server and CLI tool
