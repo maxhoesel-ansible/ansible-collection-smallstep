@@ -20,7 +20,6 @@
 
 - name: Install step-cli
   block:
-
     - name: Download and extract step-cli archive
       unarchive:
         src: "https://github.com/smallstep/cli/releases/download/v{{ step_cli_version }}/step_linux_{{ step_cli_version }}_{{ step_cli_arch[ansible_architecture] }}.tar.gz"
