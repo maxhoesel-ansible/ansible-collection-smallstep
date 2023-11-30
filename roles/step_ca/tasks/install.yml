@@ -16,32 +16,45 @@
 
 - name: Download and install step-ca
   block:
+    - name: Create temporary download directory
+      ansible.builtin.tempfile:
+        state: directory
+        suffix: step_ca_install
+      register: _tempfile
     - name: Download and extract step-ca archive
       unarchive:
         src: "https://github.com/smallstep/certificates/releases/download/v{{ step_ca_version }}/step-ca_linux_{{ step_ca_version }}_{{ step_ca_arch[ansible_architecture] }}.tar.gz"
-        dest: /tmp/
+        dest: "{{ _tempfile.path }}"
         remote_src: yes
       retries: 3
       delay: 3
     - name: Install step-ca binary <0.23 # noqa no-changed-when
       shell: >
         set -o pipefail &&
-        mv -Z /tmp/step-ca_{{ step_ca_version }}/bin/* {{ step_ca_executable | dirname }}
+        mv -Z {{ _tempfile.path }}/step-ca_{{ step_ca_version }}/bin/* {{ step_ca_executable | dirname }}
       args:
         executable: /bin/bash
       notify: restart step-ca
       when: step_ca_version is version("0.23", "<")
-    - name: Install step-ca binary >=0.23 # noqa no-changed-when
+    - name: Install step-ca binary >=0.23,<0.25.2 # noqa no-changed-when
       shell: >
         set -o pipefail &&
-        mv -Z /tmp/step-ca_{{ step_ca_version }}/step-ca {{ step_ca_executable | dirname }}
+        mv -Z {{ _tempfile.path }}/step-ca_{{ step_ca_version }}/step-ca {{ step_ca_executable | dirname }}
       args:
         executable: /bin/bash
       notify: restart step-ca
-      when: step_ca_version is version("0.23", ">=")
+      when: step_ca_version is version("0.23", ">=") and step_ca_version is version("0.25.2", "<")
+    - name: Install step-ca binary >=0.25.2 # noqa no-changed-when
+      shell: >
+        set -o pipefail &&
+        mv -Z {{ _tempfile.path }}/step-ca {{ step_ca_executable | dirname }}
+      args:
+        executable: /bin/bash
+      notify: restart step-ca
+      when: step_ca_version is version("0.25.2", ">=")
   always:
     - name: Remove step release archive
       file:
-        path: "/tmp/step-ca_{{ step_ca_version }}"
+        path: "{{ _tempfile.path }}/step-ca_{{ step_ca_version }}"
         state: absent
   when: (step_ca_installed_version.stdout) | default("") != step_ca_version
