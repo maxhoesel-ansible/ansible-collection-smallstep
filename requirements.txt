@@ -25,4 +25,4 @@ ansible-core==2.16.1
 antsibull-docs==2.5.0
 ansible-pygments==0.1.1
 sphinx==7.2.6
-sphinx-ansible-theme==0.10.2
+sphinx-ansible-theme==0.10.3
