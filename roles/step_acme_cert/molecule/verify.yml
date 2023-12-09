@@ -12,7 +12,7 @@
           - ansible_facts.services["step-renew-standalone.service"]["state"] == "running"
           - ansible_facts.services["step-renew-webroot.service"]["state"] == "running"
       register: _res
-      retries: 3
+      retries: 10
       delay: 5
       until: _res is not failed
 
@@ -30,7 +30,7 @@
           - ansible_facts.services["step-renew-standalone.service"]["state"] == "running"
           - ansible_facts.services["step-renew-webroot.service"]["state"] == "running"
       register: _res
-      retries: 3
+      retries: 10
       delay: 5
       until: _res is not failed
 
