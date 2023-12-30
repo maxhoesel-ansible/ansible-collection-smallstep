@@ -52,6 +52,17 @@
         executable: /bin/bash
       notify: restart step-ca
       when: step_ca_version is version("0.25.2", ">=")
+    - name: Restore SELinux context for binary # noqa no-changed-when
+      command: "restorecon -v {{ step_ca_executable }}"
+      when: ansible_selinux is defined and ansible_selinux and ansible_selinux.status == 'enabled'
+    - name: Ensure binary is owned by root
+      ansible.builtin.file:
+        path: "{{ step_ca_executable }}"
+        state: file
+        owner: root
+        group: root
+        mode: "755"
+
   always:
     - name: Remove step release archive
       file:

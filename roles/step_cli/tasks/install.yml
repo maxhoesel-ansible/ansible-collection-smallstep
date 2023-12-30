@@ -37,6 +37,14 @@
     - name: Restore SELinux context for binary
       command: "restorecon -v {{ _step_cli_install_path }}"
       when: ansible_selinux is defined and ansible_selinux and ansible_selinux.status == 'enabled'
+    - name: Ensure binary is owned by root
+      ansible.builtin.file:
+        path: "{{ _step_cli_install_path }}"
+        state: file
+        owner: root
+        group: root
+        mode: "755"
+
   always:
     - name: Remove step release archive
       file:
