@@ -28,6 +28,7 @@
         type: JWK
         password_file: "/tmp/tests_passfile"
         create: yes
+        x509_default_dur: 1h
       - name: tests-OIDC
         type: OIDC
         oidc_client_id: 1087160488420-8qt7bavg3qesdhs6it824mhnfgcfe8il.apps.googleusercontent.com
@@ -55,67 +56,7 @@
       - name: tests-k8s
         type: K8SSA
         k8s_pem_keys_file: "/tmp/tests_crt"
-
-  - name: Test creation idempotency
-    maxhoesel.smallstep.step_ca_provisioner: "{{ item | combine({'step_cli_executable': cli_binary })}}"
-    loop:
-      - name: tests-JWK
-        type: JWK
-        create: yes
-        password_file: "/tmp/tests_passfile"
-      - name: tests-OIDC
-        type: OIDC
-        oidc_client_id: 1087160488420-8qt7bavg3qesdhs6it824mhnfgcfe8il.apps.googleusercontent.com
-        oidc_configuration_endpoint: https://accounts.google.com/.well-known/openid-configuration
-        oidc_admin_email:
-          - mariano@smallstep.com
-          - max@smallstep.com
-      - name: tests-Amazon
-        type: AWS
-        aws_account: 123456789
-        instance_age: 1h
-      - name: tests-Google
-        type: GCP
-        gcp_service_account:
-          - 1234567890-compute@developer.gserviceaccount.com
-          - 9876543210-compute@developer.gserviceaccount.com
-        gcp_project:
-          - identity
-          - accounting
-      - name: tests-ACME
-        type: ACME
-      - name: tests-x5c
-        type: X5C
-        x5c_root_file: "/tmp/tests_crt"
-      - name: tests-k8s
-        type: K8SSA
-        k8s_pem_keys_file: "/tmp/tests_crt"
-    register: second_run
-
-  - name: Verify that nothing changed on the second run
-    assert:
-      that: not second_run.changed
-
-  - name: Test updating provisioners
-    maxhoesel.smallstep.step_ca_provisioner:
-      name: tests-OIDC
-      type: OIDC
-      oidc_client_id: 1087160488420-8qt7bavg3qesdhs6it824mhnfgcfe8il.apps.googleusercontent.com
-      oidc_configuration_endpoint: https://accounts.google.com/.well-known/openid-configuration
-      oidc_admin_email:
-        - mariano@smallstep.com
-        - max@smallstep.com
-        - new@admin.com
-      state: "updated"
-      step_cli_executable: "{{ cli_binary }}"
-    register: update_test
-
-  - name: Verify that provisioner got updated
-    ansible.builtin.assert:
-      that:
-        update_test.changed
-
-  # Remove the online provisioners before restarting as they may imapct server
+  # Remove the online provisioners before restarting as they may prevent a successful startup
   # functionality
   - name: Remove online provisioners
     maxhoesel.smallstep.step_ca_provisioner:
@@ -127,17 +68,117 @@
       - ["tests-OIDC", "OIDC"]
       - ["tests-Amazon", "AWS"]
       - ["tests-Google", "GCP"]
+  - name: Read initial file
+    ansible.builtin.command: "cat {{ ca_path }}/config/ca.json"
+    changed_when: false
+    check_mode: false
+    register: initial_config
 
+
+  # the step-ca process in our custom Dockerfile is managed by systemd, but the container isn't set up by ansible-test
+  # in a way that we can use the systemd module to manage it. Fall back to signals for manipulation instead
   - name: Get Server PID
-    shell: pgrep -fa step-ca | grep -v step-ca.sh | cut -d ' ' -f 1
+    shell:
+      cmd: |
+        set -o pipefail
+        pgrep -fa step-ca | grep -v step-ca.sh | cut -d ' ' -f 1
+      executable: /bin/bash
+    changed_when: false
+    check_mode: false
     register: _pid
-  - name: Reload Server
+  - name: Reload Server # noqa no-changed-when
     command: "kill -1 {{ _pid.stdout_lines[0] }}"
     become: false
-
+  - name: Wait for server reload
+    ansible.builtin.pause:
+      seconds: 3
   - name: Check server health
     command: "{{ cli_binary }} ca health"
     changed_when: no
+
+  - name: Test creation idempotency
+    maxhoesel.smallstep.step_ca_provisioner: "{{ item | combine({'step_cli_executable': cli_binary}) }}"
+    loop:
+      - name: tests-JWK
+        type: JWK
+        # doesn't do anything without create_force
+        create: yes
+        password_file: "/tmp/tests_passfile"
+      - name: tests-ACME
+        type: ACME
+      - name: tests-x5c
+        type: X5C
+        x5c_root_file: "/tmp/tests_crt"
+      - name: tests-k8s
+        type: K8SSA
+        k8s_pem_keys_file: "/tmp/tests_crt"
+    register: second_run
+  - name: Verify that nothing changed on the idempotency run
+    assert:
+      that: not second_run.changed
+  - name: Read config file
+    ansible.builtin.command: "cat {{ ca_path }}/config/ca.json"
+    changed_when: false
+    check_mode: false
+    register: idempotent_config
+  - name: Verify that idempotency works
+    ansible.builtin.assert:
+      that: (initial_config.stdout | from_json).authority.provisioners | selectattr('name', 'eq', item) == (idempotent_config.stdout | from_json).authority.provisioners | selectattr('name', 'eq', item)
+    loop:
+      - tests-JWK
+      - tests-ACME
+      - tests-x5c
+      - tests-k8s
+
+  - name: Test creation idempotency with no additional parameters
+    maxhoesel.smallstep.step_ca_provisioner: "{{ item | combine({'step_cli_executable': cli_binary}) }}"
+    loop:
+      - name: tests-JWK
+        type: JWK
+      - name: tests-ACME
+        type: ACME
+      - name: tests-x5c
+        type: X5C
+      - name: tests-k8s
+        type: K8SSA
+    register: second_run_no_params
+  - name: Verify that nothing changed on the idempotency run
+    assert:
+      that: not second_run_no_params.changed
+  - name: Read config file
+    ansible.builtin.command: "cat {{ ca_path }}/config/ca.json"
+    changed_when: false
+    check_mode: false
+    register: idempotent_config_no_params
+  - name: Verify that idempotency works
+    ansible.builtin.assert:
+      that: (initial_config.stdout | from_json).authority.provisioners | selectattr('name', 'eq', item) == (idempotent_config_no_params.stdout | from_json).authority.provisioners | selectattr('name', 'eq', item)
+    loop:
+      - tests-JWK
+      - tests-ACME
+      - tests-x5c
+      - tests-k8s
+
+  - name: Test updating provisioners
+    maxhoesel.smallstep.step_ca_provisioner:
+      name: tests-ACME
+      type: ACME
+      require_eab: True
+      force_cn: True
+      step_cli_executable: "{{ cli_binary }}"
+    register: update_run
+  - name: Verify that update changed something
+    ansible.builtin.assert:
+      that: update_run.changed
+  - name: Read config file
+    ansible.builtin.command: "cat {{ ca_path }}/config/ca.json"
+    changed_when: false
+    check_mode: false
+    register: updated_config
+  - name: Verify that provisioner got updated
+    ansible.builtin.assert:
+      that: (updated_config.stdout | from_json).authority.provisioners | selectattr('name', 'eq', 'tests-ACME') != (initial_config.stdout | from_json).authority.provisioners | selectattr('name', 'eq', 'tests-ACME')
+
 
   - name: Remove test provisioners
     maxhoesel.smallstep.step_ca_provisioner:
@@ -149,14 +190,26 @@
       - "tests-ACME"
       - "tests-x5c"
       - "tests-k8s"
-
   - name: Get step-ca config
     command: "cat {{ ca_path }}/config/ca.json"
+    changed_when: false
+    check_mode: false
     register: step_ca_config
   - name: Verify that all provisioners are absent
     assert:
       that:
         - (step_ca_config.stdout | from_json).authority.provisioners is not defined
+
+
+  - name: Reload Server # noqa no-changed-when
+    command: "kill -1 {{ _pid.stdout_lines[0] }}"
+    become: false
+  - name: Wait for server reload
+    ansible.builtin.pause:
+      seconds: 3
+  - name: Check server health
+    command: "{{ cli_binary }} ca health"
+    changed_when: no
   become: yes
   become_user: "{{ ca_user }}"
   environment:
