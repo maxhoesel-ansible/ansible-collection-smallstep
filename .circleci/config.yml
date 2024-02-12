@@ -13,7 +13,8 @@ filters: &semver-tagged
 executors:
   pytest:
     machine:
-      image: ubuntu-2204:current
+      # use an older ubuntu image with python 3.11 until pytest 8.0 is out
+      image: ubuntu-2204:2023.10.1
     resource_class: large
 
 jobs:
