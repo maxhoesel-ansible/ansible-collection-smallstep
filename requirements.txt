@@ -5,7 +5,7 @@
 ansible-lint==6.22.2
 pylint==3.0.3
 autopep8==2.0.4
-pre-commit==3.6.0
+pre-commit==3.6.1
 
 # Testing libraries
 pytest==7.4.4
