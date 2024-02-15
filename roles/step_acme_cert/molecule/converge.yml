@@ -45,10 +45,16 @@
         group: root
         mode: "755"
         state: directory
+
     - name: Start nginx
-      systemd:
-        name: nginx
+      ansible.builtin.systemd:
+        name: nginx.service
         state: started
+      register: _res
+      retries: 5
+      delay: 5
+      until: _res is not failed
+
     - name: Get cert via webroot
       include_role:
         name: step_acme_cert
@@ -71,8 +77,8 @@
         owner: root
         group: root
         mode: "644"
-      notify: restart nginx
       when: ansible_os_family == "Debian"
+      notify: restart nginx
     - name: Install Nginx config [RedHat]
       template:
         src: ../templates/nginx.conf
@@ -80,8 +86,9 @@
         owner: root
         group: root
         mode: "644"
-      notify: restart nginx
       when: ansible_os_family == "RedHat"
+      notify: restart nginx
+
   handlers:
     - name: restart nginx
       systemd:
