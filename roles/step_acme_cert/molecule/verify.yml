@@ -38,6 +38,6 @@
       uri:
         url: "https://{{ ansible_fqdn }}"
       register: _res
-      retries: 3
+      retries: 5
       delay: 5
       until: _res is not failed
