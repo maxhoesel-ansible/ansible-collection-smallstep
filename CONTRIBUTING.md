@@ -93,7 +93,7 @@ Custom options:
 
 ## Writing Tests
 
-Any new new component or change to an existing one should be covered by tests to ensure that the code works, and that it keeps working into the future.
+Any new component or change to an existing one should be covered by tests to ensure that the code works, and that it keeps working into the future.
 This section will help you in adding your own tests to this collection.
 
 ### Plugins

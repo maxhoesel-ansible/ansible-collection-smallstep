@@ -44,7 +44,7 @@ It will:
 - Default: `step-cli`
 
 ##### `step_cli_install_dir`
-- Used if the binary defined by `step_cli_executable` is not found on the system and `step_cli_executable` contains a executable name
+- Used if the binary defined by `step_cli_executable` is not found on the system and `step_cli_executable` contains an executable name
 - Sets the directory to install `step_cli_executable` into
 - The directory must already exist
 - Ignored if `step_cli_executable` contains a directory already
