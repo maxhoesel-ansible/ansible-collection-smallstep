@@ -63,7 +63,7 @@ It is thus **very** important that you **back up your root key and password** in
 - Default: `step-cli`
 
 ##### `step_cli_install_dir`
-- Used if `step_cli_executable` is not found and contains a executable name
+- Used if `step_cli_executable` is not found and contains an executable name
 - Sets the directory to install `step_cli_executable` into
 - The directory must already exist
 - Ignored if `step_cli_executable` contains a path already
