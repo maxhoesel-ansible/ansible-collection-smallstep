@@ -14,7 +14,7 @@ docker==7.0.0
 
 # Utility packages used in scripts
 pyyaml==6.0.1
-packaging==23.2
+packaging==24.0
 
 # Also include a version of ansible-core for IDE hints
 # and as the default version used in tests.
