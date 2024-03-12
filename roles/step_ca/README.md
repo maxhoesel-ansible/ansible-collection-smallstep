@@ -148,21 +148,14 @@ This role will only decrypt the root key for as long as strictly neccessary.
 
 ---
 
-##### `step_ca_existing_<root/key>`
-- Whether to use an existing root certificate/key and if so from where to import it from
-- Choices:
-    - `remote`: The root certificate/key is already present on the remote host
-    - `local`: The root certificate/key is read from the controller
-- Note that both cert and key need to be either imported, **or** generated.
-  For example, you cannot import the key but generate the certificate
-- Default: Not set.
-    - If unset and `_root/key_file` is also unset, a new certificate will be generated
-    - If unset and `_root/key_file` is set, the files are treated as `remote` to preserve backwards-compatibility to previous collection versions.
-      This behavior may be removed in a future release
-
 ##### `step_ca_existing_<root/key>_file`
 - The path of an existing PEM file to be used as the root certificate/key
-- Depending on the value of `step_ca_existing_<root/key>`, the file must either be on the remote host or the controller
+- If the file is present on the controller instead of the target node, set `step_ca_existing_<root/key>_is_local`, to `true`.
+- Default: not set (will generate a new certificate)
+
+##### `step_ca_existing_<root/key>_is_local`
+- Set to `true` if the file is present on the controller and needs to be copied
+- Default: `false`
 
 ##### `step_ca_existing_key_password`
 - Password to decrypt the existing key file
@@ -171,13 +164,12 @@ This role will only decrypt the root key for as long as strictly neccessary.
 Example usage:
 
 ```yaml
-# Select where to import the root certificate from. Can be `remote`, `local`, `false`
-step_ca_existing_root: remote
+# Import the root certificate from the target node
 step_ca_existing_root_file: /tmp/existing-ca-root.crt
 
 # Same for the key, except that the key is read from the controller
-step_ca_existing_key: local
 step_ca_existing_key_file: /home/controller/secret-ca-key.pem
+step_ca_existing_key_is_local: true
 # If your keyfile is password-protected, you can set the decryption password like so:
 step_ca_existing_key_password: Very-secret-password
 ```

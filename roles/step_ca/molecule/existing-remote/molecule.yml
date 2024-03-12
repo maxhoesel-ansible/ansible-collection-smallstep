@@ -4,10 +4,7 @@ platforms:
       - ubuntu
       - ca
     image: "docker.io/geerlingguy/docker-ubuntu2204-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
-    privileged: true
+    systemd: always
     override_command: false
     pre_build_image: true
 
@@ -16,10 +13,7 @@ platforms:
       - ubuntu
       - ca
     image: "docker.io/geerlingguy/docker-ubuntu2004-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
-    privileged: true
+    systemd: always
     override_command: false
     pre_build_image: true
 
@@ -28,10 +22,7 @@ platforms:
       - ubuntu
       - ca
     image: "docker.io/geerlingguy/docker-ubuntu1804-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
-    privileged: true
+    systemd: always
     override_command: false
     pre_build_image: true
 
@@ -40,10 +31,7 @@ platforms:
       - debian
       - ca
     image: "docker.io/geerlingguy/docker-debian11-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
-    privileged: true
+    systemd: always
     override_command: false
     pre_build_image: true
 
@@ -52,10 +40,7 @@ platforms:
       - debian
       - ca
     image: "docker.io/geerlingguy/docker-debian10-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
-    privileged: true
+    systemd: always
     override_command: false
     pre_build_image: true
 
@@ -64,10 +49,7 @@ platforms:
       - rockylinux
       - ca
     image: "docker.io/geerlingguy/docker-rockylinux9-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
-    privileged: true
+    systemd: always
     override_command: false
     pre_build_image: true
 
@@ -76,10 +58,7 @@ platforms:
       - rockylinux
       - ca
     image: "docker.io/geerlingguy/docker-rockylinux8-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
-    privileged: true
+    systemd: always
     override_command: false
     pre_build_image: true
 
@@ -88,10 +67,7 @@ platforms:
       - fedora
       - ca
     image: "docker.io/geerlingguy/docker-fedora36-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
-    privileged: true
+    systemd: always
     override_command: false
     pre_build_image: true
 
@@ -109,3 +85,7 @@ provisioner:
         step_ca_intermediate_password: molecule-intermediate
         step_ca_path: /etc/step-ca-molecule
         step_ca_ssh: yes
+
+        step_ca_existing_root_file: /tmp/molecule-ca.crt
+        step_ca_existing_key_file: /tmp/molecule-ca.key
+        step_ca_existing_key_password: wvTfbyADhoowLZp3RsJ9
