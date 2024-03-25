@@ -1,9 +1,9 @@
 - name: Look for step_cli_executable # noqa command-instead-of-shell
   #"command" is a shell builtin, hence the need for the shell module
   shell: "command -v {{ step_cli_executable }}"
-  register: step_cli_install
+  register: _step_cli_install
   # dash (Debian sh shell) uses 127 instead of 1 for not found errors
-  failed_when: step_cli_install.rc not in [0,1,127]
+  failed_when: _step_cli_install.rc not in [0,1,127]
   changed_when: no
   check_mode: no
 
@@ -16,7 +16,7 @@
   changed_when: no
   check_mode: no
   register: step_cli_installed_version
-  when: step_cli_install.rc == 0
+  when: _step_cli_install.rc == 0
 
 - name: Install step-cli
   block:
