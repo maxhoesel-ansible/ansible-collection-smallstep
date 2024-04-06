@@ -116,7 +116,8 @@ See the [step docs](https://smallstep.com/docs/step-cli/reference/ca/init) for m
 
 ##### `step_ca_dns`
 - The comma separated DNS names or IP addresses of the new CA
-- Default: `{{ ansible_fqdn}},{{ ansible_default_ipv4.address }}`
+- Includes the hosts FQDN and main IPv4/6 addresses by default, if present
+- Default: `"{{ ansible_fqdn }},{{ ansible_default_ipv4.address | d('') }},{{ ansible_default_ipv6.address | d('') }}"`
 
 ##### `step_ca_address`
 - The address that the new CA will listen at
