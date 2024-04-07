@@ -97,16 +97,15 @@ validity_fail_reason:
   type: str
   returned: When I(valid=false)
 """
-import json
 from typing import cast, Dict, Any
 
 from ansible.module_utils.basic import AnsibleModule
 
 from ..module_utils.cli_wrapper import StepCliExecutable, CliCommand
+from ..module_utils import helpers
 from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
 FORMAT_CLIARGS = {
-    "json": ["--format", "json"],
     "pem": ["--format", "pem"],
     "text": ["--format", "text"],
     "text-short": ["--format", "text", "--short"],
@@ -119,23 +118,17 @@ RESULT_FORMAT_KEYNAME = {
 }
 
 
-def verify(executable: StepCliExecutable, module: AnsibleModule, path: str) -> Dict[str, Any]:
-    verify_cliarg_map = {
-        "server_name": "--server-name",
-        "roots": "--roots",
-    }
-    cmd = CliCommand(executable, ["certificate", "verify", path], verify_cliarg_map, fail_on_error=False)
-    res = cmd.run(module)
+def inspect_non_json(executable: StepCliExecutable, module: AnsibleModule) -> str:
+    """Run step-cli certificate inspect and return data for a non-json format
 
-    return {"valid": True} if res.rc == 0 else {
-        "valid": False,
-        "validity_fail_reason": res.stderr
-    }
+    Args:
+        executable (StepCliExecutable): Executable to run with
+        module (AnsibleModule): ansible module
 
-
-def inspect(executable: StepCliExecutable, module: AnsibleModule) -> Dict[str, Any]:
+    Returns:
+        str: stdout data from step-cli certificate inspect
+    """
     module_params = cast(Dict, module.params)
-    result = {}
     certificate_info_cliarg_map = {
         "bundle": "--bundle",
         "insecure": "--insecure",
@@ -148,13 +141,7 @@ def inspect(executable: StepCliExecutable, module: AnsibleModule) -> Dict[str, A
     # The docs say inspect outputs to stderr, but my shell says otherwise:
     # https://github.com/smallstep/cli/issues/1032
     res = cmd.run(module)
-    if module_params["format"] == "json":
-        data = json.loads(res.stdout)
-    else:
-        data = res.stdout
-
-    result[RESULT_FORMAT_KEYNAME[module_params["format"]]] = data
-    return result
+    return res.stdout
 
 
 def main():
@@ -175,11 +162,17 @@ def main():
 
     executable = StepCliExecutable(module, module_params["step_cli_executable"])
 
-    try:
-        result.update(inspect(executable, module))
-    except json.JSONDecodeError as e:
-        module.fail_json(f"Unable to decode returned certificate information. Error: {e}")
-    result.update(verify(executable, module, module_params["path"]))
+    cert_info = helpers.get_certificate_info(executable, module, module_params["path"],
+                                             bundle=module_params["bundle"],
+                                             insecure=module_params["insecure"],
+                                             server_name=module_params["server_name"],
+                                             roots=module_params["roots"])
+    data = cert_info.data if module_params["format"] == "json" else inspect_non_json(executable, module)
+    result.update({
+        "valid": cert_info.valid,
+        "validity_fail_reason": cert_info.invalid_reason,
+        RESULT_FORMAT_KEYNAME[module_params["format"]]: data
+    })
 
     module.exit_json(**result)
 

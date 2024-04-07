@@ -260,7 +260,6 @@ EXAMPLES = r"""
     state: absent
     revoke_on_delete: true
 """
-import json
 from pathlib import Path
 from typing import cast, Dict, Any
 
@@ -269,6 +268,7 @@ from ansible.module_utils.common.validation import check_required_if
 
 from ..module_utils.params.ca_connection import CaConnectionParams
 from ..module_utils.cli_wrapper import CliCommand, StepCliExecutable
+from ..module_utils import helpers
 from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
 # maps the kty cli parameter to inspect outputs subject_key_info.key_algorithm.name
@@ -312,29 +312,25 @@ def cert_needs_recreation(executable: StepCliExecutable, module: AnsibleModule) 
         str: Reason for certificate recreation, or empty string if no recreation is needed
     """
     module_params = cast(Dict, module.params)
-    verify_args = ["certificate", "verify", module_params["crt_file"]]
-    if module_params["verify_roots"]:
-        verify_args.extend(["--roots", module_params["verify_roots"]])
 
-    verify_cmd = CliCommand(executable, verify_args, fail_on_error=False, run_in_check_mode=True)
-    res = verify_cmd.run(module)
-    if res.rc != 0:
-        return res.stderr
+    cert_info = helpers.get_certificate_info(
+        executable, module, module_params["crt_file"], roots=module_params["verify_roots"])
 
-    info_cmd = CliCommand(executable, ["certificate", "inspect", module_params["crt_file"],
-                                       "--format", "json"], run_in_check_mode=True)
-    info_res = info_cmd.run(module)
+    # certificate is invalid
+    if not cert_info.valid:
+        return cert_info.invalid_reason
 
-    cert_info = json.loads(info_res.stdout)
-    key_info = cert_info["subject_key_info"]
+    key_info = cert_info.data["subject_key_info"]
     current_kty = key_info["key_algorithm"]["name"]
 
+    # ensure SANs match
     if module_params["san"]:
         desired_sans = sorted(list(set([module_params["name"]] + module_params["san"])))
-        current_sans = sorted(cert_info["names"])
+        current_sans = sorted(cert_info.data["names"])
         if current_sans != desired_sans:
-            return f"Certificate names have changed from {cert_info['names']} to {desired_sans}"
+            return f"Certificate names have changed from {cert_info.data['names']} to {desired_sans}"
 
+    # Ensure key type matches
     if module_params["kty"]:
         if current_kty != CERTINFO_KEY_TYPES[module_params["kty"]]:
             return f"Key type has changed from {current_kty} to {CERTINFO_KEY_TYPES[module_params['kty']]}"
