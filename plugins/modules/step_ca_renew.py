@@ -77,7 +77,7 @@ from typing import Dict, cast, Any
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ..module_utils.cli_wrapper import CLIWrapper
+from ..module_utils.cli_wrapper import CliCommand, StepCliExecutable
 from ..module_utils.params.ca_connection import CaConnectionParams
 from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
@@ -104,22 +104,19 @@ def run_module():
     CaConnectionParams(module).check()
     module_params = cast(Dict, module.params)
 
-    cli = CLIWrapper(module, module_params["step_cli_executable"])
+    executable = StepCliExecutable(module, module_params["step_cli_executable"])
 
     # Regular args
     renew_cliargs = ["expires_in", "force", "exec", "output_file", "password_file", "pid", "pid_file", "signal"]
     # All parameters can be converted to a mapping by just appending -- and replacing the underscores
     renew_cliarg_map = {arg: f"--{arg.replace('_', '-')}" for arg in renew_cliargs}
 
-    cli_params = [
-        "ca", "renew", module_params["crt_file"], module_params["key_file"]
-    ] + cli.build_params({
+    renew_cmd = CliCommand(executable, ["ca", "renew", module_params["crt_file"], module_params["key_file"]], {
         **renew_cliarg_map,
         **CaConnectionParams.cliarg_map
     })
-
-    stderr = cli.run_command(cli_params)[2]
-    if "Your certificate has been saved in" in stderr:
+    renew_res = renew_cmd.run(module)
+    if "Your certificate has been saved in" in renew_res.stderr:
         result["changed"] = True
     module.exit_json(**result)
 

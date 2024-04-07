@@ -268,7 +268,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.validation import check_required_if
 
 from ..module_utils.params.ca_connection import CaConnectionParams
-from ..module_utils.cli_wrapper import CLIWrapper
+from ..module_utils.cli_wrapper import CliCommand, StepCliExecutable
 from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
 # maps the kty cli parameter to inspect outputs subject_key_info.key_algorithm.name
@@ -283,7 +283,8 @@ CERTINFO_KEYINFO_KEY = {
 }
 
 
-def create_certificate(cli: CLIWrapper, params: Dict[str, Any], force: bool = False) -> Dict[str, Any]:
+def create_certificate(executable: StepCliExecutable, module: AnsibleModule, force: bool = False) -> Dict[str, Any]:
+    module_params = cast(Dict, module.params)
     # step ca certificate arguments
     cert_cliargs = ["acme", "attestation_ca_url", "attestation_ca_root", "console", "contact", "curve",
                     "http_listen", "k8ssa_token_path", "kms", "kty", "nebula_cert", "nebula_key", "not_after",
@@ -292,63 +293,65 @@ def create_certificate(cli: CLIWrapper, params: Dict[str, Any], force: bool = Fa
     # All parameters can be converted to a mapping by just appending -- and replacing the underscores
     cert_cliarg_map = {arg: f"--{arg.replace('_', '-')}" for arg in cert_cliargs}
 
-    cli_params = [
-        "ca", "certificate", params["name"],
-        params["crt_file"], params["key_file"]
-    ] + cli.build_params({
+    args = ["ca", "certificate", module_params["name"], module_params["crt_file"], module_params["key_file"]]
+    if force:
+        args.append("--force")
+
+    create_cmd = CliCommand(executable, args, {
         **cert_cliarg_map,
         **CaConnectionParams.cliarg_map
     })
-    if force:
-        cli_params.append("--force")
-
-    cli.run_command(cli_params)
+    create_cmd.run(module)
     return {"changed": True}
 
 
-def cert_needs_recreation(cli: CLIWrapper, params: Dict[str, Any]) -> str:
+def cert_needs_recreation(executable: StepCliExecutable, module: AnsibleModule) -> str:
     """Check whether a certificate needs to be recreated based on its validity and module parameters
 
     Returns:
         str: Reason for certificate recreation, or empty string if no recreation is needed
     """
-    args = ["certificate", "verify", params["crt_file"]]
-    if params["verify_roots"]:
-        args.extend(["--roots", params["verify_roots"]])
-    rc, stdout, stderr = cli.run_command(
-        args, check=False, check_mode_safe=True)
-    if rc != 0:
-        return stderr
+    module_params = cast(Dict, module.params)
+    verify_args = ["certificate", "verify", module_params["crt_file"]]
+    if module_params["verify_roots"]:
+        verify_args.extend(["--roots", module_params["verify_roots"]])
 
-    stdout = cli.run_command(["certificate", "inspect", params["crt_file"],
-                             "--format", "json"], check_mode_safe=True)[1]
-    cert_info = json.loads(stdout)
+    verify_cmd = CliCommand(executable, verify_args, fail_on_error=False, run_in_check_mode=True)
+    res = verify_cmd.run(module)
+    if res.rc != 0:
+        return res.stderr
+
+    info_cmd = CliCommand(executable, ["certificate", "inspect", module_params["crt_file"],
+                                       "--format", "json"], run_in_check_mode=True)
+    info_res = info_cmd.run(module)
+
+    cert_info = json.loads(info_res.stdout)
     key_info = cert_info["subject_key_info"]
     current_kty = key_info["key_algorithm"]["name"]
 
-    if params["san"]:
-        desired_sans = sorted(list(set([params["name"]] + params["san"])))
+    if module_params["san"]:
+        desired_sans = sorted(list(set([module_params["name"]] + module_params["san"])))
         current_sans = sorted(cert_info["names"])
         if current_sans != desired_sans:
             return f"Certificate names have changed from {cert_info['names']} to {desired_sans}"
 
-    if params["kty"]:
-        if current_kty != CERTINFO_KEY_TYPES[params["kty"]]:
-            return f"Key type has changed from {current_kty} to {CERTINFO_KEY_TYPES[params['kty']]}"
-        if params["curve"] and current_kty == "ECDSA":
+    if module_params["kty"]:
+        if current_kty != CERTINFO_KEY_TYPES[module_params["kty"]]:
+            return f"Key type has changed from {current_kty} to {CERTINFO_KEY_TYPES[module_params['kty']]}"
+        if module_params["curve"] and current_kty == "ECDSA":
             current_curve = key_info["ecdsa_public_key"]["curve"]
-            if current_curve != params["curve"]:
-                return f"ECDSA key curve has changed from {current_curve} to {params['curve']}"
+            if current_curve != module_params["curve"]:
+                return f"ECDSA key curve has changed from {current_curve} to {module_params['curve']}"
 
     # key type matches or is not specified, we can assume the current type is correct
-    if params["size"] and current_kty in ["RSA", "ECDSA"]:
+    if module_params["size"] and current_kty in ["RSA", "ECDSA"]:
         current_length = key_info[CERTINFO_KEYINFO_KEY[current_kty]]["length"]
-        if current_length != params["size"]:
-            return f"Key size has changed from {current_length} to {params['size']}"
+        if current_length != module_params["size"]:
+            return f"Key size has changed from {current_length} to {module_params['size']}"
     return ""
 
 
-def revoke_certificate(cli: CLIWrapper, params: Dict[str, Any], module: AnsibleModule) -> Dict[str, Any]:  # pylint: disable=unused-argument
+def revoke_certificate(executable: StepCliExecutable, module: AnsibleModule) -> Dict[str, Any]:  # pylint: disable=unused-argument
     revoke_cliarg_map = {
         "crt_file": "--cert",
         "key_file": "--key",
@@ -356,33 +359,29 @@ def revoke_certificate(cli: CLIWrapper, params: Dict[str, Any], module: AnsibleM
         "revoke_reason_code": "--reasonCode",
         "token": "--token"
     }
-    # Positional Parameters
-    cli_params = [
-        "ca", "revoke"
-    ] + cli.build_params({
+    revoke_cmd = CliCommand(executable, ["ca", "revoke"], {
         **revoke_cliarg_map,
         **CaConnectionParams.cliarg_map
-    })
+    }, fail_on_error=False)
+    res = revoke_cmd.run(module)
 
-    ret = cli.run_command(cli_params, check=False)
-    rc = ret[0]
-    stderr = ret[2]
-    if rc != 0 and "is already revoked" in stderr:
+    if res.rc != 0 and "is already revoked" in res.stderr:
         return {}
-    elif rc != 0:
-        module.fail_json(f"Error revoking certificate: {stderr}")
+    elif res.rc != 0:
+        module.fail_json(f"Error revoking certificate: {res.stderr}")
         return {"changed": True}  # only here to satisfy the type checker, fail_json never returns
     else:
         # ran successfully => revoked
         return {"changed": True}
 
 
-def delete_certificate(cli: CLIWrapper, params: Dict[str, Any], module: AnsibleModule, revoke: bool) -> Dict[str, Any]:
+def delete_certificate(executable: StepCliExecutable, module: AnsibleModule, revoke: bool) -> Dict[str, Any]:
+    module_params = cast(Dict, module.params)
     result = {}
     if revoke:
-        result = revoke_certificate(cli, params, module)
+        result = revoke_certificate(executable, module)
 
-    for file in [Path(params["crt_file"]), Path(params["key_file"])]:
+    for file in [Path(module_params["crt_file"]), Path(module_params["key_file"])]:
         if file.exists():
             try:
                 file.unlink()
@@ -445,27 +444,27 @@ def run_module():
     check_required_if([
         ["state", "present", ["name", "provisioner"], True],
     ], module_params)
-    cli = CLIWrapper(module, module_params["step_cli_executable"])
+    executable = StepCliExecutable(module, module_params["step_cli_executable"])
 
     crt_exists = Path(module_params["crt_file"]).exists()
     if module_params["state"] == "present":
         if not crt_exists:
-            result.update(create_certificate(cli, module_params))
+            result.update(create_certificate(executable, module))
         else:
             if module_params["force"]:
                 recreate_reason = "force parameter enabled"
             else:
-                recreate_reason = cert_needs_recreation(cli, module_params)
+                recreate_reason = cert_needs_recreation(executable, module)
             if recreate_reason:
                 result["recreate_reason"] = recreate_reason
-                result.update(create_certificate(cli, module_params, force=True))
+                result.update(create_certificate(executable, module, force=True))
     elif module_params["state"] == "revoked":
         if crt_exists:
-            result.update(revoke_certificate(cli, module_params, module))
+            result.update(revoke_certificate(executable, module))
         else:
             module.fail_json("Cannot revoke certificate as it does not exist")
     elif module_params["state"] == "absent" and crt_exists:
-        result.update(delete_certificate(cli, module_params, module, module_params["revoke_on_delete"]))
+        result.update(delete_certificate(executable, module, module_params["revoke_on_delete"]))
 
     module.exit_json(**result)
 

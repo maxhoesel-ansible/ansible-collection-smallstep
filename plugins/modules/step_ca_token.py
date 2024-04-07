@@ -141,7 +141,7 @@ from ansible.module_utils.common.validation import check_required_one_of
 from ansible.module_utils.common.validation import check_mutually_exclusive
 from ansible.module_utils.basic import AnsibleModule
 
-from ..module_utils.cli_wrapper import CLIWrapper
+from ..module_utils.cli_wrapper import StepCliExecutable, CliCommand
 from ..module_utils.params.ca_connection import CaConnectionParams
 from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
@@ -193,7 +193,7 @@ def run_module():
         result["msg"] = "At least one of return_token and output_file must be specified"
         module.fail_json(**result)
 
-    cli = CLIWrapper(module, module_params["step_cli_executable"])
+    executable = StepCliExecutable(module, module_params["step_cli_executable"])
 
     # Regular args
     token_cliargs = ["cert_not_after", "cert_not_before", "force", "host", "k8ssa_token_path", "key", "kid",
@@ -203,18 +203,15 @@ def run_module():
     # All parameters can be converted to a mapping by just appending -- and replacing the underscores
     token_cliarg_map = {arg: f"--{arg.replace('_', '-')}" for arg in token_cliargs}
 
-    # Positional Parameters
-    cli_params = [
-        "ca", "token", module_params["name"]
-    ] + cli.build_params({
+    token_cmd = CliCommand(executable, ["ca", "token", module_params["name"]], {
         **token_cliarg_map,
         **CaConnectionParams.cliarg_map
     })
+    token_res = token_cmd.run(module)
 
-    stdout = cli.run_command(cli_params)[1]
     result["changed"] = True
     if module_params["return_token"]:
-        result["token"] = stdout
+        result["token"] = token_res.stdout
     module.exit_json(**result)
 
 

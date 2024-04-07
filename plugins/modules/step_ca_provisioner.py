@@ -368,7 +368,7 @@ EXAMPLES = r"""
 - name: Create a JWK provisioner with duration claims
   maxhoesel.smallstep.step_ca_provisioner:
     name: cicd
-    type: JWK
+    type: JWK, cli
     create: yes
     x509_min_dur: 20m
     x509_default_dur: 20m
@@ -442,7 +442,7 @@ from typing import cast, Dict, Any
 from ansible.module_utils.basic import AnsibleModule
 
 from ..module_utils.params.ca_admin import AdminParams
-from ..module_utils.cli_wrapper import CLIWrapper
+from ..module_utils.cli_wrapper import CliCommand, StepCliExecutable
 from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
 # We cannot use the default connection module util, as that one includes the --offline flag,
@@ -504,38 +504,33 @@ CREATE_UPDATE_CLIARG_MAP = {
 }
 
 
-def add_provisioner(name: str, provisioner_type: str, cli: CLIWrapper):
-    cli_params = [
-        "ca", "provisioner", "add", name, "--type", provisioner_type
-    ] + cli.build_params({
+def add_provisioner(name: str, provisioner_type: str, executable: StepCliExecutable, module: AnsibleModule):
+    cmd = CliCommand(executable, ["ca", "provisioner", "add", name, "--type", provisioner_type], {
         **CREATE_UPDATE_CLIARG_MAP,
         **CONNECTION_CLIARG_MAP,
         **AdminParams.cliarg_map
     })
-    cli.run_command(cli_params)
+    cmd.run(module)
     return
 
 
-def update_provisioner(name: str, cli: CLIWrapper):
-    cli_params = [
-        "ca", "provisioner", "update", name
-    ] + cli.build_params({
+def update_provisioner(name: str, executable: StepCliExecutable, module: AnsibleModule):
+    cmd = CliCommand(executable, ["ca", "provisioner", "update", name], {
         **CREATE_UPDATE_CLIARG_MAP,
         **CONNECTION_CLIARG_MAP,
         **AdminParams.cliarg_map
     })
-    cli.run_command(cli_params)
+    cmd.run(module)
     return
 
 
-def remove_provisioner(name: str, cli: CLIWrapper):
-    cli_params = [
-        "ca", "provisioner", "remove", name
-    ] + cli.build_params({
+def remove_provisioner(name: str, executable: StepCliExecutable, module: AnsibleModule):
+    cmd = CliCommand(executable, ["ca", "provisioner", "remove", name], {
         **CONNECTION_CLIARG_MAP,
         **AdminParams.cliarg_map
     })
-    cli.run_command(cli_params)
+    cmd.run(module)
+    return
 
 
 def run_module():
@@ -606,7 +601,7 @@ def run_module():
     admin_params.check()
     module_params = cast(Dict, module.params)
 
-    cli = CLIWrapper(module, module_params["step_cli_executable"])
+    executable = StepCliExecutable(module, module_params["step_cli_executable"])
 
     state = cast(str, module_params["state"])
     p_type = cast(str, module_params["type"])
@@ -614,14 +609,14 @@ def run_module():
     if state == "present" and not p_type:
         module.fail_json("Provisioner type is required when state == present")
 
-    rc, stdout = cli.run_command(
-        ["ca", "provisioner", "list"] + cli.build_params(CONNECTION_CLIARG_MAP),
-        check_mode_safe=True, check=False)[0:2]
+    ca_online_check = CliCommand(executable, ["ca", "provisioner", "list"],
+                                 CONNECTION_CLIARG_MAP, run_in_check_mode=True, fail_on_error=False)
+    ca_online_res = ca_online_check.run(module)
     # Offline provisioner management is possible even if the CA is down.
     # ca provisioner list does depend on the CA being available however, so we need some backup strategies.
-    if rc == 0:
+    if ca_online_res.rc == 0:
         try:
-            provisioners = json.loads(stdout)
+            provisioners = json.loads(ca_online_res.stdout)
         except (json.JSONDecodeError, OSError) as e:
             module.fail_json(f"Error reading provisioner config: {e}")
     elif admin_params.is_defined():
@@ -644,16 +639,16 @@ def run_module():
             if state == "present" and p["type"] == p_type:
                 result["msg"] = "Provisioner found in CA config - not modified"
             elif state == "updated":
-                update_provisioner(module_params["name"], cli)
+                update_provisioner(module_params["name"], executable, module)
                 result["changed"] = True
             elif state == "absent":
-                remove_provisioner(module_params["name"], cli)
+                remove_provisioner(module_params["name"], executable, module)
                 result["changed"] = True
             module.exit_json(**result)
 
     # No matching provisioner found
     if state == "present":
-        add_provisioner(module_params["name"], module_params["type"], cli)
+        add_provisioner(module_params["name"], module_params["type"], executable, module)
         result["changed"] = True
     elif state == "updated":
         module.fail_json(f"Provisioner {module_params['name']} not found but state is 'updated'")

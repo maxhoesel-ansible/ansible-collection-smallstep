@@ -102,7 +102,7 @@ from typing import cast, Dict, Any
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ..module_utils.cli_wrapper import CLIWrapper
+from ..module_utils.cli_wrapper import StepCliExecutable, CliCommand
 from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
 FORMAT_CLIARGS = {
@@ -119,23 +119,22 @@ RESULT_FORMAT_KEYNAME = {
 }
 
 
-def verify(cli: CLIWrapper, path: str) -> Dict[str, Any]:
+def verify(executable: StepCliExecutable, module: AnsibleModule, path: str) -> Dict[str, Any]:
     verify_cliarg_map = {
         "server_name": "--server-name",
         "roots": "--roots",
     }
-    cli_params = [
-        "certificate", "verify", path
-    ] + cli.build_params(verify_cliarg_map)
+    cmd = CliCommand(executable, ["certificate", "verify", path], verify_cliarg_map, fail_on_error=False)
+    res = cmd.run(module)
 
-    ret = cli.run_command(cli_params, check=False)
-    return {"valid": True} if ret[0] == 0 else {
+    return {"valid": True} if res.rc == 0 else {
         "valid": False,
-        "validity_fail_reason": ret[2]  # stderr
+        "validity_fail_reason": res.stderr
     }
 
 
-def inspect(cli: CLIWrapper, module_params: Dict[str, Any]) -> Dict[str, Any]:
+def inspect(executable: StepCliExecutable, module: AnsibleModule) -> Dict[str, Any]:
+    module_params = cast(Dict, module.params)
     result = {}
     certificate_info_cliarg_map = {
         "bundle": "--bundle",
@@ -143,17 +142,16 @@ def inspect(cli: CLIWrapper, module_params: Dict[str, Any]) -> Dict[str, Any]:
         "server_name": "--server-name",
         "roots": "--roots",
     }
-    cli_params = [
-        "certificate", "inspect", module_params["path"]
-    ] + cli.build_params(certificate_info_cliarg_map) + FORMAT_CLIARGS[module_params["format"]]
+    cmd = CliCommand(executable, ["certificate", "inspect", module_params["path"]] +
+                     FORMAT_CLIARGS[module_params["format"]], certificate_info_cliarg_map)
 
     # The docs say inspect outputs to stderr, but my shell says otherwise:
     # https://github.com/smallstep/cli/issues/1032
-    stdout = cli.run_command(cli_params)[1]
+    res = cmd.run(module)
     if module_params["format"] == "json":
-        data = json.loads(stdout)
+        data = json.loads(res.stdout)
     else:
-        data = stdout
+        data = res.stdout
 
     result[RESULT_FORMAT_KEYNAME[module_params["format"]]] = data
     return result
@@ -175,13 +173,13 @@ def main():
     }, supports_check_mode=True)
     module_params = cast(Dict, module.params)
 
-    cli = CLIWrapper(module, module_params["step_cli_executable"])
+    executable = StepCliExecutable(module, module_params["step_cli_executable"])
 
     try:
-        result.update(inspect(cli, module_params))
+        result.update(inspect(executable, module))
     except json.JSONDecodeError as e:
         module.fail_json(f"Unable to decode returned certificate information. Error: {e}")
-    result.update(verify(cli, module_params["path"]))
+    result.update(verify(executable, module, module_params["path"]))
 
     module.exit_json(**result)
 
