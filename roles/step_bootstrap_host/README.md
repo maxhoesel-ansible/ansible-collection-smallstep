@@ -10,11 +10,12 @@ It will:
 
 ## Requirements
 
-- The following distributions are currently supported:
-  - Ubuntu 18.04 LTS or newer
-  - Debian 10 or newer
-  - Fedora 36 or newer
-  - A CentOS-compatible distribution like RockyLinux/AlmaLinux 8 or newer. RockyLinux is used for testing
+- The following distributions are currently supported and tested:
+  - Ubuntu: `20.04 LTS, 22.04 LTS`
+  - Debian: `11, 12`
+  - Fedora: `38, 39`
+  - RHEL(-compatible): `9` (RockyLinux is used for testing)
+  - Other distributions may work as well, but are not tested
 - This role requires root access. Make sure to run this role with `become: yes` or equivalent
 - `step-cli` will be automatically installed, if not already present
 
