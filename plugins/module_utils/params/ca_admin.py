@@ -17,22 +17,29 @@ class AdminParams(ParamsHelper):
         admin_key=dict(type="path"),
         admin_provisioner=dict(type="str", aliases=["admin_issuer"]),
         admin_subject=dict(type="str", aliases=["admin_name"]),
+        admin_password=dict(type="str", no_log=True),
         admin_password_file=dict(type="path", no_log=False)
     )
 
     @classmethod
     def cli_args(cls) -> CliCommandArgs:
-        return CliCommandArgs([], {key: f"--{key.replace('_', '-')}" for key in cls.argument_spec})
+        return CliCommandArgs([], {
+            "admin_cert": "--admin-cert",
+            "admin_key": "--admin-key",
+            "admin_provisioner": "--admin-provisioner",
+            "admin_subject": "--admin-subject",
+            "admin_password_file": "--admin-password-file",
+        }, {
+            "admin_password": "--admin-password-file"
+        })
 
     # pylint: disable=useless-parent-delegation
     def __init__(self, module: AnsibleModule) -> None:
         super().__init__(module)
 
     def check(self):
-        try:
-            validation.check_required_together(["admin_cert", "admin_key"], self.module.params)
-        except ValueError:
-            self.module.fail_json(msg="admin_cert and admin_key must be specified together")
+        validation.check_required_together(["admin_cert", "admin_key"], self.module.params)
+        validation.check_mutually_exclusive(["admin_password", "admin_password_file"], self.module.params)
 
     def is_defined(self):
         return bool(self.module.params["admin_cert"])  # type: ignore

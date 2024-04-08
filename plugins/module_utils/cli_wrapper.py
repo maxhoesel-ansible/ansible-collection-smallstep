@@ -90,7 +90,7 @@ class CliCommandArgs:
         # Create temporary files for any parameters that need to point to files, such as password-file
         # Since these files may contain sensitive data, we first create the fd with locked-down permissions,
         # then write the actual content
-        for module_arg in self.module_tmpfile_args:
+        for module_arg in [arg for arg in self.module_tmpfile_args if module_params[arg]]:
             path = tmpdir / module_arg
             path.touch(0o700, exist_ok=False)
             with open(path, "w", encoding="utf-8") as f:
@@ -98,15 +98,13 @@ class CliCommandArgs:
             args.extend([self.module_tmpfile_args[module_arg], path.as_posix()])
 
         # transform the values in module_params into valid step-coi arguments using module_args_params mapping
-        for param_name in self.module_param_args:
+        for param_name in [arg for arg in self.module_param_args if module_params[arg]]:
             if param_name not in module_params:
                 raise CliError(f"Could not build command parameters: "
                                f"param '{param_name}' not in module argspec, this is most likely a bug")
+
             param_type = module.argument_spec[param_name].get("type", "str")
-            if not module_params[param_name]:
-                # param not set
-                pass
-            elif param_type == "bool" and bool(module_params[param_name]):
+            if param_type == "bool" and bool(module_params[param_name]):
                 args.append(self.module_param_args[param_name])
             elif param_type == "list":
                 for item in cast(List, module_params[param_name]):
@@ -147,7 +145,7 @@ class CliCommand:
             CliError if the module args don't match with the provided params
         """
         # use a context manager to ensure that our sensitive temporary files are *always* deleted
-        with tempfile.TemporaryDirectory("ansible-smallstep") as tmpdir:
+        with tempfile.TemporaryDirectory("-ansible-smallstep") as tmpdir:
             cmd = [self.executable.path] + self.args.build(module, Path(tmpdir))
 
             if module.check_mode and not self.run_in_check_mode:

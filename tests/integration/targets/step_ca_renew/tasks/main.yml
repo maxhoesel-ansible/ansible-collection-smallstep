@@ -12,6 +12,7 @@
   maxhoesel.smallstep.step_ca_renew:
     crt_file: /tmp/generated_certificate
     key_file: /tmp/generated_key
+    password_file: "{{ ca_provisioner_password_file }}"
     expires_in: 5m
     force: yes
   register: early_renewal
@@ -24,6 +25,7 @@
   maxhoesel.smallstep.step_ca_renew:
     crt_file: /tmp/generated_certificate
     key_file: /tmp/generated_key
+    password: "{{ ca_provisioner_password }}"
     force: yes
     expires_in: 61m
   register: forced_renewal

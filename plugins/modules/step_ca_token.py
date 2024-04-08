@@ -77,8 +77,16 @@ options:
       - issuer
     description: The provisioner name to use.
     type: str
+  provisioner_password:
+    description: >
+        The password to encrypt or decrypt the one-time token generating key.
+        Will be passed to step-cli through a temporary file.
+        Mutually exclusive with I(password_file)
+    type: str
   provisioner_password_file:
-    description: The path to the file containing the password to decrypt the one-time token generating key.
+    description: >
+        The path to the file containing the password to decrypt the one-time token generating key.
+        Mutually exclusive with I(provisioner_password_file)
     type: path
   return_token:
     description: >
@@ -137,8 +145,7 @@ token:
 """
 from typing import cast, Dict, Any
 
-from ansible.module_utils.common.validation import check_required_one_of
-from ansible.module_utils.common.validation import check_mutually_exclusive
+from ansible.module_utils.common.validation import check_required_one_of, check_mutually_exclusive
 from ansible.module_utils.basic import AnsibleModule
 
 from ..module_utils.cli_wrapper import CliCommandArgs, StepCliExecutable, CliCommand
@@ -161,6 +168,7 @@ def run_module():
         output_file=dict(type="path"),
         principal=dict(type="list", elements="str"),
         provisioner=dict(type="str", aliases=["issuer"]),
+        provisioner_password=dict(type="str", no_log=True),
         provisioner_password_file=dict(type="path", no_log=False),
         return_token=dict(type="bool"),
         revoke=dict(type="bool"),
@@ -183,15 +191,11 @@ def run_module():
     module_params = cast(Dict, module.params)
 
     try:
-        check_mutually_exclusive(["return_token", "output_file"], module.params)
-    except TypeError:
-        result["msg"] = "return_token and output_file cannot be specified at the same time"
-        module.fail_json(**result)
-    try:
-        check_required_one_of(["return_token", "output_file"], module.params)
-    except TypeError:
-        result["msg"] = "At least one of return_token and output_file must be specified"
-        module.fail_json(**result)
+        check_mutually_exclusive(["return_token", "output_file"], module_params)
+        check_required_one_of(["return_token", "output_file"], module_params)
+        check_mutually_exclusive(["provisioner_password", "provisioner_password_file"], module_params)
+    except TypeError as e:
+        module.fail_json(f"Parameter validation failed: {e}")
 
     executable = StepCliExecutable(module, module_params["step_cli_executable"])
 
@@ -204,7 +208,10 @@ def run_module():
     token_cliarg_map = {arg: f"--{arg.replace('_', '-')}" for arg in token_cliargs}
 
     token_args = CaConnectionParams.cli_args().join(CliCommandArgs(
-        ["ca", "token", module_params["name"]], token_cliarg_map))
+        ["ca", "token", module_params["name"]],
+        token_cliarg_map,
+        {"provisioner_password": "--provisioner-password-file"}
+    ))
     token_cmd = CliCommand(executable, token_args)
     token_res = token_cmd.run(module)
 

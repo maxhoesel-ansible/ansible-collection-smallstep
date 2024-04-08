@@ -126,8 +126,16 @@ options:
       - issuer
     description: The provisioner name to use. Required if I(state=present).
     type: str
+  provisioner_password:
+    description: >
+      The password to decrypt the one-time token generating key.
+      Will be passed to step-cli through a temporary file.
+      Mutually exclusive with I(provisioner_password_file)
+    type: str
   provisioner_password_file:
-    description: The path to the file containing the password to decrypt the one-time token generating key.
+    description: >
+        The path to the file containing the password to decrypt the one-time token generating key.
+        Mutually exclusive with I(provisioner_password)
     type: path
   revoke_on_delete:
     description: If I(state=absent), attempt to revoke the certificate before deleting it
@@ -264,7 +272,7 @@ from pathlib import Path
 from typing import cast, Dict, Any
 
 from ansible.module_utils.basic import AnsibleModule
-from ansible.module_utils.common.validation import check_required_if
+from ansible.module_utils.common.validation import check_required_if, check_mutually_exclusive
 
 from ..module_utils.params.ca_connection import CaConnectionParams
 from ..module_utils.cli_wrapper import CliCommand, CliCommandArgs, StepCliExecutable
@@ -297,7 +305,8 @@ def create_certificate(executable: StepCliExecutable, module: AnsibleModule, for
     if force:
         args.append("--force")
 
-    create_args = CaConnectionParams.cli_args().join(CliCommandArgs(args, cert_cliarg_map))
+    create_args = CaConnectionParams.cli_args().join(CliCommandArgs(
+        args, cert_cliarg_map, {"provisioner_password": "--provisioner-password-file"}))
     create_cmd = CliCommand(executable, create_args)
     create_cmd.run(module)
     return {"changed": True}
@@ -408,6 +417,7 @@ def run_module():
         not_after=dict(type="str"),
         not_before=dict(type="str"),
         provisioner=dict(type="str", aliases=["issuer"]),
+        provisioner_password=dict(type="str", no_log=True),
         provisioner_password_file=dict(type="path", no_log=False),
         revoke_on_delete=dict(type="bool", default=True),
         revoke_reason=dict(type="str"),
@@ -431,11 +441,17 @@ def run_module():
         **CaConnectionParams.argument_spec,
         **argument_spec,
     }, supports_check_mode=True)
-    CaConnectionParams(module).check()
     module_params = cast(Dict, module.params)
-    check_required_if([
-        ["state", "present", ["name", "provisioner"], True],
-    ], module_params)
+
+    try:
+        CaConnectionParams(module).check()
+        check_required_if([
+            ["state", "present", ["name", "provisioner"], True],
+        ], module_params)
+        check_mutually_exclusive(["provisioner_password", "provisioner_password_file"], module_params)
+    except TypeError as e:
+        module.fail_json(f"Parameter validation failed: {e}")
+
     executable = StepCliExecutable(module, module_params["step_cli_executable"])
 
     crt_exists = Path(module_params["crt_file"]).exists()
