@@ -101,8 +101,10 @@ argument_specs:
           - If unset, uses the root password will be used as the intermediate password
       step_ca_dns:
         type: str
-        default: "{{ ansible_fqdn}},{{ ansible_default_ipv4.address }}"
-        description: The comma separated DNS names or IP addresses of the new CA
+        default: "{{ ansible_fqdn }},{{ ansible_default_ipv4.address | d('') }},{{ ansible_default_ipv6.address | d('') }}"
+        description:
+          - The comma separated DNS names or IP addresses of the new CA
+          - Includes the hosts FQDN and main IPv4/6 addresses by default, if present
       step_ca_address:
         type: str
         default: :443
