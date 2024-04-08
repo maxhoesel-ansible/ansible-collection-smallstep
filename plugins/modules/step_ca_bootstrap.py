@@ -56,7 +56,7 @@ import os
 from typing import Dict, cast, Any
 
 from ansible.module_utils.basic import AnsibleModule
-from ..module_utils.cli_wrapper import CliCommand, StepCliExecutable
+from ..module_utils.cli_wrapper import CliCommand, CliCommandArgs, StepCliExecutable
 
 DEFAULTS_FILE = f"{os.environ.get('STEPPATH', os.environ['HOME'] + '/.step')}/config/defaults.json"
 
@@ -92,13 +92,14 @@ def run_module():
                 result["failed"] = True
             module.exit_json(**result)
 
-    bootstrap_cmd = CliCommand(cli_exec, ["ca", "bootstrap"], {
+    bootstrap_args = CliCommandArgs(["ca", "bootstrap"], {
         "ca_url": "--ca-url",
         "fingerprint": "--fingerprint",
         "force": "--force",
         "install": "--install",
         "redirect_url": "--redirect-url",
     })
+    bootstrap_cmd = CliCommand(cli_exec, bootstrap_args)
     bootstrap_cmd.run(module)
     result["changed"] = True
     module.exit_json(**result)

@@ -101,7 +101,7 @@ from typing import cast, Dict, Any
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ..module_utils.cli_wrapper import StepCliExecutable, CliCommand
+from ..module_utils.cli_wrapper import CliCommandArgs, StepCliExecutable, CliCommand
 from ..module_utils import helpers
 from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
@@ -135,8 +135,9 @@ def inspect_non_json(executable: StepCliExecutable, module: AnsibleModule) -> st
         "server_name": "--server-name",
         "roots": "--roots",
     }
-    cmd = CliCommand(executable, ["certificate", "inspect", module_params["path"]] +
-                     FORMAT_CLIARGS[module_params["format"]], certificate_info_cliarg_map)
+    args = CliCommandArgs(["certificate", "inspect", module_params["path"]] +
+                          FORMAT_CLIARGS[module_params["format"]], certificate_info_cliarg_map)
+    cmd = CliCommand(executable, args)
 
     # The docs say inspect outputs to stderr, but my shell says otherwise:
     # https://github.com/smallstep/cli/issues/1032

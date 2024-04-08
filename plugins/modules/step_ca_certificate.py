@@ -267,7 +267,7 @@ from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common.validation import check_required_if
 
 from ..module_utils.params.ca_connection import CaConnectionParams
-from ..module_utils.cli_wrapper import CliCommand, StepCliExecutable
+from ..module_utils.cli_wrapper import CliCommand, CliCommandArgs, StepCliExecutable
 from ..module_utils import helpers
 from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
@@ -297,10 +297,8 @@ def create_certificate(executable: StepCliExecutable, module: AnsibleModule, for
     if force:
         args.append("--force")
 
-    create_cmd = CliCommand(executable, args, {
-        **cert_cliarg_map,
-        **CaConnectionParams.cliarg_map
-    })
+    create_args = CaConnectionParams.cli_args().join(CliCommandArgs(args, cert_cliarg_map))
+    create_cmd = CliCommand(executable, create_args)
     create_cmd.run(module)
     return {"changed": True}
 
@@ -355,10 +353,8 @@ def revoke_certificate(executable: StepCliExecutable, module: AnsibleModule) -> 
         "revoke_reason_code": "--reasonCode",
         "token": "--token"
     }
-    revoke_cmd = CliCommand(executable, ["ca", "revoke"], {
-        **revoke_cliarg_map,
-        **CaConnectionParams.cliarg_map
-    }, fail_on_error=False)
+    revoke_args = CaConnectionParams.cli_args().join(CliCommandArgs(["ca", "revoke"], revoke_cliarg_map))
+    revoke_cmd = CliCommand(executable, revoke_args, fail_on_error=False)
     res = revoke_cmd.run(module)
 
     if res.rc != 0 and "is already revoked" in res.stderr:

@@ -3,6 +3,8 @@ from typing import Dict, Any
 
 from ansible.module_utils.basic import AnsibleModule
 
+from ..cli_wrapper import CliCommandArgs
+
 
 class ParamsHelper(ABC):
     """A helper class that provides a set of module parameters and a method to validate them.
@@ -27,8 +29,8 @@ class ParamsHelper(ABC):
         """Returns the helpers argument spec, as expected by AnsibleModule()
         """
 
-    @property
+    @classmethod
     @abstractmethod
-    def cliarg_map(self) -> Dict[str, str]:
-        """Returns a map of params with their corresponding cli parameter, for use in CliWrapper
+    def cli_args(cls) -> CliCommandArgs:
+        """Returns a CliCommandArgs object containing all the arguments needed for this parameter group
         """

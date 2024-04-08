@@ -141,7 +141,7 @@ from ansible.module_utils.common.validation import check_required_one_of
 from ansible.module_utils.common.validation import check_mutually_exclusive
 from ansible.module_utils.basic import AnsibleModule
 
-from ..module_utils.cli_wrapper import StepCliExecutable, CliCommand
+from ..module_utils.cli_wrapper import CliCommandArgs, StepCliExecutable, CliCommand
 from ..module_utils.params.ca_connection import CaConnectionParams
 from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
@@ -203,10 +203,9 @@ def run_module():
     # All parameters can be converted to a mapping by just appending -- and replacing the underscores
     token_cliarg_map = {arg: f"--{arg.replace('_', '-')}" for arg in token_cliargs}
 
-    token_cmd = CliCommand(executable, ["ca", "token", module_params["name"]], {
-        **token_cliarg_map,
-        **CaConnectionParams.cliarg_map
-    })
+    token_args = CaConnectionParams.cli_args().join(CliCommandArgs(
+        ["ca", "token", module_params["name"]], token_cliarg_map))
+    token_cmd = CliCommand(executable, token_args)
     token_res = token_cmd.run(module)
 
     result["changed"] = True
