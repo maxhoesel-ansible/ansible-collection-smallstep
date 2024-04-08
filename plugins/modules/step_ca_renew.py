@@ -77,7 +77,7 @@ from typing import Dict, cast, Any
 
 from ansible.module_utils.basic import AnsibleModule
 
-from ..module_utils.cli_wrapper import CliCommand, StepCliExecutable
+from ..module_utils.cli_wrapper import CliCommand, CliCommandArgs, StepCliExecutable
 from ..module_utils.params.ca_connection import CaConnectionParams
 from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
@@ -111,10 +111,9 @@ def run_module():
     # All parameters can be converted to a mapping by just appending -- and replacing the underscores
     renew_cliarg_map = {arg: f"--{arg.replace('_', '-')}" for arg in renew_cliargs}
 
-    renew_cmd = CliCommand(executable, ["ca", "renew", module_params["crt_file"], module_params["key_file"]], {
-        **renew_cliarg_map,
-        **CaConnectionParams.cliarg_map
-    })
+    renew_args = CaConnectionParams.cli_args().join(CliCommandArgs(
+        ["ca", "renew", module_params["crt_file"], module_params["key_file"]], renew_cliarg_map))
+    renew_cmd = CliCommand(executable, renew_args)
     renew_res = renew_cmd.run(module)
     if "Your certificate has been saved in" in renew_res.stderr:
         result["changed"] = True

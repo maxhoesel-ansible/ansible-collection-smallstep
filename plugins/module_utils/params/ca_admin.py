@@ -6,6 +6,7 @@ from typing import Dict, Any
 from ansible.module_utils.basic import AnsibleModule
 from ansible.module_utils.common import validation
 
+from ..cli_wrapper import CliCommandArgs
 from .params_helper import ParamsHelper
 
 
@@ -18,7 +19,10 @@ class AdminParams(ParamsHelper):
         admin_subject=dict(type="str", aliases=["admin_name"]),
         admin_password_file=dict(type="path", no_log=False)
     )
-    cliarg_map: Dict[str, str] = {key: f"--{key.replace('_', '-')}" for key in argument_spec}
+
+    @classmethod
+    def cli_args(cls) -> CliCommandArgs:
+        return CliCommandArgs([], {key: f"--{key.replace('_', '-')}" for key in cls.argument_spec})
 
     # pylint: disable=useless-parent-delegation
     def __init__(self, module: AnsibleModule) -> None:

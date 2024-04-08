@@ -442,7 +442,7 @@ from typing import cast, Dict, Any
 from ansible.module_utils.basic import AnsibleModule
 
 from ..module_utils.params.ca_admin import AdminParams
-from ..module_utils.cli_wrapper import CliCommand, StepCliExecutable
+from ..module_utils.cli_wrapper import CliCommand, CliCommandArgs, StepCliExecutable
 from ..module_utils.constants import DEFAULT_STEP_CLI_EXECUTABLE
 
 # We cannot use the default connection module util, as that one includes the --offline flag,
@@ -453,7 +453,7 @@ CONNECTION_CLIARG_MAP = {
     "root": "--root"
 }
 
-CREATE_UPDATE_CLIARG_MAP = {
+CREATE_UPDATE_CLIARGS = {
     "allow_renewal_after_expiry": "--allow-renewal-after-expiry",
     "aws_accounts": "--aws-account",
     "azure_audience": "--azure-audience",
@@ -505,30 +505,31 @@ CREATE_UPDATE_CLIARG_MAP = {
 
 
 def add_provisioner(name: str, provisioner_type: str, executable: StepCliExecutable, module: AnsibleModule):
-    cmd = CliCommand(executable, ["ca", "provisioner", "add", name, "--type", provisioner_type], {
-        **CREATE_UPDATE_CLIARG_MAP,
-        **CONNECTION_CLIARG_MAP,
-        **AdminParams.cliarg_map
-    })
+    args = AdminParams.cli_args().join(CliCommandArgs(
+        ["ca", "provisioner", "add", name, "--type", provisioner_type],
+        {**CREATE_UPDATE_CLIARGS, **CONNECTION_CLIARG_MAP}
+    ))
+    cmd = CliCommand(executable, args)
     cmd.run(module)
     return
 
 
 def update_provisioner(name: str, executable: StepCliExecutable, module: AnsibleModule):
-    cmd = CliCommand(executable, ["ca", "provisioner", "update", name], {
-        **CREATE_UPDATE_CLIARG_MAP,
-        **CONNECTION_CLIARG_MAP,
-        **AdminParams.cliarg_map
-    })
+    args = AdminParams.cli_args().join(CliCommandArgs(
+        ["ca", "provisioner", "update", name],
+        {**CREATE_UPDATE_CLIARGS, **CONNECTION_CLIARG_MAP}
+    ))
+    cmd = CliCommand(executable, args)
     cmd.run(module)
     return
 
 
 def remove_provisioner(name: str, executable: StepCliExecutable, module: AnsibleModule):
-    cmd = CliCommand(executable, ["ca", "provisioner", "remove", name], {
-        **CONNECTION_CLIARG_MAP,
-        **AdminParams.cliarg_map
-    })
+    args = AdminParams.cli_args().join(CliCommandArgs(
+        ["ca", "provisioner", "remove", name],
+        CONNECTION_CLIARG_MAP
+    ))
+    cmd = CliCommand(executable, args)
     cmd.run(module)
     return
 
@@ -609,8 +610,8 @@ def run_module():
     if state == "present" and not p_type:
         module.fail_json("Provisioner type is required when state == present")
 
-    ca_online_check = CliCommand(executable, ["ca", "provisioner", "list"],
-                                 CONNECTION_CLIARG_MAP, run_in_check_mode=True, fail_on_error=False)
+    ca_online_check_args = CliCommandArgs(["ca", "provisioner", "list"], CONNECTION_CLIARG_MAP)
+    ca_online_check = CliCommand(executable, ca_online_check_args, run_in_check_mode=True, fail_on_error=False)
     ca_online_res = ca_online_check.run(module)
     # Offline provisioner management is possible even if the CA is down.
     # ca provisioner list does depend on the CA being available however, so we need some backup strategies.

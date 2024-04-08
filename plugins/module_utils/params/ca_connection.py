@@ -5,6 +5,7 @@ from typing import Dict, Any
 
 from ansible.module_utils.basic import AnsibleModule
 
+from ..cli_wrapper import CliCommandArgs
 from .params_helper import ParamsHelper
 
 
@@ -16,7 +17,10 @@ class CaConnectionParams(ParamsHelper):
         ca_config=dict(type="path"),
         offline=dict(type="bool"),
     )
-    cliarg_map: Dict[str, str] = {key: f"--{key.replace('_', '-')}" for key in argument_spec}
+
+    @classmethod
+    def cli_args(cls) -> CliCommandArgs:
+        return CliCommandArgs([], {key: f"--{key.replace('_', '-')}" for key in cls.argument_spec})
 
     # pylint: disable=useless-parent-delegation
     def __init__(self, module: AnsibleModule) -> None:

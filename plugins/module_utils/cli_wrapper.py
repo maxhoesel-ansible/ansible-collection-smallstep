@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from pathlib import Path
 import tempfile
@@ -49,71 +51,40 @@ class CliCommandResult:
 
 
 @dataclass
-class CliCommand:
-    """CliCommand represents a single command to be run by step-cli
+class CliCommandArgs:
+    """Arguments to be passed to the command.
 
-    Args:
-        executable(StepCliExecutable): The executable to run the command with
-        args (List[str]): Fixed list of parameters/args to pass to step-cli, such as ["ca", "certificate"]
-        module_param_args (Dict[str,str]): Args to be sourced from a modules args. Keys must be valid module params
-                            (such as "provisioner"), while their values are the corresponding step-cli parameter
-                            (such as "--provisioner"). Values are transformed according to their type:
+    args is a plain list of arguments to be passed in
+    module_param_args is a str-str dict that maps module params to command-line args.
+        For example, {"provisioner": "--provisioner"} will cause the module param "provisioner" to be passed in
+        as the value to the "--provisioner" argument. Values are transformed according to their type:
             - bools only pass the corresponding flag (e.g. --force)
             - list causes the mapped arg to be repeated for each value (e.g. --in=1 --in=2)
             - all other types are formatted and passed as-is
-        module_tmpfile_args (Dict[str,str]): Same as module_params, except that the value is written to a
-                            temporary file and the passed value is the path to that file.
-                            For example, {"password": "--jwk-password-file"}, will result in the value of the
-                            "password" module arg to be written to a temporary file that is then passed to
-                            "--jwk-password-file". This is primarily intended for password files and sensitive data
-        run_in_check_mode (bool): Whether to run this command even if Ansibles check_mode is enabled.
-                                  If false and check_mode is enabled, the invocation will exit with rc=0 and no output.
-                                  Only set this on invocations that don't change the system state! Default is false
-        fail_on_error(bool): Whether to run module_fail if this invocation fails. Default is true
+    module_tmpfile_args is the same as module_param_args, except that the value is written to a temporary file
+        at runtime and the path to that file is passed instead. This is primarily intended for password files.
     """
-    executable: StepCliExecutable
     args: List[str]
     module_param_args: Dict[str, str] = field(default_factory=dict)
     module_tmpfile_args: Dict[str, str] = field(default_factory=dict)
-    run_in_check_mode: bool = False
-    fail_on_error: bool = True
 
-    def run(self, module: AnsibleModule) -> CliCommandResult:
-        """Execute the command with the given step-cli executable and Ansible module
+    def join(self, other: CliCommandArgs) -> CliCommandArgs:
+        """Joins this Args object with another one and produces a new object containing values from both.
+        `args` are appended while the module_x_args values are merged. The other object takes precedence.
 
         Args:
-            module (AnsibleModule): The Ansible module
+            other (Self): The other object to merge with
 
         Returns:
-            CliCommandResult: Result of the command.
-
-        Raises:
-            CliError if the module args don't match with the provided params
+            Self: New Args object
         """
-        # use a context manager to ensure that our sensitive temporary files are *always* deleted
-        with tempfile.TemporaryDirectory("ansible-smallstep") as tmpdir:
-            args = self._build_args(module, Path(tmpdir))
+        return CliCommandArgs(self.args + other.args,
+                              {**self.module_param_args, **other.module_param_args},
+                              {**self.module_tmpfile_args, **other.module_tmpfile_args}
+                              )
 
-            if module.check_mode and not self.run_in_check_mode:
-                return CliCommandResult(0, "", "")
-
-            rc, stdout, stderr = module.run_command(args)
-            if rc != 0 and self.fail_on_error:
-                if ("error allocating terminal" in stderr or "open /dev/tty: no such device or address" in stderr):
-                    module.fail_json(
-                        "Failed to run command: step-cli tried to open a terminal for interactive input. "
-                        "This happens when step-cli prompts for additional parameters or asks for confirmation. "
-                        "You may be missing a required parameter (such as 'force'). Check the module documentation. "
-                        "If you are sure that you provided all required parameters, you may have encountered a bug. "
-                        f"Please file an issue at {COLLECTION_REPO} if you think this is the case. "
-                        f"Failed command: \'{' '.join(args)}\'"
-                    )
-                else:
-                    module.fail_json(f"Error running command \'{' '.join(args)}\'. Error: {stderr}")
-            return CliCommandResult(rc, stdout, stderr)
-
-    def _build_args(self, module: AnsibleModule, tmpdir: Path) -> List[str]:
-        args = [self.executable.path] + self.args
+    def build(self, module: AnsibleModule, tmpdir: Path) -> List[str]:
+        args = self.args
         module_params = cast(Dict, module.params)
 
         # Create temporary files for any parameters that need to point to files, such as password-file
@@ -144,3 +115,55 @@ class CliCommand:
                 # all other types
                 args.extend([self.module_param_args[param_name], str(module_params[param_name])])
         return args
+
+
+@dataclass
+class CliCommand:
+    """CliCommand represents a single command to be run by step-cli
+
+    Args:
+        executable(StepCliExecutable): The executable to run the command with
+        argspec (CliCommandArgs): Arguments to be passed to the executable
+        run_in_check_mode (bool): Whether to run this command even if Ansibles check_mode is enabled.
+                                  If false and check_mode is enabled, the invocation will exit with rc=0 and no output.
+                                  Only set this on invocations that don't change the system state! Default is false
+        fail_on_error(bool): Whether to run module_fail if this invocation fails. Default is true
+    """
+    executable: StepCliExecutable
+    args: CliCommandArgs
+    run_in_check_mode: bool = False
+    fail_on_error: bool = True
+
+    def run(self, module: AnsibleModule) -> CliCommandResult:
+        """Execute the command with the given step-cli executable and Ansible module
+
+        Args:
+            module (AnsibleModule): The Ansible module
+
+        Returns:
+            CliCommandResult: Result of the command.
+
+        Raises:
+            CliError if the module args don't match with the provided params
+        """
+        # use a context manager to ensure that our sensitive temporary files are *always* deleted
+        with tempfile.TemporaryDirectory("ansible-smallstep") as tmpdir:
+            cmd = [self.executable.path] + self.args.build(module, Path(tmpdir))
+
+            if module.check_mode and not self.run_in_check_mode:
+                return CliCommandResult(0, "", "")
+
+            rc, stdout, stderr = module.run_command(cmd)
+            if rc != 0 and self.fail_on_error:
+                if ("error allocating terminal" in stderr or "open /dev/tty: no such device or address" in stderr):
+                    module.fail_json(
+                        "Failed to run command: step-cli tried to open a terminal for interactive input. "
+                        "This happens when step-cli prompts for additional parameters or asks for confirmation. "
+                        "You may be missing a required parameter (such as 'force'). Check the module documentation. "
+                        "If you are sure that you provided all required parameters, you may have encountered a bug. "
+                        f"Please file an issue at {COLLECTION_REPO} if you think this is the case. "
+                        f"Failed command: \'{' '.join(cmd)}\'"
+                    )
+                else:
+                    module.fail_json(f"Error running command \'{' '.join(cmd)}\'. Error: {stderr}")
+            return CliCommandResult(rc, stdout, stderr)

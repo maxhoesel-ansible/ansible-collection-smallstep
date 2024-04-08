@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Dict, Any
 
 from ansible.module_utils.basic import AnsibleModule
-from ..module_utils.cli_wrapper import CliCommand, StepCliExecutable
+from ..module_utils.cli_wrapper import CliCommand, StepCliExecutable, CliCommandArgs
 
 
 @dataclass
@@ -42,7 +42,7 @@ def get_certificate_info(
     if roots:
         inspect_args.extend(["--roots", roots])
 
-    inspect_cmd = CliCommand(executable, inspect_args, run_in_check_mode=True)
+    inspect_cmd = CliCommand(executable, CliCommandArgs(inspect_args), run_in_check_mode=True)
     inspect_res = inspect_cmd.run(module)
     # The docs say inspect outputs to stderr, but my shell says otherwise:
     # https://github.com/smallstep/cli/issues/1032
@@ -56,7 +56,7 @@ def get_certificate_info(
         verify_args.extend(["--server-name", server_name])
     if roots:
         verify_args.extend(["--roots", roots])
-    verify_cmd = CliCommand(executable, verify_args, run_in_check_mode=True, fail_on_error=False)
+    verify_cmd = CliCommand(executable, CliCommandArgs(verify_args), run_in_check_mode=True, fail_on_error=False)
     verify_res = verify_cmd.run(module)
     valid = verify_res.rc == 0
     invalid_reason = "" if valid else verify_res.stderr
