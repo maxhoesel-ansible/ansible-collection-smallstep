@@ -20,7 +20,16 @@ class ModuleDocFragment:
         type: str
         aliases:
           - admin_name
+      admin_password:
+        description: >
+            The password to encrypt or decrypt the private key.
+            Will be passed to step-cli through a temporary file.
+            Mutually exclusive with I(admin_password_file)
+        type: str
       admin_password_file:
-        description: The path to the file containing the password to encrypt or decrypt the private key.
+        description: >
+            The path to the file containing the password to encrypt or decrypt the private key.
+            Must already be present on the remote host.
+            Mutually exclusive with I(admin_password)
         type: path
     '''

@@ -164,8 +164,16 @@ options:
     version_added: 0.20.0
     aliases:
       - tenant_id
+  password:
+    description: >
+        The password to encrypt or decrypt the private key.
+        Will be passed to step-cli through a temporary file.
+        Mutually exclusive with I(password_file)
+    type: str
   password_file:
-    description: The path to the file containing the password to encrypt or decrypt the private key.
+    description: >
+        The path to the file containing the password to encrypt or decrypt the private key.
+        Mutually exclusive with I(password)
     type: path
   public_key:
     description: >
@@ -440,6 +448,7 @@ import os
 from typing import cast, Dict, Any
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.validation import check_mutually_exclusive
 
 from ..module_utils.params.ca_admin import AdminParams
 from ..module_utils.cli_wrapper import CliCommand, CliCommandArgs, StepCliExecutable
@@ -502,12 +511,16 @@ CREATE_UPDATE_CLIARGS = {
     "x509_default_dur": "--x509-default-dur",
     "x5c_root": "--x5c-root",
 }
+CREATE_UPDATE_TMPFILE_ARGS = {
+    "password": "--password-file"
+}
 
 
 def add_provisioner(name: str, provisioner_type: str, executable: StepCliExecutable, module: AnsibleModule):
     args = AdminParams.cli_args().join(CliCommandArgs(
         ["ca", "provisioner", "add", name, "--type", provisioner_type],
-        {**CREATE_UPDATE_CLIARGS, **CONNECTION_CLIARG_MAP}
+        {**CREATE_UPDATE_CLIARGS, **CONNECTION_CLIARG_MAP},
+        CREATE_UPDATE_TMPFILE_ARGS
     ))
     cmd = CliCommand(executable, args)
     cmd.run(module)
@@ -517,7 +530,8 @@ def add_provisioner(name: str, provisioner_type: str, executable: StepCliExecuta
 def update_provisioner(name: str, executable: StepCliExecutable, module: AnsibleModule):
     args = AdminParams.cli_args().join(CliCommandArgs(
         ["ca", "provisioner", "update", name],
-        {**CREATE_UPDATE_CLIARGS, **CONNECTION_CLIARG_MAP}
+        {**CREATE_UPDATE_CLIARGS, **CONNECTION_CLIARG_MAP},
+        CREATE_UPDATE_TMPFILE_ARGS
     ))
     cmd = CliCommand(executable, args)
     cmd.run(module)
@@ -564,6 +578,7 @@ def run_module():
         oidc_groups=dict(type="list", elements="str", aliases=["group", "oidc_group"]),
         oidc_listen_address=dict(type="str", aliases=["listen_address", "oidc_client_address"]),
         oidc_tenant_id=dict(type="str", aliases=["tenant_id"]),
+        password=dict(type="str", no_log=True),
         password_file=dict(type="path", no_log=False),
         public_key=dict(type="path", aliases=["jwk_public_key", "k8ssa_public_key", "k8s_pem_keys_file"]),
         require_eab=dict(type="bool"),
@@ -598,9 +613,14 @@ def run_module():
         **AdminParams.argument_spec,
         **argument_spec
     }, supports_check_mode=True)
-    admin_params = AdminParams(module)
-    admin_params.check()
     module_params = cast(Dict, module.params)
+    admin_params = AdminParams(module)
+
+    try:
+        admin_params.check()
+        check_mutually_exclusive(["password", "password_file"], module_params)
+    except TypeError as e:
+        module.fail_json(f"Parameter validation failed: {e}")
 
     executable = StepCliExecutable(module, module_params["step_cli_executable"])
 

@@ -3,191 +3,191 @@
     key_file: "/tmp/key.pem"
 
 - block:
-  - name: Create normal certificate on CA
-    maxhoesel.smallstep.step_ca_certificate:
-      name: "127.0.0.1"
-      crt_file: "{{ crt_file }}"
-      key_file: "{{ key_file }}"
-      provisioner: "{{ ca_provisioner }}"
-      provisioner_password_file: "{{ ca_provisioner_password_file }}"
-      san:
-        - foo.bar
-      kty: RSA
-      size: 4096
-      not_after: 3h
+    - name: Create normal certificate on CA
+      maxhoesel.smallstep.step_ca_certificate:
+        name: "127.0.0.1"
+        crt_file: "{{ crt_file }}"
+        key_file: "{{ key_file }}"
+        provisioner: "{{ ca_provisioner }}"
+        provisioner_password_file: "{{ ca_provisioner_password_file }}"
+        san:
+          - foo.bar
+        kty: RSA
+        size: 4096
+        not_after: 3h
 
-  - name: Certificate is still present (idempotency check)
-    maxhoesel.smallstep.step_ca_certificate:
-      name: "127.0.0.1"
-      crt_file: "{{ crt_file }}"
-      key_file: "{{ key_file }}"
-      provisioner: "{{ ca_provisioner }}"
-      provisioner_password_file: "{{ ca_provisioner_password_file }}"
-      san:
-        - foo.bar
-      kty: RSA
-      size: 4096
-      not_after: 3h
-      verify_roots: "/root/.step/certs/root_ca.crt"
-    register: cert_idempotency
-  - name: Check that cert did not change
-    ansible.builtin.assert:
-      that: not cert_idempotency.changed
+    - name: Certificate is still present (idempotency check)
+      maxhoesel.smallstep.step_ca_certificate:
+        name: "127.0.0.1"
+        crt_file: "{{ crt_file }}"
+        key_file: "{{ key_file }}"
+        provisioner: "{{ ca_provisioner }}"
+        provisioner_password_file: "{{ ca_provisioner_password_file }}"
+        san:
+          - foo.bar
+        kty: RSA
+        size: 4096
+        not_after: 3h
+        verify_roots: "/root/.step/certs/root_ca.crt"
+      register: cert_idempotency
+    - name: Check that cert did not change
+      ansible.builtin.assert:
+        that: not cert_idempotency.changed
 
-  - name: Certificate stays the same if parameters are omitted
-    maxhoesel.smallstep.step_ca_certificate:
-      name: "127.0.0.1"
-      crt_file: "{{ crt_file }}"
-      key_file: "{{ key_file }}"
-      provisioner: "{{ ca_provisioner }}"
-      provisioner_password_file: "{{ ca_provisioner_password_file }}"
-      verify_roots: "/root/.step/certs/root_ca.crt"
-    register: cert_missing_parameters_idempotency
-  - name: Check that cert did not change
-    ansible.builtin.assert:
-      that: not cert_missing_parameters_idempotency.changed
+    - name: Certificate stays the same if parameters are omitted
+      maxhoesel.smallstep.step_ca_certificate:
+        name: "127.0.0.1"
+        crt_file: "{{ crt_file }}"
+        key_file: "{{ key_file }}"
+        provisioner: "{{ ca_provisioner }}"
+        provisioner_password_file: "{{ ca_provisioner_password_file }}"
+        verify_roots: "/root/.step/certs/root_ca.crt"
+      register: cert_missing_parameters_idempotency
+    - name: Check that cert did not change
+      ansible.builtin.assert:
+        that: not cert_missing_parameters_idempotency.changed
 
-  - name: Certificate gets reissued on force
-    maxhoesel.smallstep.step_ca_certificate:
-      force: true
-      name: "127.0.0.1"
-      crt_file: "{{ crt_file }}"
-      key_file: "{{ key_file }}"
-      provisioner: "{{ ca_provisioner }}"
-      provisioner_password_file: "{{ ca_provisioner_password_file }}"
-      san:
-        - foo.bar
-      kty: RSA
-      size: 4096
-      not_after: 3h
-      verify_roots: "/root/.step/certs/root_ca.crt"
-    register: cert_force
-  - name: Check that cert changed
-    ansible.builtin.assert:
-      that: cert_force.changed
+    - name: Certificate gets reissued on force
+      maxhoesel.smallstep.step_ca_certificate:
+        force: true
+        name: "127.0.0.1"
+        crt_file: "{{ crt_file }}"
+        key_file: "{{ key_file }}"
+        provisioner: "{{ ca_provisioner }}"
+        provisioner_password: "{{ ca_provisioner_password }}"
+        san:
+          - foo.bar
+        kty: RSA
+        size: 4096
+        not_after: 3h
+        verify_roots: "/root/.step/certs/root_ca.crt"
+      register: cert_force
+    - name: Check that cert changed
+      ansible.builtin.assert:
+        that: cert_force.changed
 
-  - name: Certificate gets reissued on SAN change
-    maxhoesel.smallstep.step_ca_certificate:
-      name: "127.0.0.1"
-      crt_file: "{{ crt_file }}"
-      key_file: "{{ key_file }}"
-      provisioner: "{{ ca_provisioner }}"
-      provisioner_password_file: "{{ ca_provisioner_password_file }}"
-      san:
-        - foo.bar
-        - another.san
-      kty: RSA
-      size: 4096
-      not_after: 3h
-      verify_roots: "/root/.step/certs/root_ca.crt"
-    register: cert_san
-  - name: Check that cert changed
-    ansible.builtin.assert:
-      that: cert_san.changed
+    - name: Certificate gets reissued on SAN change
+      maxhoesel.smallstep.step_ca_certificate:
+        name: "127.0.0.1"
+        crt_file: "{{ crt_file }}"
+        key_file: "{{ key_file }}"
+        provisioner: "{{ ca_provisioner }}"
+        provisioner_password: "{{ ca_provisioner_password }}"
+        san:
+          - foo.bar
+          - another.san
+        kty: RSA
+        size: 4096
+        not_after: 3h
+        verify_roots: "/root/.step/certs/root_ca.crt"
+      register: cert_san
+    - name: Check that cert changed
+      ansible.builtin.assert:
+        that: cert_san.changed
 
-  - name: Certificate gets reissued on size change
-    maxhoesel.smallstep.step_ca_certificate:
-      name: "127.0.0.1"
-      crt_file: "{{ crt_file }}"
-      key_file: "{{ key_file }}"
-      provisioner: "{{ ca_provisioner }}"
-      provisioner_password_file: "{{ ca_provisioner_password_file }}"
-      san:
-        - foo.bar
-        - another.san
-      kty: RSA
-      size: 2048
-      not_after: 3h
-      verify_roots: "/root/.step/certs/root_ca.crt"
-    register: cert_size
-  - name: Check that cert changed
-    ansible.builtin.assert:
-      that: cert_size.changed
+    - name: Certificate gets reissued on size change
+      maxhoesel.smallstep.step_ca_certificate:
+        name: "127.0.0.1"
+        crt_file: "{{ crt_file }}"
+        key_file: "{{ key_file }}"
+        provisioner: "{{ ca_provisioner }}"
+        provisioner_password: "{{ ca_provisioner_password }}"
+        san:
+          - foo.bar
+          - another.san
+        kty: RSA
+        size: 2048
+        not_after: 3h
+        verify_roots: "/root/.step/certs/root_ca.crt"
+      register: cert_size
+    - name: Check that cert changed
+      ansible.builtin.assert:
+        that: cert_size.changed
 
-  - name: Certificate gets reissued on kty change
-    maxhoesel.smallstep.step_ca_certificate:
-      name: "127.0.0.1"
-      crt_file: "{{ crt_file }}"
-      key_file: "{{ key_file }}"
-      provisioner: "{{ ca_provisioner }}"
-      provisioner_password_file: "{{ ca_provisioner_password_file }}"
-      san:
-        - foo.bar
-        - another.san
-      kty: EC
-      not_after: 3h
-      verify_roots: "/root/.step/certs/root_ca.crt"
-    register: cert_kty
-  - name: Check that cert changed
-    ansible.builtin.assert:
-      that: cert_kty.changed
+    - name: Certificate gets reissued on kty change
+      maxhoesel.smallstep.step_ca_certificate:
+        name: "127.0.0.1"
+        crt_file: "{{ crt_file }}"
+        key_file: "{{ key_file }}"
+        provisioner: "{{ ca_provisioner }}"
+        provisioner_password: "{{ ca_provisioner_password }}"
+        san:
+          - foo.bar
+          - another.san
+        kty: EC
+        not_after: 3h
+        verify_roots: "/root/.step/certs/root_ca.crt"
+      register: cert_kty
+    - name: Check that cert changed
+      ansible.builtin.assert:
+        that: cert_kty.changed
 
-  - name: Certificate gets reissued on crv change
-    maxhoesel.smallstep.step_ca_certificate:
-      name: "127.0.0.1"
-      crt_file: "{{ crt_file }}"
-      key_file: "{{ key_file }}"
-      provisioner: "{{ ca_provisioner }}"
-      provisioner_password_file: "{{ ca_provisioner_password_file }}"
-      san:
-        - foo.bar
-        - another.san
-      kty: EC
-      crv: P-521
-      not_after: 3h
-      verify_roots: "/root/.step/certs/root_ca.crt"
-    register: cert_crv
-  - name: Check that cert changed
-    ansible.builtin.assert:
-      that: cert_crv.changed
+    - name: Certificate gets reissued on crv change
+      maxhoesel.smallstep.step_ca_certificate:
+        name: "127.0.0.1"
+        crt_file: "{{ crt_file }}"
+        key_file: "{{ key_file }}"
+        provisioner: "{{ ca_provisioner }}"
+        provisioner_password: "{{ ca_provisioner_password }}"
+        san:
+          - foo.bar
+          - another.san
+        kty: EC
+        crv: P-521
+        not_after: 3h
+        verify_roots: "/root/.step/certs/root_ca.crt"
+      register: cert_crv
+    - name: Check that cert changed
+      ansible.builtin.assert:
+        that: cert_crv.changed
 
-  - name: Revoke certificate
-    maxhoesel.smallstep.step_ca_certificate:
-      crt_file: "{{ crt_file }}"
-      key_file: "{{ key_file }}"
-      state: revoked
-    register: revoked
-  - name: Check that cert got revoked
-    ansible.builtin.assert:
-      that: revoked.changed
+    - name: Revoke certificate
+      maxhoesel.smallstep.step_ca_certificate:
+        crt_file: "{{ crt_file }}"
+        key_file: "{{ key_file }}"
+        state: revoked
+      register: revoked
+    - name: Check that cert got revoked
+      ansible.builtin.assert:
+        that: revoked.changed
 
-  - name: Revoke certificate again
-    maxhoesel.smallstep.step_ca_certificate:
-      crt_file: "{{ crt_file }}"
-      key_file: "{{ key_file }}"
-      state: revoked
-    register: revoked_again
-  - name: Check that cert revocation didn't change
-    ansible.builtin.assert:
-      that: not revoked_again.changed
+    - name: Revoke certificate again
+      maxhoesel.smallstep.step_ca_certificate:
+        crt_file: "{{ crt_file }}"
+        key_file: "{{ key_file }}"
+        state: revoked
+      register: revoked_again
+    - name: Check that cert revocation didn't change
+      ansible.builtin.assert:
+        that: not revoked_again.changed
 
-  - name: Delete certificate
-    maxhoesel.smallstep.step_ca_certificate:
-      crt_file: "{{ crt_file }}"
-      key_file: "{{ key_file }}"
-      revoke_on_delete: true # already the default
-      state: absent
-    register: deleted
-  - name: Check that cert got deleted
-    ansible.builtin.assert:
-      that: revoked.changed
+    - name: Delete certificate
+      maxhoesel.smallstep.step_ca_certificate:
+        crt_file: "{{ crt_file }}"
+        key_file: "{{ key_file }}"
+        revoke_on_delete: true # already the default
+        state: absent
+      register: deleted
+    - name: Check that cert got deleted
+      ansible.builtin.assert:
+        that: revoked.changed
 
-  - name: Delete certificate again
-    maxhoesel.smallstep.step_ca_certificate:
-      crt_file: "{{ crt_file }}"
-      key_file: "{{ key_file }}"
-      revoke_on_delete: true # already the default
-      state: absent
-    register: deleted_again
-  - name: Check that cert did not change
-    ansible.builtin.assert:
-      that: not deleted_again.changed
+    - name: Delete certificate again
+      maxhoesel.smallstep.step_ca_certificate:
+        crt_file: "{{ crt_file }}"
+        key_file: "{{ key_file }}"
+        revoke_on_delete: true # already the default
+        state: absent
+      register: deleted_again
+    - name: Check that cert did not change
+      ansible.builtin.assert:
+        that: not deleted_again.changed
 
   always:
-  - name: Delete generated files
-    file:
-      path: "{{ item }}"
-      state: absent
-    loop:
-      - "{{ crt_file }}"
-      - "{{ key_file }}"
+    - name: Delete generated files
+      file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ crt_file }}"
+        - "{{ key_file }}"

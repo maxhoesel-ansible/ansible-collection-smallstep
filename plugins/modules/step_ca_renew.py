@@ -38,8 +38,16 @@ options:
   output_file:
     description: The new certificate file path. Defaults to overwriting the crt-file positional argument.
     type: path
+  password:
+    description: >
+        The password to encrypt or decrypt the private key.
+        Will be passed to step-cli through a temporary file.
+        Mutually exclusive with I(password_file)
+    type: str
   password_file:
-    description: The path to the file containing the password to encrypt or decrypt the private key.
+    description: >
+        The path to the file containing the password to encrypt or decrypt the private key.
+        Mutually exclusive with I(password)
     type: path
   pid:
     description: >
@@ -76,6 +84,7 @@ EXAMPLES = r"""
 from typing import Dict, cast, Any
 
 from ansible.module_utils.basic import AnsibleModule
+from ansible.module_utils.common.validation import check_mutually_exclusive
 
 from ..module_utils.cli_wrapper import CliCommand, CliCommandArgs, StepCliExecutable
 from ..module_utils.params.ca_connection import CaConnectionParams
@@ -90,6 +99,7 @@ def run_module():
         exec=dict(type="str"),
         key_file=dict(type="path", required=True),
         output_file=dict(type="path"),
+        password=dict(type="str", no_log=True),
         password_file=dict(type="path", no_log=False),
         pid=dict(type="int"),
         pid_file=dict(type="path"),
@@ -101,8 +111,13 @@ def run_module():
         **CaConnectionParams.argument_spec,
         **argument_spec
     }, supports_check_mode=True)
-    CaConnectionParams(module).check()
     module_params = cast(Dict, module.params)
+
+    try:
+        CaConnectionParams(module).check()
+        check_mutually_exclusive(["password", "password_file"], module_params)
+    except TypeError as e:
+        module.fail_json(f"Parameter validation failed: {e}")
 
     executable = StepCliExecutable(module, module_params["step_cli_executable"])
 
@@ -112,7 +127,10 @@ def run_module():
     renew_cliarg_map = {arg: f"--{arg.replace('_', '-')}" for arg in renew_cliargs}
 
     renew_args = CaConnectionParams.cli_args().join(CliCommandArgs(
-        ["ca", "renew", module_params["crt_file"], module_params["key_file"]], renew_cliarg_map))
+        ["ca", "renew", module_params["crt_file"], module_params["key_file"]],
+        renew_cliarg_map,
+        {"password": "--password-file"}
+    ))
     renew_cmd = CliCommand(executable, renew_args)
     renew_res = renew_cmd.run(module)
     if "Your certificate has been saved in" in renew_res.stderr:
