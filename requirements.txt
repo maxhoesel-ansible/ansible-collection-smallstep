@@ -22,7 +22,7 @@ packaging==24.0
 ansible-core==2.16.5
 
 # Docs
-antsibull-docs==2.9.0
+antsibull-docs==2.10.0
 ansible-pygments==0.1.1
 sphinx==7.2.6
 sphinx-ansible-theme==0.10.3
