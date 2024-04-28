@@ -8,7 +8,7 @@ autopep8==2.1.0
 pre-commit==3.7.0
 
 # Testing libraries
-pytest==8.1.2
+pytest==8.2.0
 pytest-virtualenv==1.7.0
 docker==7.0.0
 
