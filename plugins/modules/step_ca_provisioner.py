@@ -640,6 +640,7 @@ def run_module():
             provisioners = json.loads(ca_online_res.stdout)
         except (json.JSONDecodeError, OSError) as e:
             module.fail_json(f"Error reading provisioner config: {e}")
+            return  # makes pylint happy
     elif admin_params.is_defined():
         # Admin credentials means that the provisioners are managed remotely and are stored in the DB.
         # Combined with a connection failure, this means that we are unable to continue
@@ -647,6 +648,7 @@ def run_module():
             "Could not contact CA to retrieve provisioners and cannot fallback to direct manipulation "
             "as remote admin parameters are set. Aborting"
         )
+        return  # makes pylint happy
     else:
         # Without admin, provisioners are always managed locally, so we can just read them as a fallback
         with open(module_params["ca_config"], "rb") as f:
@@ -654,8 +656,9 @@ def run_module():
                 provisioners = json.load(f).get("authority", {}).get("provisioners", [])
             except (json.JSONDecodeError, OSError) as e:
                 module.fail_json(f"Error reading provisioner config: {e}")
+                return  # makes pylint and pylance happy
 
-    for p in provisioners:  # type: ignore
+    for p in provisioners:
         if p["name"] == module_params["name"]:
             if state == "present" and p["type"] == p_type:
                 result["msg"] = "Provisioner found in CA config - not modified"
