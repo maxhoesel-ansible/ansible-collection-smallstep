@@ -10,7 +10,7 @@ pre-commit==3.7.1
 # Testing libraries
 pytest==8.2.0
 pytest-virtualenv==1.7.0
-docker==7.0.0
+docker==7.1.0
 
 # Utility packages used in scripts
 pyyaml==6.0.1
