@@ -176,8 +176,8 @@ While the *Ansible* collection itself doesn't have any dependencies outside of a
 We use [`pip-tools`](https://github.com/jazzband/pip-tools/) to lock these dependencies to a specific version for testing.
 This prevents random CI failures because of [`requests` updates et. al.](https://github.com/docker/docker-py/pull/3257), but still gives us a simple `requirements.txt` that anyone can install.
 
-The direct dependencies are stored in `requirements.in`, use `pip-compile requirements.in` to generate a new `requirements.txt`.
-You **must** add the `requirements.in` file, else renovate [won't be able to resolve and update dependencies in CI!](https://docs.renovatebot.com/modules/manager/pip-compile/#assumption-of-header-with-a-command)
+The direct dependencies are stored in `requirements.in`, use `scripts/udate_requirements.sh` to generate a new `requirements.txt`.
+Do **not** generate `requirements.txt` in another way or remove the header, else renovate [won't be able to resolve and update dependencies in CI!](https://docs.renovatebot.com/modules/manager/pip-compile/#assumption-of-header-with-a-command)
 
 
 ### Raising minimum supported step versions

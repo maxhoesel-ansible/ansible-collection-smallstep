@@ -13,7 +13,7 @@ filters: &semver-tagged
 executors:
   pytest:
     machine:
-      # use an older ubuntu image with python 3.11 until pytest 8.0 is out
+      # python 3.11, needed for ansible-test 2.15
       image: ubuntu-2204:2023.10.1
     resource_class: large
 
@@ -27,10 +27,7 @@ jobs:
         description: Version of Ansible to use for testing
         type: string
       step-version:
-        type: enum
-        enum:
-          - latest
-          - compat
+        type: string
         description: Version of smallstep to test
       node-python-version:
         description: Version of python to use for module tests
@@ -38,26 +35,13 @@ jobs:
     executor: pytest
     parallelism: << parameters.parallelism >>
     steps:
-      - when:
-          condition:
-            equal: ["<< parameters.step-version >>", "latest"]
-          steps:
-            - collection-testing/pytest:
-                pytest-args: >
-                  --ansible-version << parameters.ansible-version >>
-                  --step-cli-version "latest"
-                  --step-ca-version "latest"
-                  --node-python-version << parameters.node-python-version >>
-      - when:
-          condition:
-            equal: ["<< parameters.step-version >>", "compat"]
-          steps:
-            - collection-testing/pytest:
-                pytest-args: >
-                  --ansible-version << parameters.ansible-version >>
-                  --step-cli-version "0.24.0"
-                  --step-ca-version "0.24.0"
-                  --node-python-version << parameters.node-python-version >>
+      - collection-testing/pytest:
+          pytest-args: >
+            --ci
+            --ansible-version "<< parameters.ansible-version >>"
+            --step-cli-version "<< parameters.step-version >>"
+            --step-ca-version "<< parameters.step-version >>"
+            --node-python-version "<< parameters.node-python-version >>"
 
 workflows:
   ci:
@@ -68,7 +52,7 @@ workflows:
           matrix:
             parameters:
               ansible-version: ["2.15", "2.16"]
-              step-version: ["latest", "compat"]
+              step-version: ["latest", "0.24.0"]
               node-python-version: ["3.7"]
       - collection-testing/pre-commit-lint:
           name: Lint

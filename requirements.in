@@ -4,30 +4,31 @@
 # Requirements for developing this collection
 # Includes utilities, CLI helpers and so on
 
+# Include a version of ansible-core for IDE hints and the default pytest version
+# It is also needed for docs generation.
+#
+# This installed version can be overriden by running pytest with the --ansible-version command.
+# Ideally pytest would install another venv just for the test, but the pytest-virtualenv package
+# is ancient and incompatible with python 3.12.
+ansible-core==2.16.6
+
 # Linting & Formatting
 ansible-lint==24.5.0
 pylint==3.2.1
 autopep8==2.1.0
 pre-commit==3.7.1
 
-# Testing libraries
+# Utility packages used in test fixtures and scripts
 pytest==8.2.0
-pytest-virtualenv==1.7.0
+pyyaml==6.0.1
+packaging==24.0
 docker==7.1.0
 # Dependencies for executing the role scenarios.
 molecule==6.0.2
 molecule-plugins[docker]==23.4.1
 
-# Utility packages used in scripts
-pyyaml==6.0.1
-packaging==24.0
 # Generating requirements and syncing venv
 pip-tools==7.4.1
-
-# Also include a version of ansible-core for IDE hints
-# and as the default version used in tests.
-# It is also needed for docs generation
-ansible-core==2.16.6
 
 # Docs
 antsibull-docs==2.11.0
