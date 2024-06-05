@@ -170,6 +170,16 @@ The CI also builds the docs to ensure they don't break silently.
 
 ## Maintainer information
 
+### Updating Dependencies
+
+While the *Ansible* collection itself doesn't have any dependencies outside of ansible itself, the tooling used to build and test the collection does.
+We use [`pip-tools`](https://github.com/jazzband/pip-tools/) to lock these dependencies to a specific version for testing.
+This prevents random CI failures because of [`requests` updates et. al.](https://github.com/docker/docker-py/pull/3257), but still gives us a simple `requirements.txt` that anyone can install.
+
+The direct dependencies are stored in `requirements.in`, use `pip-compile requirements.in` to generate a new `requirements.txt`.
+You **must** add the `requirements.in` file, else renovate [won't be able to resolve and update dependencies in CI!](https://docs.renovatebot.com/modules/manager/pip-compile/#assumption-of-header-with-a-command)
+
+
 ### Raising minimum supported step versions
 
 1. Change the versions in [`plugins/module_utils/constants.py`](./plugins/module_utils/constants.py)
