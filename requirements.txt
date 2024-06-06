@@ -50,7 +50,7 @@ attrs==23.2.0
     #   aiohttp
     #   jsonschema
     #   referencing
-autopep8==2.1.0
+autopep8==2.2.0
     # via -r requirements.in
 babel==2.15.0
     # via sphinx
