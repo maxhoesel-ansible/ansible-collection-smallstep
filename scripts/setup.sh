@@ -11,8 +11,8 @@ source .venv/bin/activate
 printf "Installing development requirements..."
 python3 -m pip install --upgrade pip --quiet
 python3 -m pip install --quiet -r requirements.txt --upgrade
-# Also install the scenario requirements so we can run them directly
-python3 -m pip install --quiet -r tests/roles/requirements.txt --upgrade
+python3 -m piptools sync --pip-args "--quiet" # ensure contents stay synced with lockfile
+
 printf "OK\n"
 
 printf "Installing pre-commit hook..."

@@ -20,10 +20,10 @@ def render_integration_config(template, dest: Path, **kwargs):
         f.write(f"{content}\n")
 
 
-def test_plugins_integration_remote(test_versions, remote_ca_container, ansible_test_env):
+def test_plugins_integration_remote(collection_test_env, test_versions, remote_ca_container, ):
     render_integration_config(
         INTEGRATION_CONFIG_TEMPLATE_REMOTE,
-        ansible_test_env.cwd / "tests" / "integration" / INTEGRATION_CONFIG_FILE,
+        collection_test_env.cwd / "tests" / "integration" / INTEGRATION_CONFIG_FILE,
         step_ca_version=test_versions.step_ca_version,
         step_cli_version=test_versions.step_cli_version,
         step_remote_ca_url=remote_ca_container.ca_url,
@@ -32,7 +32,7 @@ def test_plugins_integration_remote(test_versions, remote_ca_container, ansible_
         step_remote_ca_provisioner_password=remote_ca_container.ca_provisioner_password
     )
 
-    ansible_test_env.run([
+    collection_test_env.run([
         "ansible-test", "integration", "--color", "-v",
         "--controller", "docker:default",
         "--target", f"docker:default,python={test_versions.node_python_version}",
@@ -41,15 +41,15 @@ def test_plugins_integration_remote(test_versions, remote_ca_container, ansible_
     ])
 
 
-def test_plugins_integration_local(test_versions, local_ca_image, ansible_test_env):
+def test_plugins_integration_local(collection_test_env, test_versions, local_ca_image):
     render_integration_config(
         INTEGRATION_CONFIG_TEMPLATE_LOCAL,
-        ansible_test_env.cwd / "tests" / "integration" / INTEGRATION_CONFIG_FILE,
+        collection_test_env.cwd / "tests" / "integration" / INTEGRATION_CONFIG_FILE,
         step_ca_version=test_versions.step_ca_version,
         step_cli_version=test_versions.step_cli_version,
     )
 
-    ansible_test_env.run([
+    collection_test_env.run([
         "ansible-test", "integration", "--color", "-v",
         "--controller", "docker:default",
         "--target", f"docker:{local_ca_image.tags[0]},python={test_versions.node_python_version}",
@@ -57,8 +57,8 @@ def test_plugins_integration_local(test_versions, local_ca_image, ansible_test_e
     ])
 
 
-def test_plugins_sanity(ansible_test_env, test_versions):
-    ansible_test_env.run([
+def test_plugins_sanity(collection_test_env, test_versions):
+    collection_test_env.run([
         "ansible-test",
         "sanity", "--docker", "--color", "-v",
         "--python", test_versions.node_python_version,
