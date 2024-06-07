@@ -1,6 +1,6 @@
 {
     "extends": [
-        "github>maxhoesel-ansible/.github:renovate-config"
+        "github>maxhoesel-ansible/.github:renovate-config.json5"
     ],
     "pip-compile": {
         "fileMatch": ["^requirements\\.txt$"]
