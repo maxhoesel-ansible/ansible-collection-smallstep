@@ -231,7 +231,7 @@ referencing==0.35.1
     # via
     #   jsonschema
     #   jsonschema-specifications
-requests==2.31.0
+requests==2.32.3
     # via
     #   docker
     #   molecule-plugins
@@ -308,7 +308,7 @@ twiggy==0.5.1
     #   antsibull-docs
 typer[all]==0.12.3
     # via rstcheck
-typing-extensions==4.12.1
+typing-extensions==4.12.2
     # via
     #   pydantic
     #   pydantic-core
