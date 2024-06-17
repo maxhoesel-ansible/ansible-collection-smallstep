@@ -50,7 +50,7 @@ attrs==23.2.0
     #   aiohttp
     #   jsonschema
     #   referencing
-autopep8==2.2.0
+autopep8==2.3.0
     # via -r requirements.in
 babel==2.15.0
     # via sphinx
@@ -191,7 +191,7 @@ pluggy==1.5.0
     #   pytest
 pre-commit==3.7.1
     # via -r requirements.in
-pycodestyle==2.11.1
+pycodestyle==2.12.0
     # via autopep8
 pycparser==2.22
     # via cffi
