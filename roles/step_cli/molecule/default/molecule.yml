@@ -1,4 +1,15 @@
 platforms:
+  - name: step-cli-ubuntu-24
+    image: "docker.io/geerlingguy/docker-ubuntu2404-ansible"
+    groups:
+      - ubuntu
+    override_command: false
+    pre_build_image: true
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    cgroupns_mode: host
+    privileged: true
+
   - name: step-cli-ubuntu-22
     image: "docker.io/geerlingguy/docker-ubuntu2204-ansible"
     groups:
@@ -54,19 +65,8 @@ platforms:
     cgroupns_mode: host
     privileged: true
 
-  - name: step-cli-rockylinux-8
-    image: "docker.io/geerlingguy/docker-rockylinux8-ansible"
-    groups:
-      - rockylinux
-    override_command: false
-    pre_build_image: true
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
-    privileged: true
-
-  - name: step-cli-fedora-39
-    image: "docker.io/geerlingguy/docker-fedora39-ansible"
+  - name: step-cli-fedora-40
+    image: "docker.io/geerlingguy/docker-fedora40-ansible"
     groups:
       - fedora
     override_command: false
@@ -76,8 +76,8 @@ platforms:
     cgroupns_mode: host
     privileged: true
 
-  - name: step-cli-fedora-38
-    image: "docker.io/geerlingguy/docker-fedora38-ansible"
+  - name: step-cli-fedora-39
+    image: "docker.io/geerlingguy/docker-fedora39-ansible"
     groups:
       - fedora
     override_command: false
