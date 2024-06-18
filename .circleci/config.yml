@@ -51,7 +51,7 @@ workflows:
           parallelism: 3
           matrix:
             parameters:
-              ansible-version: ["2.15", "2.16"]
+              ansible-version: ["2.16", "2.17"]
               step-version: ["latest", "0.24.0"]
               node-python-version: ["3.7"]
       - collection-testing/pre-commit-lint:
