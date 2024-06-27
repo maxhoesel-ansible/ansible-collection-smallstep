@@ -5,39 +5,49 @@
     - name: Get service facts
       service_facts:
 
-    - name: Verify that nginx and renew services are running
-      assert:
-        that:
-          - ansible_facts.services["nginx.service"]["state"] == "running"
-          - ansible_facts.services["step-renew-standalone.service"]["state"] == "running"
-          - ansible_facts.services["step-renew-webroot.service"]["state"] == "running"
-      register: _res
-      retries: 10
-      delay: 5
-      until: _res is not failed
+    - block:
+        - name: Verify that nginx and renew services are running
+          assert:
+            that:
+              - ansible_facts.services["nginx.service"]["state"] == "running"
+              - ansible_facts.services["step-renew-standalone.service"]["state"] == "running"
+              - ansible_facts.services["step-renew-webroot.service"]["state"] == "running"
+          register: _res
+          retries: 10
+          delay: 5
+          until: _res is not failed
 
-    - name: Wait for renewal to occur
-      ansible.builtin.pause:
-        minutes: 1
+        - name: Wait for renewal to occur
+          ansible.builtin.pause:
+            minutes: 1
 
-    - name: Get service facts
-      service_facts:
+        - name: Get service facts
+          service_facts:
 
-    - name: Verify that nginx and renew services are running
-      assert:
-        that:
-          - ansible_facts.services["nginx.service"]["state"] == "running"
-          - ansible_facts.services["step-renew-standalone.service"]["state"] == "running"
-          - ansible_facts.services["step-renew-webroot.service"]["state"] == "running"
-      register: _res
-      retries: 10
-      delay: 5
-      until: _res is not failed
+        - name: Verify that nginx and renew services are running
+          assert:
+            that:
+              - ansible_facts.services["nginx.service"]["state"] == "running"
+              - ansible_facts.services["step-renew-standalone.service"]["state"] == "running"
+              - ansible_facts.services["step-renew-webroot.service"]["state"] == "running"
+          register: _res
+          retries: 10
+          delay: 5
+          until: _res is not failed
 
-    - name: Try to access the locally hosted site over HTTPS
-      uri:
-        url: "https://{{ ansible_fqdn }}"
-      register: _res
-      retries: 5
-      delay: 5
-      until: _res is not failed
+        - name: Try to access the locally hosted site over HTTPS
+          uri:
+            url: "https://{{ ansible_fqdn }}"
+          register: _res
+          retries: 5
+          delay: 5
+          until: _res is not failed
+      rescue:
+        - name: Show nginx status
+          ansible.builtin.command: journalctl -eu nginx.service
+          changed_when: false
+          check_mode: false
+
+        - name: Fail Test
+          ansible.builtin.fail:
+            msg: Nginx service is in error state
