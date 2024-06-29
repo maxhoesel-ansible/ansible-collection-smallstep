@@ -1,37 +1,15 @@
 ---
-- name: Verify that step_ca_name and step_ca_root_password are set # noqa no-log-password
+- name: Verify explicit root cert/key parameters
   assert:
     that:
-      - step_ca_name is defined
-      - step_ca_name | length > 0
-      - step_ca_root_password is defined
-      - step_ca_root_password | length > 0
-    fail_msg: step_ca_name and step_ca_root_password must both be set
-  when: ansible_version.string is version('2.11.1', '<')
-
-# Kept for backwards-compatibility with older collection versions.
-# Can be combined with the explicit check  below when the backwards-compatibile existing keyfile logic is removed
-- name: Verify existing root cert/key parameters
-  assert:
-    that:
+      - step_ca_existing_key_file is defined
+      - step_ca_existing_root_file is defined
       - step_ca_existing_root_file | length > 0
       - step_ca_existing_key_file | length > 0
     fail_msg: existing_key/cert_file variables must be passed as a group
   when: >
-    step_ca_existing_root_file is defined or
-    step_ca_existing_key_file is defined
-
-- name: Verify explicit root cert/key positions
-  assert:
-    that:
-      - step_ca_existing_key
-      - step_ca_existing_root
-      - step_ca_existing_root_file | length > 0
-      - step_ca_existing_key_file | length > 0
-    fail_msg: existing_key/cert and existing_key/cert_file variables must be passed as a group
-  when: >
-    step_ca_existing_key is defined or
-    step_ca_existing_root is defined
+    step_ca_existing_key_file is defined or
+    step_ca_existing_root_file is defined
 
 - name: Verify existing root key/password
   assert:
