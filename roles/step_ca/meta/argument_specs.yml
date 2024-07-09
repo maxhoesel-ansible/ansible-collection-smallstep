@@ -117,34 +117,29 @@ argument_specs:
         default: no
         description: Create keys to sign SSH certificates
       # Existing cert options
-      step_ca_existing_root:
-        type: str
-        choices:
-          - remote
-          - local
-        description: Whether to use an existing root certificate and if so from where to import it from
-      step_ca_existing_key:
-        type: str
-        choices:
-          - remote
-          - local
-        description:
-          - Whether to use an existing root key and if so from where to import it from
-          - Note that both cert and key need to be either imported, B(or) generated. For example, you cannot import the key but generate the certificate
-          - Note that if this is unset and I(step_ca_existing_root/key_file) is set, the files are treated as C(remote) to preserve backwards-compatibility to previous collection versions. This behavior may be removed in a future release
-      step_ca_existing_key_password:
-        type: str
-        description: Password to decrypt the root key
       step_ca_existing_root_file:
         type: path
         description:
           - The path of an existing PEM file to be used as the root certificate authority
-          - Depending on the value of I(step_ca_existing_root), the file must either be on the remote host or the controller
+          - If the file is present on the controller instead of the target node, set I(step_ca_existing_root_file_is_local), to C(true).
       step_ca_existing_key_file:
         type: path
         description:
           - The path of an existing key file of the root certificate authority
-          - Depending on the value of I(step_ca_existing_key), the file must either be on the remote host or the controller
+          - If the file is present on the controller instead of the target node, set I(step_ca_existing_key_file_is_local), to C(true).
+      step_ca_existing_root_file_is_local:
+        type: bool
+        default: false
+        description:
+          - Set to C(true) if the file is present on the controller and needs to be copied
+      step_ca_existing_key_file_is_local:
+        type: bool
+        default: false
+        description:
+          - Set to C(true) if the file is present on the controller and needs to be copied
+      step_ca_existing_key_password:
+        type: str
+        description: Password to decrypt the root key
       # RA options
       step_ca_ra:
         type: str
