@@ -62,7 +62,7 @@ build==1.2.1
     # via
     #   antsibull-core
     #   pip-tools
-certifi==2024.6.2
+certifi==2024.7.4
     # via requests
 cffi==1.16.0
     # via cryptography
@@ -108,7 +108,7 @@ frozenlist==1.4.1
     # via
     #   aiohttp
     #   aiosignal
-identify==2.5.36
+identify==2.6.0
     # via pre-commit
 idna==3.7
     # via
@@ -128,7 +128,7 @@ jinja2==3.1.4
     #   antsibull-docs
     #   molecule
     #   sphinx
-jsonschema==4.22.0
+jsonschema==4.23.0
     # via
     #   ansible-compat
     #   ansible-lint
@@ -195,12 +195,12 @@ pycodestyle==2.12.0
     # via autopep8
 pycparser==2.22
     # via cffi
-pydantic==2.7.4
+pydantic==2.8.2
     # via
     #   antsibull-core
     #   antsibull-docs
     #   rstcheck-core
-pydantic-core==2.18.4
+pydantic-core==2.20.1
     # via pydantic
 pygments==2.18.0
     # via
@@ -244,11 +244,11 @@ rich==13.7.1
     #   enrich
     #   molecule
     #   typer
-rpds-py==0.18.1
+rpds-py==0.19.0
     # via
     #   jsonschema
     #   referencing
-rstcheck==6.2.1
+rstcheck==6.2.4
     # via
     #   antsibull-changelog
     #   antsibull-docs
@@ -306,7 +306,7 @@ twiggy==0.5.1
     # via
     #   antsibull-core
     #   antsibull-docs
-typer[all]==0.12.3
+typer==0.12.3
     # via rstcheck
 typing-extensions==4.12.2
     # via
