@@ -24,7 +24,7 @@ pyyaml==6.0.1
 packaging==24.1
 docker==7.1.0
 # Dependencies for executing the role scenarios.
-molecule==24.6.1
+molecule==24.7.0
 molecule-plugins[docker]==23.5.3
 
 # Generating requirements and syncing venv
