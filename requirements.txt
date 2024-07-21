@@ -271,7 +271,7 @@ six==1.16.0
     # via twiggy
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==7.4.6
+sphinx==7.4.7
     # via
     #   -r requirements.in
     #   antsibull-docs
