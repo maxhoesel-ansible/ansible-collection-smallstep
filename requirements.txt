@@ -116,7 +116,7 @@ idna==3.7
     #   yarl
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==8.0.0
+importlib-metadata==8.2.0
     # via ansible-lint
 iniconfig==2.0.0
     # via pytest
@@ -244,7 +244,7 @@ rich==13.7.1
     #   enrich
     #   molecule
     #   typer
-rpds-py==0.19.0
+rpds-py==0.19.1
     # via
     #   jsonschema
     #   referencing
@@ -282,19 +282,19 @@ sphinx-ansible-theme==0.10.3
     # via -r requirements.in
 sphinx-rtd-theme==2.0.0
     # via sphinx-ansible-theme
-sphinxcontrib-applehelp==1.0.8
+sphinxcontrib-applehelp==2.0.0
     # via sphinx
-sphinxcontrib-devhelp==1.0.6
+sphinxcontrib-devhelp==2.0.0
     # via sphinx
-sphinxcontrib-htmlhelp==2.0.6
+sphinxcontrib-htmlhelp==2.1.0
     # via sphinx
 sphinxcontrib-jquery==4.1
     # via sphinx-rtd-theme
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
-sphinxcontrib-qthelp==1.0.8
+sphinxcontrib-qthelp==2.0.0
     # via sphinx
-sphinxcontrib-serializinghtml==1.1.10
+sphinxcontrib-serializinghtml==2.0.0
     # via sphinx
 subprocess-tee==0.4.2
     # via
