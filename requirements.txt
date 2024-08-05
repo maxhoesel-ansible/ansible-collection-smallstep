@@ -6,7 +6,9 @@
 #
 aiofiles==24.1.0
     # via antsibull-core
-aiohttp==3.9.5
+aiohappyeyeballs==2.3.4
+    # via aiohttp
+aiohttp==3.10.1
     # via
     #   antsibull-core
     #   antsibull-docs
@@ -45,7 +47,7 @@ astroid==3.2.4
     # via pylint
 asyncio-pool==0.6.0
     # via antsibull-docs
-attrs==23.2.0
+attrs==24.1.0
     # via
     #   aiohttp
     #   jsonschema
@@ -54,9 +56,9 @@ autopep8==2.3.1
     # via -r requirements.in
 babel==2.15.0
     # via sphinx
-black==24.4.2
+black==24.8.0
     # via ansible-lint
-bracex==2.4
+bracex==2.5
     # via wcmatch
 build==1.2.1
     # via
@@ -191,7 +193,7 @@ pluggy==1.5.0
     #   pytest
 pre-commit==3.8.0
     # via -r requirements.in
-pycodestyle==2.12.0
+pycodestyle==2.12.1
     # via autopep8
 pycparser==2.22
     # via cffi
@@ -319,11 +321,11 @@ urllib3==2.2.2
     #   requests
 virtualenv==20.26.3
     # via pre-commit
-wcmatch==8.5.2
+wcmatch==9.0
     # via
     #   ansible-lint
     #   molecule
-wheel==0.43.0
+wheel==0.44.0
     # via pip-tools
 yamllint==1.35.1
     # via ansible-lint
