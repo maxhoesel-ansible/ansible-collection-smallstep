@@ -217,7 +217,7 @@ pyproject-hooks==1.1.0
     #   pip-tools
 pytest==8.3.2
     # via -r requirements.in
-pyyaml==6.0.1
+pyyaml==6.0.2
     # via
     #   -r requirements.in
     #   ansible-compat
