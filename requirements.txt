@@ -6,9 +6,9 @@
 #
 aiofiles==24.1.0
     # via antsibull-core
-aiohappyeyeballs==2.3.4
+aiohappyeyeballs==2.3.5
     # via aiohttp
-aiohttp==3.10.1
+aiohttp==3.10.3
     # via
     #   antsibull-core
     #   antsibull-docs
@@ -47,14 +47,14 @@ astroid==3.2.4
     # via pylint
 asyncio-pool==0.6.0
     # via antsibull-docs
-attrs==24.1.0
+attrs==24.2.0
     # via
     #   aiohttp
     #   jsonschema
     #   referencing
 autopep8==2.3.1
     # via -r requirements.in
-babel==2.15.0
+babel==2.16.0
     # via sphinx
 black==24.8.0
     # via ansible-lint
@@ -66,7 +66,7 @@ build==1.2.1
     #   pip-tools
 certifi==2024.7.4
     # via requests
-cffi==1.16.0
+cffi==1.17.0
     # via cryptography
 cfgv==3.4.0
     # via pre-commit
@@ -246,7 +246,7 @@ rich==13.7.1
     #   enrich
     #   molecule
     #   typer
-rpds-py==0.19.1
+rpds-py==0.20.0
     # via
     #   jsonschema
     #   referencing
@@ -331,7 +331,7 @@ yamllint==1.35.1
     # via ansible-lint
 yarl==1.9.4
     # via aiohttp
-zipp==3.19.2
+zipp==3.20.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
