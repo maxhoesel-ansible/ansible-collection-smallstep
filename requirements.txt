@@ -6,9 +6,9 @@
 #
 aiofiles==24.1.0
     # via antsibull-core
-aiohappyeyeballs==2.3.7
+aiohappyeyeballs==2.4.0
     # via aiohttp
-aiohttp==3.10.4
+aiohttp==3.10.5
     # via
     #   antsibull-core
     #   antsibull-docs
@@ -18,7 +18,7 @@ alabaster==0.7.16
     # via sphinx
 annotated-types==0.7.0
     # via pydantic
-ansible-compat==24.7.0
+ansible-compat==24.8.0
     # via
     #   ansible-lint
     #   molecule
@@ -41,7 +41,7 @@ antsibull-core==3.0.2
     # via antsibull-docs
 antsibull-docs==2.12.0
     # via -r requirements.in
-antsibull-docs-parser==1.0.2
+antsibull-docs-parser==1.1.0
     # via antsibull-docs
 astroid==3.2.4
     # via pylint
@@ -112,13 +112,13 @@ frozenlist==1.4.1
     #   aiosignal
 identify==2.6.0
     # via pre-commit
-idna==3.7
+idna==3.8
     # via
     #   requests
     #   yarl
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==8.2.0
+importlib-metadata==8.4.0
     # via ansible-lint
 iniconfig==2.0.0
     # via pytest
@@ -308,7 +308,7 @@ twiggy==0.5.1
     # via
     #   antsibull-core
     #   antsibull-docs
-typer==0.12.4
+typer==0.12.5
     # via rstcheck
 typing-extensions==4.12.2
     # via
