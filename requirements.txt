@@ -5,7 +5,9 @@
 #    pip-compile requirements.in
 #
 aiofiles==24.1.0
-    # via antsibull-core
+    # via
+    #   antsibull-core
+    #   antsibull-fileutils
 aiohappyeyeballs==2.4.0
     # via aiohttp
 aiohttp==3.10.5
@@ -39,9 +41,11 @@ antsibull-changelog==0.29.0
     # via antsibull-docs
 antsibull-core==3.0.2
     # via antsibull-docs
-antsibull-docs==2.13.1
+antsibull-docs==2.14.0
     # via -r requirements.in
 antsibull-docs-parser==1.1.0
+    # via antsibull-docs
+antsibull-fileutils==1.0.0
     # via antsibull-docs
 astroid==3.2.4
     # via pylint
@@ -226,6 +230,7 @@ pyyaml==6.0.2
     #   antsibull-changelog
     #   antsibull-core
     #   antsibull-docs
+    #   antsibull-fileutils
     #   molecule
     #   pre-commit
     #   yamllint
