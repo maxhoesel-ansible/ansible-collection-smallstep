@@ -19,7 +19,7 @@ autopep8==2.3.1
 pre-commit==3.8.0
 
 # Utility packages used in test fixtures and scripts
-pytest==8.3.2
+pytest==8.3.3
 pyyaml==6.0.2
 packaging==24.1
 docker==7.1.0

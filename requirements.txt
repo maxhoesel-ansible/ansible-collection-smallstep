@@ -224,7 +224,7 @@ pyproject-hooks==1.1.0
     # via
     #   build
     #   pip-tools
-pytest==8.3.2
+pytest==8.3.3
     # via -r requirements.in
 pyyaml==6.0.2
     # via
