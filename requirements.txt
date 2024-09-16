@@ -39,7 +39,7 @@ ansible-pygments==0.1.1
     #   sphinx-ansible-theme
 antsibull-changelog==0.30.0
     # via antsibull-docs
-antsibull-core==3.0.2
+antsibull-core==3.1.0
     # via antsibull-docs
 antsibull-docs==2.14.0
     # via -r requirements.in
@@ -47,9 +47,10 @@ antsibull-docs-parser==1.1.0
     # via antsibull-docs
 antsibull-docutils==1.0.0
     # via antsibull-changelog
-antsibull-fileutils==1.0.0
+antsibull-fileutils==1.0.1
     # via
     #   antsibull-changelog
+    #   antsibull-core
     #   antsibull-docs
 astroid==3.2.4
     # via pylint
@@ -119,15 +120,15 @@ frozenlist==1.4.1
     # via
     #   aiohttp
     #   aiosignal
-identify==2.6.0
+identify==2.6.1
     # via pre-commit
-idna==3.8
+idna==3.10
     # via
     #   requests
     #   yarl
 imagesize==1.4.1
     # via sphinx
-importlib-metadata==8.4.0
+importlib-metadata==8.5.0
     # via ansible-lint
 iniconfig==2.0.0
     # via pytest
@@ -191,7 +192,7 @@ perky==0.9.2
     # via antsibull-core
 pip-tools==7.4.1
     # via -r requirements.in
-platformdirs==4.3.2
+platformdirs==4.3.3
     # via
     #   black
     #   pylint
@@ -232,7 +233,6 @@ pyyaml==6.0.2
     #   ansible-compat
     #   ansible-core
     #   ansible-lint
-    #   antsibull-core
     #   antsibull-docs
     #   antsibull-fileutils
     #   molecule
@@ -249,7 +249,7 @@ requests==2.32.3
     #   sphinx
 resolvelib==1.0.1
     # via ansible-core
-rich==13.8.0
+rich==13.8.1
     # via
     #   ansible-lint
     #   enrich
@@ -324,7 +324,7 @@ typing-extensions==4.12.2
     #   pydantic
     #   pydantic-core
     #   typer
-urllib3==2.2.2
+urllib3==2.2.3
     # via
     #   docker
     #   requests
@@ -340,7 +340,7 @@ yamllint==1.35.1
     # via ansible-lint
 yarl==1.11.1
     # via aiohttp
-zipp==3.20.1
+zipp==3.20.2
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
