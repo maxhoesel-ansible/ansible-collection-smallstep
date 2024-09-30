@@ -8,9 +8,9 @@ aiofiles==24.1.0
     # via
     #   antsibull-core
     #   antsibull-fileutils
-aiohappyeyeballs==2.4.0
+aiohappyeyeballs==2.4.2
     # via aiohttp
-aiohttp==3.10.5
+aiohttp==3.10.8
     # via
     #   antsibull-core
     #   antsibull-docs
@@ -39,7 +39,7 @@ ansible-pygments==0.1.1
     #   sphinx-ansible-theme
 antsibull-changelog==0.30.0
     # via antsibull-docs
-antsibull-core==3.1.0
+antsibull-core==3.2.0
     # via antsibull-docs
 antsibull-docs==2.14.0
     # via -r requirements.in
@@ -67,7 +67,7 @@ babel==2.16.0
     # via sphinx
 black==24.8.0
     # via ansible-lint
-bracex==2.5
+bracex==2.5.post1
     # via wcmatch
 build==1.2.2
     # via
@@ -92,7 +92,7 @@ click-help-colors==0.9.4
     # via molecule
 cryptography==43.0.1
     # via ansible-core
-dill==0.3.8
+dill==0.3.9
     # via pylint
 distlib==0.3.8
     # via virtualenv
@@ -221,7 +221,7 @@ pygments==2.18.0
     #   sphinx
 pylint==3.3.1
     # via -r requirements.in
-pyproject-hooks==1.1.0
+pyproject-hooks==1.2.0
     # via
     #   build
     #   pip-tools
@@ -328,9 +328,9 @@ urllib3==2.2.3
     # via
     #   docker
     #   requests
-virtualenv==20.26.5
+virtualenv==20.26.6
     # via pre-commit
-wcmatch==9.0
+wcmatch==10.0
     # via
     #   ansible-lint
     #   molecule
@@ -338,7 +338,7 @@ wheel==0.44.0
     # via pip-tools
 yamllint==1.35.1
     # via ansible-lint
-yarl==1.11.1
+yarl==1.13.1
     # via aiohttp
 zipp==3.20.2
     # via importlib-metadata
