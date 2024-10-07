@@ -8,9 +8,9 @@ aiofiles==24.1.0
     # via
     #   antsibull-core
     #   antsibull-fileutils
-aiohappyeyeballs==2.4.2
+aiohappyeyeballs==2.4.3
     # via aiohttp
-aiohttp==3.10.8
+aiohttp==3.10.9
     # via
     #   antsibull-core
     #   antsibull-docs
@@ -52,7 +52,7 @@ antsibull-fileutils==1.0.1
     #   antsibull-changelog
     #   antsibull-core
     #   antsibull-docs
-astroid==3.3.4
+astroid==3.3.5
     # via pylint
 asyncio-pool==0.6.0
     # via antsibull-docs
@@ -69,7 +69,7 @@ black==24.8.0
     # via ansible-lint
 bracex==2.5.post1
     # via wcmatch
-build==1.2.2
+build==1.2.2.post1
     # via
     #   antsibull-core
     #   pip-tools
@@ -249,7 +249,7 @@ requests==2.32.3
     #   sphinx
 resolvelib==1.0.1
     # via ansible-core
-rich==13.8.1
+rich==13.9.2
     # via
     #   ansible-lint
     #   enrich
