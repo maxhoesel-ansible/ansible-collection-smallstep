@@ -201,7 +201,7 @@ pluggy==1.5.0
     # via
     #   molecule
     #   pytest
-pre-commit==3.8.0
+pre-commit==4.0.1
     # via -r requirements.in
 pycodestyle==2.12.1
     # via autopep8
