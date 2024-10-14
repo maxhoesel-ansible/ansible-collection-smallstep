@@ -10,7 +10,7 @@ aiofiles==24.1.0
     #   antsibull-fileutils
 aiohappyeyeballs==2.4.3
     # via aiohttp
-aiohttp==3.10.9
+aiohttp==3.10.10
     # via
     #   antsibull-core
     #   antsibull-docs
@@ -39,7 +39,7 @@ ansible-pygments==0.1.1
     #   sphinx-ansible-theme
 antsibull-changelog==0.30.0
     # via antsibull-docs
-antsibull-core==3.2.0
+antsibull-core==3.3.0
     # via antsibull-docs
 antsibull-docs==2.14.0
     # via -r requirements.in
@@ -65,7 +65,7 @@ autopep8==2.3.1
     # via -r requirements.in
 babel==2.16.0
     # via sphinx
-black==24.8.0
+black==24.10.0
     # via ansible-lint
 bracex==2.5.post1
     # via wcmatch
@@ -79,7 +79,7 @@ cffi==1.17.1
     # via cryptography
 cfgv==3.4.0
     # via pre-commit
-charset-normalizer==3.3.2
+charset-normalizer==3.4.0
     # via requests
 click==8.1.7
     # via
@@ -94,7 +94,7 @@ cryptography==43.0.1
     # via ansible-core
 dill==0.3.9
     # via pylint
-distlib==0.3.8
+distlib==0.3.9
     # via virtualenv
 distro==1.9.0
     # via selinux
@@ -102,7 +102,7 @@ docker==7.1.0
     # via
     #   -r requirements.in
     #   molecule-plugins
-docutils==0.20.1
+docutils==0.21.2
     # via
     #   antsibull-changelog
     #   antsibull-docs
@@ -145,11 +145,11 @@ jsonschema==4.23.0
     #   ansible-compat
     #   ansible-lint
     #   molecule
-jsonschema-specifications==2023.12.1
+jsonschema-specifications==2024.10.1
     # via jsonschema
 markdown-it-py==3.0.0
     # via rich
-markupsafe==2.1.5
+markupsafe==3.0.1
     # via jinja2
 mccabe==0.7.0
     # via pylint
@@ -203,6 +203,8 @@ pluggy==1.5.0
     #   pytest
 pre-commit==3.8.0
     # via -r requirements.in
+propcache==0.2.0
+    # via yarl
 pycodestyle==2.12.1
     # via autopep8
 pycparser==2.22
@@ -291,7 +293,7 @@ sphinx==7.4.7
     #   sphinxcontrib-jquery
 sphinx-ansible-theme==0.10.3
     # via -r requirements.in
-sphinx-rtd-theme==2.0.0
+sphinx-rtd-theme==3.0.1
     # via sphinx-ansible-theme
 sphinxcontrib-applehelp==2.0.0
     # via sphinx
@@ -338,7 +340,7 @@ wheel==0.44.0
     # via pip-tools
 yamllint==1.35.1
     # via ansible-lint
-yarl==1.13.1
+yarl==1.15.2
     # via aiohttp
 zipp==3.20.2
     # via importlib-metadata
