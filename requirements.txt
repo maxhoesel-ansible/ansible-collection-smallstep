@@ -37,7 +37,7 @@ ansible-pygments==0.1.1
     #   -r requirements.in
     #   antsibull-docs
     #   sphinx-ansible-theme
-antsibull-changelog==0.30.0
+antsibull-changelog==0.31.0
     # via antsibull-docs
 antsibull-core==3.3.0
     # via antsibull-docs
@@ -90,7 +90,7 @@ click==8.1.7
     #   typer
 click-help-colors==0.9.4
     # via molecule
-cryptography==43.0.1
+cryptography==43.0.3
     # via ansible-core
 dill==0.3.9
     # via pylint
@@ -149,7 +149,7 @@ jsonschema-specifications==2024.10.1
     # via jsonschema
 markdown-it-py==3.0.0
     # via rich
-markupsafe==3.0.1
+markupsafe==3.0.2
     # via jinja2
 mccabe==0.7.0
     # via pylint
@@ -269,7 +269,7 @@ rstcheck-core==1.2.1
     # via rstcheck
 ruamel-yaml==0.18.6
     # via ansible-lint
-ruamel-yaml-clib==0.2.8
+ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
 selinux==0.3.0
     # via molecule-plugins
@@ -330,7 +330,7 @@ urllib3==2.2.3
     # via
     #   docker
     #   requests
-virtualenv==20.26.6
+virtualenv==20.27.0
     # via pre-commit
 wcmatch==10.0
     # via
@@ -340,7 +340,7 @@ wheel==0.44.0
     # via pip-tools
 yamllint==1.35.1
     # via ansible-lint
-yarl==1.15.2
+yarl==1.15.5
     # via aiohttp
 zipp==3.20.2
     # via importlib-metadata
