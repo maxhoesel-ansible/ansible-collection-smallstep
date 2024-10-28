@@ -37,7 +37,7 @@ ansible-pygments==0.1.1
     #   -r requirements.in
     #   antsibull-docs
     #   sphinx-ansible-theme
-antsibull-changelog==0.31.0
+antsibull-changelog==0.31.1
     # via antsibull-docs
 antsibull-core==3.3.0
     # via antsibull-docs
@@ -47,7 +47,7 @@ antsibull-docs-parser==1.1.0
     # via antsibull-docs
 antsibull-docutils==1.0.0
     # via antsibull-changelog
-antsibull-fileutils==1.0.1
+antsibull-fileutils==1.1.0
     # via
     #   antsibull-changelog
     #   antsibull-core
@@ -116,7 +116,7 @@ filelock==3.16.1
     # via
     #   ansible-lint
     #   virtualenv
-frozenlist==1.4.1
+frozenlist==1.5.0
     # via
     #   aiohttp
     #   aiosignal
@@ -251,7 +251,7 @@ requests==2.32.3
     #   sphinx
 resolvelib==1.0.1
     # via ansible-core
-rich==13.9.2
+rich==13.9.3
     # via
     #   ansible-lint
     #   enrich
@@ -340,7 +340,7 @@ wheel==0.44.0
     # via pip-tools
 yamllint==1.35.1
     # via ansible-lint
-yarl==1.15.5
+yarl==1.16.0
     # via aiohttp
 zipp==3.20.2
     # via importlib-metadata
