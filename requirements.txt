@@ -251,13 +251,13 @@ requests==2.32.3
     #   sphinx
 resolvelib==1.0.1
     # via ansible-core
-rich==13.9.3
+rich==13.9.4
     # via
     #   ansible-lint
     #   enrich
     #   molecule
     #   typer
-rpds-py==0.20.0
+rpds-py==0.20.1
     # via
     #   jsonschema
     #   referencing
@@ -330,7 +330,7 @@ urllib3==2.2.3
     # via
     #   docker
     #   requests
-virtualenv==20.27.0
+virtualenv==20.27.1
     # via pre-commit
 wcmatch==10.0
     # via
@@ -340,7 +340,7 @@ wheel==0.44.0
     # via pip-tools
 yamllint==1.35.1
     # via ansible-lint
-yarl==1.16.0
+yarl==1.17.1
     # via aiohttp
 zipp==3.20.2
     # via importlib-metadata
