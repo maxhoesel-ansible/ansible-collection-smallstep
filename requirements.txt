@@ -10,7 +10,7 @@ aiofiles==24.1.0
     #   antsibull-fileutils
 aiohappyeyeballs==2.4.3
     # via aiohttp
-aiohttp==3.10.10
+aiohttp==3.11.6
     # via
     #   antsibull-core
     #   antsibull-docs
@@ -120,7 +120,7 @@ frozenlist==1.5.0
     # via
     #   aiohttp
     #   aiosignal
-identify==2.6.1
+identify==2.6.2
     # via pre-commit
 idna==3.10
     # via
@@ -204,17 +204,19 @@ pluggy==1.5.0
 pre-commit==3.8.0
     # via -r requirements.in
 propcache==0.2.0
-    # via yarl
+    # via
+    #   aiohttp
+    #   yarl
 pycodestyle==2.12.1
     # via autopep8
 pycparser==2.22
     # via cffi
-pydantic==2.9.2
+pydantic==2.10.0
     # via
     #   antsibull-core
     #   antsibull-docs
     #   rstcheck-core
-pydantic-core==2.23.4
+pydantic-core==2.27.0
     # via pydantic
 pygments==2.18.0
     # via
@@ -257,7 +259,7 @@ rich==13.9.4
     #   enrich
     #   molecule
     #   typer
-rpds-py==0.20.1
+rpds-py==0.21.0
     # via
     #   jsonschema
     #   referencing
@@ -293,7 +295,7 @@ sphinx==7.4.7
     #   sphinxcontrib-jquery
 sphinx-ansible-theme==0.10.3
     # via -r requirements.in
-sphinx-rtd-theme==3.0.1
+sphinx-rtd-theme==3.0.2
     # via sphinx-ansible-theme
 sphinxcontrib-applehelp==2.0.0
     # via sphinx
@@ -319,7 +321,7 @@ twiggy==0.5.1
     # via
     #   antsibull-core
     #   antsibull-docs
-typer==0.12.5
+typer==0.13.1
     # via rstcheck
 typing-extensions==4.12.2
     # via
@@ -336,13 +338,13 @@ wcmatch==10.0
     # via
     #   ansible-lint
     #   molecule
-wheel==0.44.0
+wheel==0.45.0
     # via pip-tools
 yamllint==1.35.1
     # via ansible-lint
-yarl==1.17.1
+yarl==1.17.2
     # via aiohttp
-zipp==3.20.2
+zipp==3.21.0
     # via importlib-metadata
 
 # The following packages are considered to be unsafe in a requirements file:
