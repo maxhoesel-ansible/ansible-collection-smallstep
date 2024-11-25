@@ -10,7 +10,7 @@ aiofiles==24.1.0
     #   antsibull-fileutils
 aiohappyeyeballs==2.4.3
     # via aiohttp
-aiohttp==3.11.6
+aiohttp==3.11.7
     # via
     #   antsibull-core
     #   antsibull-docs
@@ -211,12 +211,12 @@ pycodestyle==2.12.1
     # via autopep8
 pycparser==2.22
     # via cffi
-pydantic==2.10.0
+pydantic==2.10.1
     # via
     #   antsibull-core
     #   antsibull-docs
     #   rstcheck-core
-pydantic-core==2.27.0
+pydantic-core==2.27.1
     # via pydantic
 pygments==2.18.0
     # via
@@ -338,11 +338,11 @@ wcmatch==10.0
     # via
     #   ansible-lint
     #   molecule
-wheel==0.45.0
+wheel==0.45.1
     # via pip-tools
 yamllint==1.35.1
     # via ansible-lint
-yarl==1.17.2
+yarl==1.18.0
     # via aiohttp
 zipp==3.21.0
     # via importlib-metadata
