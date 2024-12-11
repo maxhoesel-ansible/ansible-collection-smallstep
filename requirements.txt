@@ -30,7 +30,7 @@ ansible-core==2.18.0
     #   ansible-compat
     #   ansible-lint
     #   molecule
-ansible-lint==24.10.0
+ansible-lint==24.12.0
     # via -r requirements.in
 ansible-pygments==0.1.1
     # via
@@ -255,7 +255,6 @@ resolvelib==1.0.1
     # via ansible-core
 rich==13.9.4
     # via
-    #   ansible-lint
     #   enrich
     #   molecule
     #   typer
