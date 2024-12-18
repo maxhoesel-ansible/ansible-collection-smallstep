@@ -2,4 +2,4 @@
 # These are not the collection runtime requirements, see galaxy.yml for those
 collections:
   - name: community.docker
-    version: "==3.13.3"
+    version: "==3.13.4"
