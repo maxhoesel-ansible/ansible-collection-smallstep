@@ -29,6 +29,9 @@
   become_user: "{{ step_acme_cert_user }}"
   environment:
     STEPPATH: "{{ _resolved_steppath }}"
+  notify:
+    - reload affected services
+    - restart renewal service
 
 - name: Cert and key permissions are set
   file:
