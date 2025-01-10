@@ -41,7 +41,7 @@ antsibull-changelog==0.31.1
     # via antsibull-docs
 antsibull-core==3.4.0
     # via antsibull-docs
-antsibull-docs==2.16.1
+antsibull-docs==2.16.2
     # via -r requirements.in
 antsibull-docs-parser==1.1.0
     # via antsibull-docs
@@ -285,7 +285,7 @@ six==1.17.0
     # via twiggy
 snowballstemmer==2.2.0
     # via sphinx
-sphinx==7.4.7
+sphinx==8.1.3
     # via
     #   -r requirements.in
     #   antsibull-docs
