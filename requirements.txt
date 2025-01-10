@@ -52,7 +52,7 @@ antsibull-fileutils==1.1.0
     #   antsibull-changelog
     #   antsibull-core
     #   antsibull-docs
-astroid==3.3.6
+astroid==3.3.8
     # via pylint
 asyncio-pool==0.6.0
     # via antsibull-docs
@@ -223,7 +223,7 @@ pygments==2.18.0
     #   ansible-pygments
     #   rich
     #   sphinx
-pylint==3.3.2
+pylint==3.3.3
     # via -r requirements.in
 pyproject-hooks==1.2.0
     # via
