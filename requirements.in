@@ -15,7 +15,7 @@ ansible-core==2.18.1
 # Linting & Formatting
 ansible-lint==24.12.2
 pylint==3.3.3
-autopep8==2.3.1
+autopep8==2.3.2
 pre-commit==4.0.1
 
 # Utility packages used in test fixtures and scripts
