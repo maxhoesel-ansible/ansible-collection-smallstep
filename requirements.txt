@@ -43,7 +43,7 @@ antsibull-core==3.4.0
     # via antsibull-docs
 antsibull-docs==2.16.2
     # via -r requirements.in
-antsibull-docs-parser==1.1.0
+antsibull-docs-parser==1.1.1
     # via antsibull-docs
 antsibull-docutils==1.1.0
     # via antsibull-changelog
@@ -242,7 +242,7 @@ pyyaml==6.0.2
     #   molecule
     #   pre-commit
     #   yamllint
-referencing==0.35.1
+referencing==0.36.1
     # via
     #   jsonschema
     #   jsonschema-specifications
@@ -326,12 +326,13 @@ typing-extensions==4.12.2
     # via
     #   pydantic
     #   pydantic-core
+    #   referencing
     #   typer
 urllib3==2.3.0
     # via
     #   docker
     #   requests
-virtualenv==20.28.1
+virtualenv==20.29.1
     # via pre-commit
 wcmatch==10.0
     # via
