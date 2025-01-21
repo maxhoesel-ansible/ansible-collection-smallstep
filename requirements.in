@@ -16,7 +16,7 @@ ansible-core==2.18.1
 ansible-lint==24.12.2
 pylint==3.3.3
 autopep8==2.3.2
-pre-commit==4.0.1
+pre-commit==4.1.0
 
 # Utility packages used in test fixtures and scripts
 pytest==8.3.4
