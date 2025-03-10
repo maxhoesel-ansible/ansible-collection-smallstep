@@ -8,7 +8,7 @@ aiofiles==24.1.0
     # via
     #   antsibull-core
     #   antsibull-fileutils
-aiohappyeyeballs==2.4.6
+aiohappyeyeballs==2.5.0
     # via aiohttp
 aiohttp==3.11.13
     # via
@@ -52,7 +52,7 @@ antsibull-fileutils==1.1.0
     #   antsibull-changelog
     #   antsibull-core
     #   antsibull-docs
-astroid==3.3.8
+astroid==3.3.9
     # via pylint
 asyncio-pool==0.6.0
     # via antsibull-docs
@@ -120,7 +120,7 @@ frozenlist==1.5.0
     # via
     #   aiohttp
     #   aiosignal
-identify==2.6.8
+identify==2.6.9
     # via pre-commit
 idna==3.10
     # via
@@ -134,7 +134,7 @@ iniconfig==2.0.0
     # via pytest
 isort==6.0.1
     # via pylint
-jinja2==3.1.5
+jinja2==3.1.6
     # via
     #   ansible-core
     #   antsibull-docs
@@ -334,7 +334,7 @@ urllib3==2.3.0
     # via
     #   docker
     #   requests
-virtualenv==20.29.2
+virtualenv==20.29.3
     # via pre-commit
 wcmatch==10.0
     # via
