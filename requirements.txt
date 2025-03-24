@@ -132,7 +132,7 @@ imagesize==1.4.1
     # via sphinx
 importlib-metadata==8.6.1
     # via ansible-lint
-iniconfig==2.0.0
+iniconfig==2.1.0
     # via pytest
 isort==6.0.1
     # via pylint
@@ -194,7 +194,7 @@ perky==0.9.3
     # via antsibull-core
 pip-tools==7.4.1
     # via -r requirements.in
-platformdirs==4.3.6
+platformdirs==4.3.7
     # via
     #   black
     #   pylint
@@ -345,7 +345,7 @@ wcmatch==10.0
     #   molecule
 wheel==0.45.1
     # via pip-tools
-yamllint==1.36.2
+yamllint==1.37.0
     # via ansible-lint
 yarl==1.18.3
     # via aiohttp
