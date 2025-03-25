@@ -43,10 +43,14 @@
           delay: 5
           until: _res is not failed
       rescue:
-        - name: Show nginx status
+        - name: Get nginx status
           ansible.builtin.command: journalctl -eu nginx.service
           changed_when: false
           check_mode: false
+          register: nginx_status
+        - name: Print nginx status
+          ansible.builtin.debug:
+            msg: "{{ nginx_status }}"
 
         - name: Fail Test
           ansible.builtin.fail:
