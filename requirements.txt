@@ -39,7 +39,7 @@ ansible-pygments==0.1.1
     #   -r requirements.in
     #   antsibull-docs
     #   sphinx-ansible-theme
-antsibull-changelog==0.32.0
+antsibull-changelog==0.33.0
     # via antsibull-docs
 antsibull-core==3.4.0
     # via antsibull-docs
@@ -205,21 +205,21 @@ pluggy==1.5.0
     #   pytest
 pre-commit==4.2.0
     # via -r requirements.in
-propcache==0.3.0
+propcache==0.3.1
     # via
     #   aiohttp
     #   yarl
-pycodestyle==2.12.1
+pycodestyle==2.13.0
     # via autopep8
 pycparser==2.22
     # via cffi
-pydantic==2.10.6
+pydantic==2.11.1
     # via
     #   antsibull-changelog
     #   antsibull-core
     #   antsibull-docs
     #   rstcheck-core
-pydantic-core==2.27.2
+pydantic-core==2.33.0
     # via pydantic
 pygments==2.19.1
     # via
@@ -256,14 +256,14 @@ requests==2.32.3
     #   sphinx
 resolvelib==1.0.1
     # via ansible-core
-rich==13.9.4
+rich==14.0.0
     # via
     #   enrich
     #   molecule
     #   typer
 roman-numerals-py==3.1.0
     # via sphinx
-rpds-py==0.23.1
+rpds-py==0.24.0
     # via
     #   jsonschema
     #   referencing
@@ -327,12 +327,15 @@ twiggy==0.5.1
     #   antsibull-docs
 typer==0.15.2
     # via rstcheck
-typing-extensions==4.12.2
+typing-extensions==4.13.0
     # via
     #   pydantic
     #   pydantic-core
     #   referencing
     #   typer
+    #   typing-inspection
+typing-inspection==0.4.0
+    # via pydantic
 urllib3==2.3.0
     # via
     #   docker
