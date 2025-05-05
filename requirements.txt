@@ -32,7 +32,7 @@ ansible-core==2.18.5
     #   ansible-compat
     #   ansible-lint
     #   molecule
-ansible-lint==24.12.2
+ansible-lint==25.4.0
     # via -r requirements.in
 ansible-pygments==0.1.1
     # via
@@ -247,6 +247,7 @@ pyyaml==6.0.2
     #   yamllint
 referencing==0.36.2
     # via
+    #   ansible-lint
     #   jsonschema
     #   jsonschema-specifications
 requests==2.32.3
