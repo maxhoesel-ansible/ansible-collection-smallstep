@@ -39,7 +39,7 @@ ansible-pygments==0.1.1
     #   -r requirements.in
     #   antsibull-docs
     #   sphinx-ansible-theme
-antsibull-changelog==0.33.0
+antsibull-changelog==0.34.0
     # via antsibull-docs
 antsibull-core==3.4.0
     # via antsibull-docs
@@ -54,7 +54,7 @@ antsibull-fileutils==1.2.0
     #   antsibull-changelog
     #   antsibull-core
     #   antsibull-docs
-astroid==3.3.9
+astroid==3.3.10
     # via pylint
 asyncio-pool==0.6.0
     # via antsibull-docs
@@ -83,7 +83,7 @@ cfgv==3.4.0
     # via pre-commit
 charset-normalizer==3.4.2
     # via requests
-click==8.1.8
+click==8.2.0
     # via
     #   black
     #   click-help-colors
@@ -194,7 +194,7 @@ perky==0.9.3
     # via antsibull-core
 pip-tools==7.4.1
     # via -r requirements.in
-platformdirs==4.3.7
+platformdirs==4.3.8
     # via
     #   black
     #   pylint
@@ -288,7 +288,7 @@ shellingham==1.5.4
     # via typer
 six==1.17.0
     # via twiggy
-snowballstemmer==2.2.0
+snowballstemmer==3.0.1
     # via sphinx
 sphinx==8.2.3
     # via
@@ -340,7 +340,7 @@ urllib3==2.4.0
     # via
     #   docker
     #   requests
-virtualenv==20.30.0
+virtualenv==20.31.2
     # via pre-commit
 wcmatch==10.0
     # via
