@@ -157,11 +157,11 @@ mccabe==0.7.0
     # via pylint
 mdurl==0.1.2
     # via markdown-it-py
-molecule==24.12.0
+molecule==25.4.0
     # via
     #   -r requirements.in
     #   molecule-plugins
-molecule-plugins[docker]==23.6.0
+molecule-plugins[docker]==23.7.0
     # via -r requirements.in
 multidict==6.4.4
     # via
