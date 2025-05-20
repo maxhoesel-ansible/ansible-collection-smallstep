@@ -22,7 +22,7 @@ annotated-types==0.7.0
     # via
     #   antsibull-changelog
     #   pydantic
-ansible-compat==25.1.5
+ansible-compat==25.5.0
     # via
     #   ansible-lint
     #   molecule
@@ -83,7 +83,7 @@ cfgv==3.4.0
     # via pre-commit
 charset-normalizer==3.4.2
     # via requests
-click==8.2.0
+click==8.1.8
     # via
     #   black
     #   click-help-colors
@@ -92,7 +92,7 @@ click==8.2.0
     #   typer
 click-help-colors==0.9.4
     # via molecule
-cryptography==44.0.3
+cryptography==45.0.2
     # via ansible-core
 dill==0.4.0
     # via pylint
@@ -163,7 +163,7 @@ molecule==24.12.0
     #   molecule-plugins
 molecule-plugins[docker]==23.6.0
     # via -r requirements.in
-multidict==6.4.3
+multidict==6.4.4
     # via
     #   aiohttp
     #   yarl
@@ -199,7 +199,7 @@ platformdirs==4.3.8
     #   black
     #   pylint
     #   virtualenv
-pluggy==1.5.0
+pluggy==1.6.0
     # via
     #   molecule
     #   pytest
@@ -263,7 +263,7 @@ rich==14.0.0
     #   typer
 roman-numerals-py==3.1.0
     # via sphinx
-rpds-py==0.24.0
+rpds-py==0.25.0
     # via
     #   jsonschema
     #   referencing
@@ -325,7 +325,7 @@ twiggy==0.5.1
     # via
     #   antsibull-core
     #   antsibull-docs
-typer==0.15.3
+typer==0.15.4
     # via rstcheck
 typing-extensions==4.13.2
     # via
