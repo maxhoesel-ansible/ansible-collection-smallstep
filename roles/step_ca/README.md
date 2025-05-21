@@ -30,9 +30,9 @@ It is thus **very** important that you **back up your root key and password** in
 ## Requirements
 
 - The following distributions are currently supported and tested:
-  - Ubuntu: `20.04 LTS, 22.04 LTS, 24.04 LTS`
+  - Ubuntu: `22.04 LTS, 24.04 LTS`
   - Debian: `11, 12`
-  - Fedora: `39, 40`
+  - Fedora: `42`
   - RHEL(-compatible): `9` (RockyLinux is used for testing)
   - Other distributions may work as well, but are not tested
 - Supported architectures: amd64, arm64
@@ -49,12 +49,10 @@ It is thus **very** important that you **back up your root key and password** in
 
 ##### `step_cli_version`
 - Set the version of step to install
-- Can be a version tag (e.g. `0.15.3`), or `latest` to always install the most recent version
-- It is **highly** recommended that your cli version matches the collection version
-  (e.g. if you are using the collection version 0.20.x you should be installing step-cli version 0.20.x as well)
+- Can be a version tag (e.g. `0.24.0`), or `latest` to always install the most recent version
 - Note that the role will query the GitHub API if this value is set to `latest`. Try setting
   a specific version if you are running into rate limiting issues
-- Default: `latest` (same as the upstream step-cli packages)
+- Default: `latest`
 
 ##### `step_cli_executable`
 - What to name and where to put the `step-cli` executable that will be installed by this role
@@ -79,9 +77,8 @@ It is thus **very** important that you **back up your root key and password** in
 
 ##### `step_ca_version`
 - Set the version of step-ca to install
-- Can be a version tag (e.g. `0.15.3`), or `latest` to always install the most recent version
-- It is **highly** recommended that your ca version matches the collection version
-  (e.g. if you are using the collection version 0.20.x you should be installing step-ca version 0.20.x as well)
+- Can be a version tag (e.g. `0.24.0`), or `latest` to always install the most recent version
+- The minimum `step-ca` version supported by the collection is `0.24.0`
 - Note that the role will query the GitHub API if this value is set to `latest`. Try setting
   a specific version if you are running into rate limiting issues
 - Default: `latest`

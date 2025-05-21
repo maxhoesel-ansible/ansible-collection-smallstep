@@ -10,7 +10,7 @@
 - name: Get currently installed step-cli version
   shell: >
     set -o pipefail &&
-    {{ step_cli_executable }} version | cut -d' ' -f 2 | cut -d'/' -f 2 | awk 'FNR == 1'
+    {{ step_cli_executable }} version | cut -d' ' -f 2 | cut -d'/' -f 2 | head -n 1
   args:
     executable: /bin/bash
   changed_when: no

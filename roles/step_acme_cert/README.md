@@ -13,9 +13,9 @@ The advantage of the `step` method is that no additional tools are required.
 ## Requirements
 
 - The following distributions are currently supported and tested:
-  - Ubuntu: `20.04 LTS, 22.04 LTS, 24.04 LTS`
+  - Ubuntu: `22.04 LTS, 24.04 LTS`
   - Debian: `11, 12`
-  - Fedora: `39, 40`
+  - Fedora: `42`
   - RHEL(-compatible): `9` (RockyLinux is used for testing)
   - Other distributions may work as well, but are not tested
 - Running this role requires root access. Make sure to run this role with `become: yes` or equivalent

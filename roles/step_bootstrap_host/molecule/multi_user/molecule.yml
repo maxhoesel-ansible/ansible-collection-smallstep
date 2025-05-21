@@ -42,20 +42,6 @@ platforms:
     networks:
       - name: molecule-step-bootstrap-host
 
-  - name: step-host-ubuntu-20
-    groups:
-      - clients
-      - ubuntu
-    image: "docker.io/geerlingguy/docker-ubuntu2004-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
-    privileged: true
-    override_command: false
-    pre_build_image: true
-    networks:
-      - name: molecule-step-bootstrap-host
-
   - name: step-host-debian-12
     groups:
       - clients
@@ -98,25 +84,11 @@ platforms:
     networks:
       - name: molecule-step-bootstrap-host
 
-  - name: step-host-fedora-40
+  - name: step-host-fedora-42
     groups:
       - clients
       - fedora
-    image: "docker.io/geerlingguy/docker-fedora40-ansible"
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
-    cgroupns_mode: host
-    privileged: true
-    override_command: false
-    pre_build_image: true
-    networks:
-      - name: molecule-step-bootstrap-host
-
-  - name: step-host-fedora-39
-    groups:
-      - clients
-      - fedora
-    image: "docker.io/geerlingguy/docker-fedora39-ansible"
+    image: "docker.io/geerlingguy/docker-fedora42-ansible"
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
     cgroupns_mode: host
