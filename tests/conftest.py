@@ -10,7 +10,7 @@ from packaging import version
 import pytest
 import yaml
 
-NODE_PYTHON_DEFAULT_VERSION = "3.7"
+NODE_PYTHON_DEFAULT_VERSION = "3.8"
 STEP_CLI_DEFAULT_VERSION = "latest"
 STEP_CA_DEFAULT_VERSION = "latest"
 
