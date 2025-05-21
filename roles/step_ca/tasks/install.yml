@@ -6,7 +6,7 @@
 - name: Get currently installed step-ca version
   shell: >
     set -o pipefail &&
-    {{ step_ca_executable }} version | cut -d' ' -f 2 | cut -d'/' -f 2 | awk 'FNR == 1'
+    {{ step_ca_executable }} version | cut -d' ' -f 2 | cut -d'/' -f 2 | head -n 1
   args:
     executable: /bin/bash
   changed_when: no

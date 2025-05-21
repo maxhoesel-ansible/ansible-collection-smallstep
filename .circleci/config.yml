@@ -13,8 +13,7 @@ filters: &semver-tagged
 executors:
   pytest:
     machine:
-      # python 3.11, needed for ansible-test 2.15
-      image: ubuntu-2204:2023.10.1
+      image: ubuntu-2204:2024.08.1 # python 3.12, supports ansible 2.16+2.17
     resource_class: large
 
 jobs:
@@ -23,38 +22,45 @@ jobs:
       parallelism:
         description: Number of parallel runners
         type: integer
-      ansible-version:
-        description: Version of Ansible to use for testing
+      ansible-python-version-tuple:
+        description: Comma-separated version tuple containing Ansible and node python version to use
         type: string
-      step-version:
+      step-version-tuple:
         type: string
-        description: Version of smallstep to test
-      node-python-version:
-        description: Version of python to use for module tests
-        type: string
+        description: Comma separated version of step-cli+step-ca version to use for test
     executor: pytest
     parallelism: << parameters.parallelism >>
     steps:
+      - run:
+          name: Split version tuples
+          command: |
+            export ANSIBLE_VERSION_STRING=$(echo "<< parameters.ansible-python-version-tuple >>" | cut -d ',' -f 1)
+            export PYTHON_VERSION_STRING=$(echo "<< parameters.ansible-python-version-tuple >>" | cut -d ',' -f 2)
+            echo export ANSIBLE_VERSION="$ANSIBLE_VERSION_STRING" >> "$BASH_ENV"
+            echo export PYTHON_VERSION="$PYTHON_VERSION_STRING" >> "$BASH_ENV"
+
+            export STEP_CLI_VERSION_STRING=$(echo "<< parameters.step-version-tuple >>" | cut -d ',' -f 1)
+            export STEP_CA_VERSION_STRING=$(echo "<< parameters.step-version-tuple >>" | cut -d ',' -f 2)
+            echo export STEP_CLI_VERSION="$STEP_CLI_VERSION_STRING" >> "$BASH_ENV"
+            echo export STEP_CA_VERSION="$STEP_CA_VERSION_STRING" >> "$BASH_ENV"
       - collection-testing/pytest:
           pytest-args: >
             --ci
-            --ansible-version "<< parameters.ansible-version >>"
-            --step-cli-version "<< parameters.step-version >>"
-            --step-ca-version "<< parameters.step-version >>"
-            --node-python-version "<< parameters.node-python-version >>"
-
+            --ansible-version "$ANSIBLE_VERSION"
+            --step-cli-version "$STEP_CLI_VERSION"
+            --step-ca-version "$STEP_CA_VERSION"
+            --node-python-version "$PYTHON_VERSION"
 
 workflows:
   ci:
     jobs:
       - test:
-          name: Test (ansible-<< matrix.ansible-version >>, step-<< matrix.step-version >>)
+          name: Test (ansible-<< matrix.ansible-python-version-tuple >>, step-<< matrix.step-version-tuple >>)
           parallelism: 3
           matrix:
             parameters:
-              ansible-version: ["2.16", "2.17"]
-              step-version: ["latest", "0.24.0"]
-              node-python-version: ["3.7"]
+              ansible-python-version-tuple: ["2.17,3.7", "2.18,3.8"]
+              step-version-tuple: ["latest,latest", "0.24.0,0.24.0"]
       - collection-testing/pre-commit-lint:
           name: Lint
       - collection-testing/antsibull-docs:
