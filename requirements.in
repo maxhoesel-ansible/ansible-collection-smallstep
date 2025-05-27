@@ -13,7 +13,7 @@
 ansible-core==2.18.6
 
 # Linting & Formatting
-ansible-lint==25.4.0
+ansible-lint==25.5.0
 pylint==3.3.7
 autopep8==2.3.2
 pre-commit==4.2.0
