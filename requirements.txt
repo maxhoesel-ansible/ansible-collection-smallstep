@@ -10,7 +10,7 @@ aiofiles==24.1.0
     #   antsibull-fileutils
 aiohappyeyeballs==2.6.1
     # via aiohttp
-aiohttp==3.12.11
+aiohttp==3.12.13
     # via
     #   antsibull-core
     #   antsibull-docs
@@ -75,7 +75,7 @@ build==1.2.2.post1
     # via
     #   antsibull-core
     #   pip-tools
-certifi==2025.4.26
+certifi==2025.6.15
     # via requests
 cffi==1.17.1
     # via cryptography
@@ -92,7 +92,7 @@ click==8.2.1
     #   typer
 click-help-colors==0.9.4
     # via molecule
-cryptography==45.0.3
+cryptography==45.0.4
     # via ansible-core
 dill==0.4.0
     # via pylint
@@ -118,7 +118,7 @@ filelock==3.18.0
     # via
     #   ansible-lint
     #   virtualenv
-frozenlist==1.6.2
+frozenlist==1.7.0
     # via
     #   aiohttp
     #   aiosignal
@@ -205,7 +205,7 @@ pluggy==1.6.0
     #   pytest
 pre-commit==4.2.0
     # via -r requirements.in
-propcache==0.3.1
+propcache==0.3.2
     # via
     #   aiohttp
     #   yarl
@@ -213,7 +213,7 @@ pycodestyle==2.13.0
     # via autopep8
 pycparser==2.22
     # via cffi
-pydantic==2.11.5
+pydantic==2.11.7
     # via
     #   antsibull-changelog
     #   antsibull-core
@@ -251,7 +251,7 @@ referencing==0.36.2
     #   ansible-lint
     #   jsonschema
     #   jsonschema-specifications
-requests==2.32.3
+requests==2.32.4
     # via
     #   docker
     #   molecule-plugins
@@ -275,7 +275,7 @@ rstcheck==6.2.5
     #   antsibull-docs
 rstcheck-core==1.2.2
     # via rstcheck
-ruamel-yaml==0.18.13
+ruamel-yaml==0.18.14
     # via ansible-lint
 ruamel-yaml-clib==0.2.12
     # via ruamel-yaml
@@ -352,7 +352,7 @@ wheel==0.45.1
     # via pip-tools
 yamllint==1.37.1
     # via ansible-lint
-yarl==1.20.0
+yarl==1.20.1
     # via aiohttp
 zipp==3.23.0
     # via importlib-metadata
