@@ -163,7 +163,7 @@ molecule==25.6.0
     #   molecule-plugins
 molecule-plugins[docker]==23.7.0
     # via -r requirements.in
-multidict==6.5.0
+multidict==6.6.2
     # via
     #   aiohttp
     #   yarl
