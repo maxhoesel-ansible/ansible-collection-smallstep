@@ -32,6 +32,6 @@ pip-tools==7.4.1
 
 # Docs
 antsibull-docs==2.18.0
-ansible-pygments==0.1.1
+ansible-pygments==0.1.2
 sphinx==8.2.3
 sphinx-ansible-theme==0.10.3
