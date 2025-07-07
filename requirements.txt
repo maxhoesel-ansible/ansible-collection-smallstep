@@ -14,7 +14,7 @@ aiohttp==3.12.13
     # via
     #   antsibull-core
     #   antsibull-docs
-aiosignal==1.3.2
+aiosignal==1.4.0
     # via aiohttp
 alabaster==1.0.0
     # via sphinx
@@ -47,7 +47,7 @@ antsibull-docs==2.18.0
     # via -r requirements.in
 antsibull-docs-parser==1.2.1
     # via antsibull-docs
-antsibull-docutils==1.2.0
+antsibull-docutils==1.2.1
     # via antsibull-changelog
 antsibull-fileutils==1.3.0
     # via
@@ -92,7 +92,7 @@ click==8.2.1
     #   typer
 click-help-colors==0.9.4
     # via molecule
-cryptography==45.0.4
+cryptography==45.0.5
     # via ansible-core
 dill==0.4.0
     # via pylint
@@ -163,7 +163,7 @@ molecule==25.6.0
     #   molecule-plugins
 molecule-plugins[docker]==23.7.0
     # via -r requirements.in
-multidict==6.6.2
+multidict==6.6.3
     # via
     #   aiohttp
     #   yarl
@@ -265,7 +265,7 @@ rich==14.0.0
     #   typer
 roman-numerals-py==3.1.0
     # via sphinx
-rpds-py==0.25.1
+rpds-py==0.26.0
     # via
     #   jsonschema
     #   referencing
@@ -329,8 +329,9 @@ twiggy==0.5.1
     #   antsibull-docs
 typer==0.16.0
     # via rstcheck
-typing-extensions==4.14.0
+typing-extensions==4.14.1
     # via
+    #   aiosignal
     #   pydantic
     #   pydantic-core
     #   referencing
