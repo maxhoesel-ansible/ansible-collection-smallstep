@@ -10,7 +10,7 @@
 # This installed version can be overriden by running pytest with the --ansible-version command.
 # Ideally pytest would install another venv just for the test, but the pytest-virtualenv package
 # is ancient and incompatible with python 3.12.
-ansible-core==2.18.6
+ansible-core==2.18.7
 
 # Linting & Formatting
 ansible-lint==25.6.1
