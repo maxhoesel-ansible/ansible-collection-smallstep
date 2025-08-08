@@ -28,7 +28,7 @@ molecule==25.7.0
 molecule-plugins[docker]==23.7.0
 
 # Generating requirements and syncing venv
-pip-tools==7.4.1
+pip-tools==7.5.0
 
 # Docs
 antsibull-docs==2.20.0
