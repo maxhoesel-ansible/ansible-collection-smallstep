@@ -205,7 +205,7 @@ pluggy==1.6.0
     # via
     #   molecule
     #   pytest
-pre-commit==4.2.0
+pre-commit==4.3.0
     # via -r requirements.in
 propcache==0.3.2
     # via
