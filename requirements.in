@@ -31,7 +31,7 @@ molecule-plugins[docker]==23.7.0
 pip-tools==7.5.0
 
 # Docs
-antsibull-docs==2.20.0
+antsibull-docs==2.21.0
 ansible-pygments==0.1.2
 sphinx==8.2.3
 sphinx-ansible-theme==0.10.3
