@@ -163,7 +163,7 @@ molecule==25.7.0
     # via
     #   -r requirements.in
     #   molecule-plugins
-molecule-plugins[docker]==23.7.0
+molecule-plugins[docker]==25.8.12
     # via -r requirements.in
 multidict==6.6.3
     # via

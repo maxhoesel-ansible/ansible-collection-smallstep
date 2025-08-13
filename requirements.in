@@ -25,7 +25,7 @@ packaging==25.0
 docker==7.1.0
 # Dependencies for executing the role scenarios.
 molecule==25.7.0
-molecule-plugins[docker]==23.7.0
+molecule-plugins[docker]==25.8.12
 
 # Generating requirements and syncing venv
 pip-tools==7.5.0
