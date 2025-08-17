@@ -58,7 +58,7 @@ from typing import Dict, cast, Any
 from ansible.module_utils.basic import AnsibleModule
 from ..module_utils.cli_wrapper import CliCommand, CliCommandArgs, StepCliExecutable
 
-DEFAULTS_FILE = f"{os.environ.get('STEPPATH', os.environ['HOME'] + '/.step')}/config/defaults.json"
+DEFAULTS_FILE = f"{os.getenv('STEPPATH') or os.environ['HOME'] + '/.step'}/config/defaults.json"
 
 
 def run_module():

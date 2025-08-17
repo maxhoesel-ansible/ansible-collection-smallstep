@@ -22,15 +22,15 @@ argument_specs:
           - Path or name of the step-cli executable to use for executing commands in this role
           - Can be an absolute path or a command (make sure the executable is in $PATH) for all users
         default: step-cli
-      step_cli_steppath:
+      step_acme_cert_steppath:
         type: path
         description:
-          - Optionally set a custom C($STEPPATH) from which to read the step config
+          - Set this if C(step_acme_cert_user) requires a custom C(steppath) from which to read the step config
           - "Example: C(/etc/step-cli)"
         default: $HOME/.step
       step_acme_cert_ca_provisioner:
         type: str
-        required: yes
+        required: true
         description:
           - Name of the provisioner on the CA that will issue the ACME cert
       step_acme_cert_webroot_path:
@@ -69,7 +69,7 @@ argument_specs:
             description: Absolute path to the cert file
           mode:
             type: str
-            default: '644'
+            default: "644"
             description: File mode for the cert file
           owner:
             type: str
@@ -89,7 +89,7 @@ argument_specs:
             description: Absolute path to the key file
           mode:
             type: str
-            default: '600'
+            default: "600"
             description: File mode for the key file
           owner:
             type: str

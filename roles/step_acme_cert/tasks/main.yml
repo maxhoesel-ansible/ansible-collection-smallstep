@@ -2,10 +2,6 @@
 # tasks file for step_acme_cert
 - ansible.builtin.include_tasks: check.yml
 
-- name: "Compatibility: Respect step_cli_steppath if step_acme_cert_user is root"
-  ansible.builtin.set_fact:
-    _resolved_steppath: "{{ (step_cli_steppath is defined and step_acme_cert_user == 'root') | ternary(step_cli_steppath, step_acme_cert_steppath) }}"
-
 - name: Update cert/keyfile dicts with defaults
   ansible.builtin.set_fact:
     # Role params take precedence over set_fact, so we need to declare a new private variable
@@ -28,7 +24,7 @@
   become: yes
   become_user: "{{ step_acme_cert_user }}"
   environment:
-    STEPPATH: "{{ _resolved_steppath }}"
+    STEPPATH: "{{ step_acme_cert_steppath }}"
   notify:
     - reload affected services
     - restart renewal service

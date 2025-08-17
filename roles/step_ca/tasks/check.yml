@@ -24,8 +24,8 @@
 - name: Verify explicit root cert/key positions
   assert:
     that:
-      - step_ca_existing_key
-      - step_ca_existing_root
+      - step_ca_existing_key in ["remote", "local"]
+      - step_ca_existing_root in ["remote", "local"]
       - step_ca_existing_root_file | length > 0
       - step_ca_existing_key_file | length > 0
     fail_msg: existing_key/cert and existing_key/cert_file variables must be passed as a group

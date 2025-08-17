@@ -58,18 +58,17 @@ argument_specs:
           - user: root
         description:
           - List of users that C(step-cli) should be bootstrapped for
-          - You can optionally set a custom C($STEPPATH) for each user to store the C(step-cli) configuration in
-          - Note that this role does *not* alter the users environment variables to load the custom C($STEPPATH) automatically. If you set a non-standard C($STEPPATH), you are responsible for including it in any future C(step-cli) invocations
-          - ⚠️ Deprecated ⚠️ If I(step_bootstrap_users) only contains C(root) without a path and I(step_cli_steppath) is set, this role will use the value of I(tep_cli_steppath) instead of I(step_boostrap_default_steppath) for the C(root) user when bootstrapping. This behavior exists to preserve backwards-compatibility with older role versions that could only bootstrap the root user and will be removed in a future release.
+          - You can optionally set a custom C(steppath) for each user to store the C(step-cli) configuration in
+          - Note that this role does *not* alter the users environment variables to load the custom C($STEPPATH) automatically. If you set a non-standard C(steppath), you are responsible for including it in any future C(step-cli) invocations
       step_bootstrap_ca_url:
         type: str
-        required: yes
+        required: true
         description:
           - URL of the step-ca CA
           - "Example: C(https://myca.localdomain)"
       step_bootstrap_fingerprint:
         type: str
-        required: yes
+        required: true
         description:
           - Fingerprint of the CA root cert
           - This is used to verify the authenticity of the remote CA
