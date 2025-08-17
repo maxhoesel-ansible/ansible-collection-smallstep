@@ -1,0 +1,93 @@
+platforms:
+  - name: step-ca-ubuntu-22
+    groups:
+      - ubuntu
+      - ca
+    image: "docker.io/geerlingguy/docker-ubuntu2204-ansible"
+    systemd: always
+    override_command: false
+    pre_build_image: true
+
+  - name: step-ca-ubuntu-20
+    groups:
+      - ubuntu
+      - ca
+    image: "docker.io/geerlingguy/docker-ubuntu2004-ansible"
+    systemd: always
+    override_command: false
+    pre_build_image: true
+
+  - name: step-ca-ubuntu-18
+    groups:
+      - ubuntu
+      - ca
+    image: "docker.io/geerlingguy/docker-ubuntu1804-ansible"
+    systemd: always
+    override_command: false
+    pre_build_image: true
+
+  - name: step-ca-debian-11
+    groups:
+      - debian
+      - ca
+    image: "docker.io/geerlingguy/docker-debian11-ansible"
+    systemd: always
+    override_command: false
+    pre_build_image: true
+
+  - name: step-ca-debian-10
+    groups:
+      - debian
+      - ca
+    image: "docker.io/geerlingguy/docker-debian10-ansible"
+    systemd: always
+    override_command: false
+    pre_build_image: true
+
+  - name: step-ca-rockylinux-9
+    groups:
+      - rockylinux
+      - ca
+    image: "docker.io/geerlingguy/docker-rockylinux9-ansible"
+    systemd: always
+    override_command: false
+    pre_build_image: true
+
+  - name: step-ca-rockylinux-8
+    groups:
+      - rockylinux
+      - ca
+    image: "docker.io/geerlingguy/docker-rockylinux8-ansible"
+    systemd: always
+    override_command: false
+    pre_build_image: true
+
+  - name: step-ca-fedora-36
+    groups:
+      - fedora
+      - ca
+    image: "docker.io/geerlingguy/docker-fedora36-ansible"
+    systemd: always
+    override_command: false
+    pre_build_image: true
+
+
+provisioner:
+  playbooks:
+    converge: ../converge.yml
+    verify: ../verify.yml
+  inventory:
+    group_vars:
+      ca:
+        step_ca_name: Molecule Test CA
+        step_ca_user: step-ca-molecule
+        step_ca_root_password: molecule
+        step_ca_intermediate_password: molecule-intermediate
+        step_ca_path: /etc/step-ca-molecule
+        step_ca_ssh: yes
+
+        step_ca_existing_root_file_is_local: true
+        step_ca_existing_root_file: ../files/molecule-ca.crt
+        step_ca_existing_key_file_is_local: true
+        step_ca_existing_key_file: ../files/molecule-ca.key
+        step_ca_existing_key_password: wvTfbyADhoowLZp3RsJ9
