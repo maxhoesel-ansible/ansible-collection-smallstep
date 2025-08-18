@@ -37,8 +37,6 @@ The advantage of the `step` method is that no additional tools are required.
 
 ##### `step_acme_cert_steppath`
 - Set this if `step_acme_cert_user` requires a custom `$STEPPATH` from which to read the step config
-- ⚠️ Deprecated ⚠️ If `step_acme_cert_user` is `root` and `step_cli_steppath` is set, this role will read the users steppath from it.
-  This behavior exists to preserve backwards-compatibility with older role versions that could only use the root user and will be removed in a future release.
 - Example: `/etc/step-cli`
 - Default: `$HOME/.step/`
 

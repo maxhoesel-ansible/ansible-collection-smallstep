@@ -4,34 +4,17 @@
     name: maxhoesel.smallstep.step_cli
   when: step_cli_install
 
-- name: "Compatibility: Respect step_cli_steppath is only root is bootstrapped"
-  ansible.builtin.set_fact:
-    _root_legacy_steppath: "{{ (step_bootstrap_users | length == 1 and step_bootstrap_users.0.user == 'root' and step_bootstrap_users.0.steppath is not defined and step_cli_steppath is defined) | ternary(step_cli_steppath,'') }}"
-
 # File permissions are handled by step itself, only make sure that the directory exists
 - name: Custom user STEPPATHS are present # noqa risky-file-permissions
   ansible.builtin.file:
-    path: "{{ path }}"
+    path: "{{ item.steppath }}"
     owner: "{{ item.user }}"
     group: "{{ item.user }}"
     state: directory
   loop: "{{ step_bootstrap_users }}"
-  when: path | length > 0
-  vars:
-    path: "{{ (item.user == 'root' and _root_legacy_steppath) | ternary(step_cli_steppath, item.steppath | d('')) }}"
+  when: item.steppath | d("") | length > 0
 
-- name: step-cli is bootstrapped (default STEPPATH)
-  maxhoesel.smallstep.step_ca_bootstrap:
-    ca_url: "{{ step_bootstrap_ca_url }}"
-    fingerprint: "{{ step_bootstrap_fingerprint }}"
-    step_cli_executable: "{{ step_cli_executable }}"
-    force: "{{ step_bootstrap_force | d(omit) }}"
-  become: yes
-  become_user: "{{ item.user }}"
-  loop: "{{ step_bootstrap_users }}"
-  when: not item.steppath is defined and (not _root_legacy_steppath or item.user != "root")
-
-- name: step-cli is bootstrapped (custom STEPPATH)
+- name: step-cli is bootstrapped
   maxhoesel.smallstep.step_ca_bootstrap:
     ca_url: "{{ step_bootstrap_ca_url }}"
     fingerprint: "{{ step_bootstrap_fingerprint }}"
@@ -40,11 +23,8 @@
   become: yes
   become_user: "{{ item.user }}"
   environment:
-    STEPPATH: "{{ steppath }}"
+    STEPPATH: "{{ item.steppath | d('') }}"
   loop: "{{ step_bootstrap_users }}"
-  when: steppath
-  vars:
-    steppath: "{{ (item.user == 'root' and _root_legacy_steppath) | ternary(step_cli_steppath, item.steppath | d('')) }}"
 
 - name: Install certificate into system trust store
   when:
@@ -61,7 +41,7 @@
     - name: Set steppath for checking system install
       ansible.builtin.set_fact:
         _install_check_user: "{{ step_bootstrap_users.0.user }}"
-        _install_check_steppath: "{{ (step_bootstrap_users.0.user == 'root' and _root_legacy_steppath) | ternary(step_cli_steppath, step_bootstrap_users.0.steppath | d(ansible_facts.getent_passwd[step_bootstrap_users.0.user][4] + '/.step')) }}"
+        _install_check_steppath: "{{ step_bootstrap_users.0.steppath | d(ansible_facts.getent_passwd[step_bootstrap_users.0.user][4] + '/.step') }}"
 
     - name: Check if cert is already installed
       ansible.builtin.command: "{{ step_cli_executable }} certificate verify {{ _install_check_steppath }}/certs/root_ca.crt"

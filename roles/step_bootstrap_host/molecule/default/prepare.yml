@@ -11,3 +11,14 @@
     - name: Install iproute
       package:
         name: iproute
+
+- hosts: clients
+  tasks:
+    - name: Add Test Users
+      ansible.builtin.user:
+        name: "{{ item }}"
+        create_home: yes
+        password: "*"
+      loop:
+        - max
+        - ari

@@ -55,9 +55,9 @@ It will:
 
 ##### `step_bootstrap_users`
 - List of users that `step-cli` should be bootstrapped for
-- You can optionally set a custom `$STEPPATH` for each user to store the `step-cli` configuration in.
+- You can optionally set a custom `steppath` for each user to store the `step-cli` configuration in.
     - Note that this role does *not* alter the users environment variables/shell to load the custom `$STEPPATH` automatically.
-      If you set a non-standard `$STEPPATH`, you are responsible for including it in any future `step-cli` invocations
+      If you set a non-standard `steppath`, you are responsible for including it in any future `step-cli` invocations
 - Example:
     ```yaml
     step_bootstrap_users:
@@ -66,9 +66,6 @@ It will:
         - user: johnsmith
           steppath: "$HOME/.step"
     ```
-- ⚠️ Deprecated ⚠️ If `step_bootstrap_users` only contains `root` without a path and `step_cli_steppath` is set, this role will use the value of `step_cli_steppath` for the `root` user when bootstrapping.
-  This behavior exists to preserve backwards-compatibility with older role versions that could only bootstrap the root user and will be removed in a future release.
-
 - Default:
     ```yaml
     step_bootstrap_users:

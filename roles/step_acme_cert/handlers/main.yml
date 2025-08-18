@@ -5,5 +5,5 @@
 
 - name: reload affected services
   command: systemctl try-reload-or-restart {{ step_acme_cert_renewal_reload_services | join(' ') }}
-  when: step_acme_cert_renewal_reload_services
+  when: step_acme_cert_renewal_reload_services | length > 0
   ignore_errors: true
