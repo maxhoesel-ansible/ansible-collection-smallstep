@@ -116,7 +116,7 @@ docutils==0.21.2
     #   sphinx-rtd-theme
 enrich==1.2.7
     # via molecule
-filelock==3.18.0
+filelock==3.19.1
     # via
     #   ansible-lint
     #   virtualenv
@@ -151,7 +151,7 @@ jsonschema==4.25.0
     #   molecule
 jsonschema-specifications==2025.4.1
     # via jsonschema
-markdown-it-py==3.0.0
+markdown-it-py==4.0.0
     # via rich
 markupsafe==3.0.2
     # via jinja2
@@ -165,7 +165,7 @@ molecule==25.7.0
     #   molecule-plugins
 molecule-plugins[docker]==23.7.0
     # via -r requirements.in
-multidict==6.6.3
+multidict==6.6.4
     # via
     #   aiohttp
     #   yarl
@@ -345,7 +345,7 @@ urllib3==2.5.0
     # via
     #   docker
     #   requests
-virtualenv==20.33.1
+virtualenv==20.34.0
     # via pre-commit
 wcmatch==10.1
     # via
