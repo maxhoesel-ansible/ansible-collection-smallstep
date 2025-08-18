@@ -59,7 +59,7 @@ workflows:
           parallelism: 3
           matrix:
             parameters:
-              ansible-python-version-tuple: ["2.17,3.7", "2.18,3.8"]
+              ansible-python-version-tuple: ["2.18,3.8", "2.19,3.8"]
               step-version-tuple: ["latest,latest", "0.24.0,0.24.0"]
       - collection-testing/pre-commit-lint:
           name: Lint
