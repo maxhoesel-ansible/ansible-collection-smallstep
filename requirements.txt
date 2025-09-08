@@ -94,7 +94,7 @@ click==8.2.1
     #   typer
 click-help-colors==0.9.4
     # via molecule
-cryptography==45.0.6
+cryptography==45.0.7
     # via ansible-core
 dill==0.4.0
     # via pylint
@@ -124,7 +124,7 @@ frozenlist==1.7.0
     # via
     #   aiohttp
     #   aiosignal
-identify==2.6.13
+identify==2.6.14
     # via pre-commit
 idna==3.10
     # via
@@ -196,7 +196,7 @@ perky==0.9.3
     # via antsibull-core
 pip-tools==7.5.0
     # via -r requirements.in
-platformdirs==4.3.8
+platformdirs==4.4.0
     # via
     #   black
     #   pylint
@@ -267,7 +267,7 @@ rich==14.1.0
     #   typer
 roman-numerals-py==3.1.0
     # via sphinx
-rpds-py==0.27.0
+rpds-py==0.27.1
     # via
     #   jsonschema
     #   referencing
@@ -329,9 +329,9 @@ twiggy==0.5.1
     # via
     #   antsibull-core
     #   antsibull-docs
-typer==0.16.1
+typer==0.17.4
     # via rstcheck
-typing-extensions==4.14.1
+typing-extensions==4.15.0
     # via
     #   aiosignal
     #   pydantic
