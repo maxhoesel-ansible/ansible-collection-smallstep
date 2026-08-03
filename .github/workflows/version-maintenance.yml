@@ -34,7 +34,7 @@ jobs:
         run: uv run --locked scripts/update-version "${{ steps.drafter.outputs.name }}"
 
       - name: Open PR for collection version update
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v8
         with:
           base: main
           add-paths: |
