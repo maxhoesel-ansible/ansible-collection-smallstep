@@ -1,16 +1,16 @@
 # pylint: disable=redefined-outer-name
-from dataclasses import dataclass
-from pathlib import Path
 import random
 import string
-from typing import cast, Generator
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Generator, cast
 
 import docker
+import pytest
+from docker.errors import NotFound
 from docker.models.containers import Container
 from docker.models.images import Image
 from docker.models.networks import Network
-from docker.errors import NotFound
-import pytest
 
 REMOTE_CA_NETWORK = "ansible-collection-smallstep-test-remote-ca"
 REMOTE_CA_CONTAINER_NAME = "ansible-collection-smallstep-test-remote-ca"

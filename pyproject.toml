@@ -1,3 +1,37 @@
+[project]
+name = "ansible-collection-smallstep"
+version = "0.1.0"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[dependency-groups]
+dev = [
+    "ansible-lint==26.6.0",
+    "antsibull-docs==2.25.0",
+    "molecule==26.6.0",
+    "molecule-plugins[docker]==26.7.15",
+    "pre-commit==4.6.1",
+    "pylint==4.0.6",
+    "pytest==9.1.1",
+    "sphinx-ansible-theme==0.10.4",
+]
+# used for linting and for running pytest
+"ansible-2.21" = [
+    "ansible-core==2.21.2",
+]
+"ansible-2.20" = [
+    "ansible-core==2.20.7"
+]
+
+[tool.uv]
+conflicts = [
+    [
+        { group = "ansible-2.20" },
+        { group = "ansible-2.21" },
+    ]
+]
+
 [tool.autopep8]
 max_line_length = 120
 ignore = "E402"
@@ -18,7 +52,6 @@ disable = [
     'wrong-import-position',         # Ansible module best practices
     "I",
 ]
-
 [tool.pylint.'FORMAT']
 max-line-length = 120
 

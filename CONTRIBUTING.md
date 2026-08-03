@@ -11,15 +11,14 @@ Prerequisites:
 
 - A recent version of Python supported by the current release of `ansible-core` (see [here](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#control-node-requirements))
 - Docker (for running Tests)
+- [`uv`](https://docs.astral.sh/uv/)
 
 Steps:
 
 1. Clone the repository (or your fork) to your local machine
-2. Run `./scripts/setup.sh`. This will set up a virtual environment with all required dependencies for development
-3. Activate the virtualenv with `source .venv/bin/activate`
-4. Make your changes
-5. Run the relevant tests using the instructions in [here](#testing-changes)
-6. Once you're done, commit your changes and open a PR
+2. Make your changes
+3. Run the relevant tests using the instructions in [here](#testing-changes)
+4. Once you're done, commit your changes and open a PR
 
 ## Developing Content
 
@@ -57,38 +56,28 @@ We aim to test every part of this collection as thoroughly as reasonable to ensu
 We use `pytest` to run all of our tests, both for plugins and roles.
 If you set up the test environment as described in [the Getting Started guide](#getting-started), you should be able to see all available tests:
 
-`pytest --co`
+`uv run pytest --co`
 
-You can run these tests using `pytest` and limit execution to specific test with `pytest -k 'test_pattern'` (or just use your editors testing plugin).
+You can run these tests using `uv run pytest` and limit execution to specific test with `uv run pytest -k 'test_pattern'` (or just use your editors testing plugin).
 Please note that running the full test suite executes all molecule scenarios and may take **up to an hour** to complete.
 
 ### Testing different App Versions
 
-When you run the collection tests using `ptytest`, they are executed with the current stable Ansible version in `requirements.txt` and the latest smallstep tools.
+When you run the collection tests using `ptytest`, they are executed with the current stable Ansible version in `pyproject.toml` and the latest smallstep tools.
 To ensure that this collection remains backwards-compatible, we also test against older versions of both ansible and the smallstep tools.
 Our testing Matrix currently looks like this:
 
 | Component | Module Tests | Role Tests | Versions |
 |-----------|--------------|------------|----------|
-| `ansible-core` | ✅ | ✅ | Three most recent releases (e.g. `2.13`, `2.14`, `2.15`) |
+| `ansible-core` | ✅ | ✅ | Two most recent releases (e.g. `2.20`, `2.21`) |
 | Node Python Version | ✅ | ❌ | Collection-supported Python version (see [README](./README.md))
 | `step-ca`, `step-cli` | ✅ | ✅ | `latest` and the minimum collection-supported version (see [README](./README.md))
 
 All possible permutations are automatically tested in CI.
-You can change the tested versions locally by supplying additional arguments to `pytest`:
+You can change the tested versions locally by supplying additional arguments to `uv run pytest`:
 
-```
-$ pytest --help
-# truncated output
-Custom options:
-  --ansible-version=ANSIBLE_VERSION
-                        Version of ansible to use for tests, in the format '2.xx'. Default: see requirements.txt
-  --step-cli-version=STEP_CLI_VERSION
-                        Version of step-cli to use for tests, either 'latest' (default) or a version ('0.24.0')
-  --step-ca-version=STEP_CA_VERSION
-                        Version of step-ca to use for tests, either 'latest' (default) or a version ('0.24.0')
-  --node-python-version=NODE_PYTHON_VERSION
-                        Python version to test Ansible modules with, in the format '3.x'. Default: '3.6'
+```bash
+$ uv run --group "ansible-2.xx" pytest --node-python-version=NODE_PYTHON_VERSION --step-ca-version 0.24.0 --step-cli-version 0.24.0
 ```
 
 ## Writing Tests
@@ -173,12 +162,7 @@ The CI also builds the docs to ensure they don't break silently.
 ### Updating Dependencies
 
 While the *Ansible* collection itself doesn't have any dependencies outside of ansible itself, the tooling used to build and test the collection does.
-We use [`pip-tools`](https://github.com/jazzband/pip-tools/) to lock these dependencies to a specific version for testing.
-This prevents random CI failures because of [`requests` updates et. al.](https://github.com/docker/docker-py/pull/3257), but still gives us a simple `requirements.txt` that anyone can install.
-
-The direct dependencies are stored in `requirements.in`, use `scripts/udate_requirements.sh` to generate a new `requirements.txt`.
-Do **not** generate `requirements.txt` in another way or remove the header, else renovate [won't be able to resolve and update dependencies in CI!](https://docs.renovatebot.com/modules/manager/pip-compile/#assumption-of-header-with-a-command)
-
+We use `uv` to lock these dependencies to a specific version for testing.
 
 ### Raising minimum supported step versions
 
@@ -188,13 +172,14 @@ Do **not** generate `requirements.txt` in another way or remove the header, else
 
 ### Bumping supported ansible-core versions
 
-1. Update the versions in the [CI config](./.circleci/config.yml)
-2. Update the version in [`requirements.txt`](./requirements.txt)
+1. Update the groups in [`pyproject.toml`](./pyproject.toml)
+2. Update the groups in the [CI config](./.circleci/config.yml)
 
 ### Bumping node python version
 
 1. Update the version in [`tests/conftest.py`](./tests/conftest.py)
 2. Update the version in the [CI config](./.circleci/config.yml)
+3. Update the version in the [`README`](./README.md)
 
 ### Versioning and Releases
 

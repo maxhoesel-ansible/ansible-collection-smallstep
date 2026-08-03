@@ -12,7 +12,7 @@ repos:
       - id: check-executables-have-shebangs
       - id: debug-statements
   - repo: https://github.com/ansible/ansible-lint
-    rev: v25.9.0
+    rev: v26.6.0
     hooks:
       - id: ansible-lint
         args:
@@ -22,16 +22,22 @@ repos:
     hooks:
       - id: pylint
         name: pylint
-        entry: pylint
+        entry: uv
         language: system
         types: [python]
         args: [
+            "run",
+            "--locked",
+            "pylint",
             "-rn", # Only display messages
             "-sn", # Don't display the score
             "--disable=R",
           ]
 
 ci:
+  # pre-commit updates are handled by renovate, but there is no way to disable pre-commit-ci
+  # autoupdates. Reduce their check interval for now, this should reduce PR noise
+  autoupdate_schedule: quarterly
   skip:
     - pylint
     # Ansible-lint has a tendency to timeout in the pre-commit CI, so skip it
