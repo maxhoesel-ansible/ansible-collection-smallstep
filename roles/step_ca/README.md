@@ -30,9 +30,9 @@ It is thus **very** important that you **back up your root key and password** in
 ## Requirements
 
 - The following distributions are currently supported and tested:
-  - Ubuntu: `22.04 LTS, 24.04 LTS`
-  - Debian: `11, 12, 13`
-  - Fedora: `42`
+  - Ubuntu: `22.04 LTS, 24.04 LTS, 26.04 LTS`
+  - Debian: `12, 13`
+  - Fedora: `44+`
   - RHEL(-compatible): `9, 10` (RockyLinux is used for testing)
   - Other distributions may work as well, but are not tested
 - Supported architectures: amd64, arm64
