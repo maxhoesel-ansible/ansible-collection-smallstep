@@ -18,7 +18,7 @@
       ansible.builtin.file:
         path: "{{ certs_directory }}"
         owner: "{{ step_acme_cert_user }}"
-        group: "{{ web_user[ansible_os_family] }}"
+        group: "{{ web_user[ansible_facts.os_family] }}"
         mode: "750"
         state: directory
 
@@ -30,18 +30,18 @@
         step_acme_cert_certfile:
           path: "{{ certs_directory }}/standalone.cert"
           mode: "644"
-          group: "{{ web_user[ansible_os_family] }}"
+          group: "{{ web_user[ansible_facts.os_family] }}"
         step_acme_cert_keyfile:
           path: "{{ certs_directory }}/standalone.key"
           mode: "640"
-          group: "{{ web_user[ansible_os_family] }}"
+          group: "{{ web_user[ansible_facts.os_family] }}"
         step_acme_cert_renewal_service: step-renew-standalone
 
     # this is done so that we can write our ACME token as the nginx user while getting a certificate.
     - name: Set .well-known directory permissions to nginx
       ansible.builtin.file:
-        path: "{{ webroots[ansible_os_family] }}/.well-known"
-        owner: "{{ web_user[ansible_os_family] }}"
+        path: "{{ webroots[ansible_facts.os_family] }}/.well-known"
+        owner: "{{ web_user[ansible_facts.os_family] }}"
         group: root
         mode: "755"
         state: directory
@@ -62,12 +62,12 @@
         step_acme_cert_certfile:
           path: "{{ certs_directory }}/webroot.cert"
           mode: "644"
-          group: "{{ web_user[ansible_os_family] }}"
+          group: "{{ web_user[ansible_facts.os_family] }}"
         step_acme_cert_keyfile:
           path: "{{ certs_directory }}/webroot.key"
           mode: "640"
-          group: "{{ web_user[ansible_os_family] }}"
-        step_acme_cert_webroot_path: "{{ webroots[ansible_os_family] }}"
+          group: "{{ web_user[ansible_facts.os_family] }}"
+        step_acme_cert_webroot_path: "{{ webroots[ansible_facts.os_family] }}"
         step_acme_cert_renewal_service: step-renew-webroot
 
     - name: Install Nginx site [Debian]
@@ -77,7 +77,7 @@
         owner: root
         group: root
         mode: "644"
-      when: ansible_os_family == "Debian"
+      when: ansible_facts.os_family == "Debian"
       notify: restart nginx
     - name: Install Nginx config [RedHat]
       template:
@@ -86,7 +86,7 @@
         owner: root
         group: root
         mode: "644"
-      when: ansible_os_family == "RedHat"
+      when: ansible_facts.os_family == "RedHat"
       notify: restart nginx
 
   handlers:

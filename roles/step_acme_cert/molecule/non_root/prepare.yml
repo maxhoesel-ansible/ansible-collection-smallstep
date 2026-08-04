@@ -6,7 +6,7 @@
 
 - hosts: rockylinux:fedora
   tasks:
-    # Required to prevent issues with ansible_default_ipv4 missing
+    # Required to prevent issues with ansible_facts.default_ipv4 missing
     - name: Install iproute
       package:
         name: iproute
@@ -52,5 +52,5 @@
       vars:
         step_bootstrap_fingerprint: "{{ _ca_fingerprint.stdout }}"
         step_bootstrap_users:
-          - user: "{{ web_user[ansible_os_family] }}"
+          - user: "{{ web_user[ansible_facts.os_family] }}"
             steppath: "{{ step_acme_cert_steppath }}"

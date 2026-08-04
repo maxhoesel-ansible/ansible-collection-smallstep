@@ -37,7 +37,7 @@
 
         - name: Try to access the locally hosted site over HTTPS
           uri:
-            url: "https://{{ ansible_fqdn }}"
+            url: "https://{{ ansible_facts.fqdn }}"
           register: _res
           retries: 5
           delay: 5

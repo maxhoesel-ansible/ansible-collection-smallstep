@@ -56,7 +56,7 @@ The advantage of the `step` method is that no additional tools are required.
 
 ##### `step_acme_cert_name`
 - The subject name that the certificate will be issued for
-- Default: `{{ ansible_fqdn }}`
+- Default: `{{ ansible_facts.fqdn }}`
 
 ##### `step_acme_cert_san`
 - Subject Alternate Names to add to the cert

@@ -2,12 +2,12 @@
 step_cli_executable: step-cli
 
 step_acme_cert_user: root
-step_acme_cert_steppath: "{{ ansible_env.HOME }}/.step"
+step_acme_cert_steppath: "{{ ansible_facts.env.HOME }}/.step"
 
 #step_acme_cert_ca_provisioner:
 step_acme_cert_webroot_path: ""
 
-step_acme_cert_name: "{{ ansible_fqdn }}"
+step_acme_cert_name: "{{ ansible_facts.fqdn }}"
 step_acme_cert_san: []
 #step_acme_cert_duration: 24h
 step_acme_cert_contact: root@localhost
