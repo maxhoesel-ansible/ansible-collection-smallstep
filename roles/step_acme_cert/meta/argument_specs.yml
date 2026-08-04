@@ -43,7 +43,7 @@ argument_specs:
       # Certificate Options
       step_acme_cert_name:
         type: str
-        default: "{{ ansible_fqdn }}"
+        default: "{{ ansible_facts.fqdn }}"
         description: The subject name that the certificate will be issued for
       step_acme_cert_san:
         type: list

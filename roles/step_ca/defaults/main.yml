@@ -10,7 +10,7 @@ step_ca_path: /etc/step-ca
 #step_ca_root_password:
 #step_ca_intermediate_password:
 # step-ca init skips empty entries, so this works
-step_ca_dns: "{{ ansible_fqdn }},{{ ansible_default_ipv4.address | d('') }},{{ ansible_default_ipv6.address | d('') }}"
+step_ca_dns: "{{ ansible_facts.fqdn }},{{ ansible_facts.default_ipv4.address | d('') }},{{ ansible_facts.default_ipv6.address | d('') }}"
 step_ca_address: ":443"
 
 #step_ca_existing_root:
