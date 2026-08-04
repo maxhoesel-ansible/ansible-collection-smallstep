@@ -18,7 +18,7 @@
     name: "{{ step_acme_cert_name }}"
     not_after: "{{ step_acme_cert_duration | default(omit) }}"
     san: "{{ step_acme_cert_san }}"
-    standalone: "{{ step_acme_cert_webroot_path | bool }}"
+    standalone: "{{ step_acme_cert_webroot_path | length == 0 }}"
     step_cli_executable: "{{ step_cli_executable }}"
     webroot: "{{ step_acme_cert_webroot_path }}"
   become: yes
