@@ -9,7 +9,7 @@ dependencies = []
 dev = [
     "ansible-lint==26.8.0",
     "antsibull-docs==2.25.0",
-    "molecule==26.6.0",
+    "molecule==26.8.0",
     "molecule-plugins[docker]==26.7.15",
     "pre-commit==4.6.1",
     "pylint==4.0.7",
