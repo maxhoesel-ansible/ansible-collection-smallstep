@@ -1,26 +1,26 @@
 authors:
-  - Max Hösel <ansible@maxhoesel.de>
+- Max Hösel <ansible@maxhoesel.de>
 build_ignore:
-  - .circleci
-  - .github
-  - .vscode
-  - dist
-  - CODE_OF_CONDUCT.md
-  - CONTRIBUTING.md
-  - .yamllint
-  - "*.tar.gz"
-  - .venv
-  - .pytest_cache
-  - scripts
-  - .pre-commit-config.yaml
-  - .readthedocs.yaml
-  - pyproject.toml
-  - requirements.txt
-  - "**/requirements.txt"
-  - docs/tmp
-  - docs/build
+- .circleci
+- .github
+- .vscode
+- dist
+- CODE_OF_CONDUCT.md
+- CONTRIBUTING.md
+- .yamllint
+- '*.tar.gz'
+- .venv
+- .pytest_cache
+- scripts
+- .pre-commit-config.yaml
+- .readthedocs.yaml
+- pyproject.toml
+- requirements.txt
+- '**/requirements.txt'
+- docs/tmp
+- docs/build
 dependencies:
-  community.general: ">=1.0.0"
+  community.general: '>=1.0.0'
 description: Install, configure and use the Smallstep CA server and CLI tool
 issues: https://github.com/maxhoesel-ansible/ansible-collection-smallstep/issues
 license_file: LICENSE
@@ -29,8 +29,8 @@ namespace: maxhoesel
 readme: README.md
 repository: https://github.com/maxhoesel-ansible/ansible-collection-smallstep
 tags:
-  - smallstep
-  - ca
-  - application
-  - certificates
-version: 0.24.5
+- smallstep
+- ca
+- application
+- certificates
+version: 1.0.0
