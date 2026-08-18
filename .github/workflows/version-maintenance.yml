@@ -28,7 +28,7 @@ jobs:
         with:
           python-version: "3.14"
       - name: Install uv
-        uses: astral-sh/setup-uv@v9.0.0
+        uses: astral-sh/setup-uv@v10.0.1
 
       - name: Run updater script
         run: uv run --locked scripts/update-version "${{ steps.drafter.outputs.name }}"
