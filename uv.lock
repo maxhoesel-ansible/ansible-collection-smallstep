@@ -179,10 +179,10 @@ source = { virtual = "." }
 
 [package.dev-dependencies]
 ansible-2-20 = [
-    { name = "ansible-core", version = "2.20.8", source = { registry = "https://pypi.org/simple" } },
+    { name = "ansible-core", version = "2.20.9", source = { registry = "https://pypi.org/simple" } },
 ]
 ansible-2-21 = [
-    { name = "ansible-core", version = "2.21.3", source = { registry = "https://pypi.org/simple" } },
+    { name = "ansible-core", version = "2.21.4", source = { registry = "https://pypi.org/simple" } },
 ]
 dev = [
     { name = "ansible-lint" },
@@ -198,8 +198,8 @@ dev = [
 [package.metadata]
 
 [package.metadata.requires-dev]
-ansible-2-20 = [{ name = "ansible-core", specifier = "==2.20.8" }]
-ansible-2-21 = [{ name = "ansible-core", specifier = "==2.21.3" }]
+ansible-2-20 = [{ name = "ansible-core", specifier = "==2.20.9" }]
+ansible-2-21 = [{ name = "ansible-core", specifier = "==2.21.4" }]
 dev = [
     { name = "ansible-lint", specifier = "==26.8.0" },
     { name = "antsibull-docs", specifier = "==2.26.0" },
@@ -216,8 +216,8 @@ name = "ansible-compat"
 version = "26.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "ansible-core", version = "2.20.8", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-20'" },
-    { name = "ansible-core", version = "2.21.3", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-21' or extra != 'group-28-ansible-collection-smallstep-ansible-2-20'" },
+    { name = "ansible-core", version = "2.20.9", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-20'" },
+    { name = "ansible-core", version = "2.21.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-21' or extra != 'group-28-ansible-collection-smallstep-ansible-2-20'" },
     { name = "jsonschema" },
     { name = "packaging" },
     { name = "pyyaml" },
@@ -230,7 +230,7 @@ wheels = [
 
 [[package]]
 name = "ansible-core"
-version = "2.20.8"
+version = "2.20.9"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'linux2'",
@@ -247,14 +247,14 @@ dependencies = [
     { name = "pyyaml", marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-20'" },
     { name = "resolvelib", marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-20'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/9f/5b/d09dde47a896ad85f446bbb8d570dfcf83acab981e7f52292cac5573cd23/ansible_core-2.20.8.tar.gz", hash = "sha256:66e0e91ee43d98b3968a612c42c8e6e3d1ea43be501c4f8f6fc8c75b35892cdf", size = 3354686, upload-time = "2026-08-10T16:44:53.097Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/bb/40/b68ddb572920e0fb746fd28cd54d89135bd3e352bc5e6c0e8343b00a8b55/ansible_core-2.20.9.tar.gz", hash = "sha256:73bcd4c3dd51b597202f8cf5a72b8e145342c7885ad21114e5979bdf629b3366", size = 3349426, upload-time = "2026-09-08T16:49:38.337Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/be/bf/16dfd21bd81e33e1d2766aa3f39323de865d634422cf610d7613049c29d2/ansible_core-2.20.8-py3-none-any.whl", hash = "sha256:fc6b18073900b6c886124faf5298ae0fc5d148e58635a04c9b358048981136d8", size = 2420535, upload-time = "2026-08-10T16:44:50.871Z" },
+    { url = "https://files.pythonhosted.org/packages/94/c6/4d2294acd85dd28444561513285b64542abacb60333e89c6de165bb0cef5/ansible_core-2.20.9-py3-none-any.whl", hash = "sha256:1ab5e75c4bb214a37e75f40f02dc545cdbbe2a322ef367cbb4451234c3cbe765", size = 2430540, upload-time = "2026-09-08T16:49:35.888Z" },
 ]
 
 [[package]]
 name = "ansible-core"
-version = "2.21.3"
+version = "2.21.4"
 source = { registry = "https://pypi.org/simple" }
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'linux2'",
@@ -271,9 +271,9 @@ dependencies = [
     { name = "pyyaml", marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-21' or extra != 'group-28-ansible-collection-smallstep-ansible-2-20'" },
     { name = "resolvelib", marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-21' or extra != 'group-28-ansible-collection-smallstep-ansible-2-20'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1c/11/cb53834d320c38d739e756e2458852d6e74a6c7018a9ab9f6d4ab5e5196e/ansible_core-2.21.3.tar.gz", hash = "sha256:4194fbd82273cbacfd06d86d74d2d7168c3c4b8426c03e93562cd7217f811ae1", size = 3397615, upload-time = "2026-08-10T16:46:14.554Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/df/72/2152230f254bd9c6b892f95d6d291a96fd09b632ce01c6b406eda8c5cd75/ansible_core-2.21.4.tar.gz", hash = "sha256:81a9329f4f12cfa5008dcab5d1bf23ae69b7effc08c0f00048ab2461147ae95a", size = 3394492, upload-time = "2026-09-08T16:51:48.569Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a3/fa/938fe0504372377af2bef42abe0d8e463fdcd011ad803eaf300e4577dd7a/ansible_core-2.21.3-py3-none-any.whl", hash = "sha256:9e7dd367f7dc5d5e9fc5ae1baf8af9c4edc09e916a73a40108a3f32e3ad93f10", size = 2446988, upload-time = "2026-08-10T16:46:12.947Z" },
+    { url = "https://files.pythonhosted.org/packages/a1/05/d4e28474dd027db4d60fef2422cf6bc80df100ab32e5fa5e7aad898ffd55/ansible_core-2.21.4-py3-none-any.whl", hash = "sha256:ebe74d9c8fadcb41ad2151e031bf1e785e3098aaa015019b4e19a0a96f0dcc4f", size = 2457154, upload-time = "2026-09-08T16:51:47.044Z" },
 ]
 
 [[package]]
@@ -282,8 +282,8 @@ version = "26.8.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ansible-compat" },
-    { name = "ansible-core", version = "2.20.8", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-20'" },
-    { name = "ansible-core", version = "2.21.3", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-21' or extra != 'group-28-ansible-collection-smallstep-ansible-2-20'" },
+    { name = "ansible-core", version = "2.20.9", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-20'" },
+    { name = "ansible-core", version = "2.21.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-21' or extra != 'group-28-ansible-collection-smallstep-ansible-2-20'" },
     { name = "black" },
     { name = "cffi" },
     { name = "cryptography" },
@@ -1096,8 +1096,8 @@ version = "26.8.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ansible-compat" },
-    { name = "ansible-core", version = "2.20.8", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-20'" },
-    { name = "ansible-core", version = "2.21.3", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-21' or extra != 'group-28-ansible-collection-smallstep-ansible-2-20'" },
+    { name = "ansible-core", version = "2.20.9", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-20'" },
+    { name = "ansible-core", version = "2.21.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-21' or extra != 'group-28-ansible-collection-smallstep-ansible-2-20'" },
     { name = "click" },
     { name = "enrich" },
     { name = "jinja2" },

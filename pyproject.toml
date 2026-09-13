@@ -18,10 +18,10 @@ dev = [
 ]
 # used for linting and for running pytest
 "ansible-2.21" = [
-    "ansible-core==2.21.3",
+    "ansible-core==2.21.4",
 ]
 "ansible-2.20" = [
-    "ansible-core==2.20.8"
+    "ansible-core==2.20.9"
 ]
 
 [tool.uv]
