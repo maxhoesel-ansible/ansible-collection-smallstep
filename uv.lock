@@ -202,7 +202,7 @@ ansible-2-20 = [{ name = "ansible-core", specifier = "==2.20.9" }]
 ansible-2-21 = [{ name = "ansible-core", specifier = "==2.21.4" }]
 dev = [
     { name = "ansible-lint", specifier = "==26.8.0" },
-    { name = "antsibull-docs", specifier = "==2.26.0" },
+    { name = "antsibull-docs", specifier = "==2.27.0" },
     { name = "molecule", specifier = "==26.8.0" },
     { name = "molecule-plugins", extras = ["docker"], specifier = "==26.7.15" },
     { name = "pre-commit", specifier = "==4.6.2" },
@@ -359,7 +359,7 @@ wheels = [
 
 [[package]]
 name = "antsibull-docs"
-version = "2.26.0"
+version = "2.27.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -379,9 +379,9 @@ dependencies = [
     { name = "semantic-version" },
     { name = "sphinx" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/29/a9/4b3a611a40dd417201d786cd17b347ea476b7ad8a8d029575496b388ef02/antsibull_docs-2.26.0.tar.gz", hash = "sha256:8bb9274f1e69b10c64eaa9f7d893add824a5a6db6aeca472d0e769dc07f8df8c", size = 1596995, upload-time = "2026-08-14T18:58:28.857Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9c/8e/844eceb5ef4b1d10468be2c0f555c6f0d03fbceb9dc8e39ff3c88f0a80c6/antsibull_docs-2.27.0.tar.gz", hash = "sha256:ed89776c5bfd9c779ee20965dc29e84aacb5efb7e21e3c72b2ed9a81378afa96", size = 1602777, upload-time = "2026-09-10T20:14:39.269Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/07/d5/9e5e94354551f488a47ddf219337b90d5fa4277d166333c26f9f5abc64e3/antsibull_docs-2.26.0-py3-none-any.whl", hash = "sha256:bd16a94e162f7ffeb641e0f4655acf5d25ba4357f181189bbcbad07c960d4ec4", size = 304260, upload-time = "2026-08-14T18:58:30.499Z" },
+    { url = "https://files.pythonhosted.org/packages/8b/a2/053f3a36ce18dd538966f73cfa498c86ad4a14bf6be0965ef01ea5260c75/antsibull_docs-2.27.0-py3-none-any.whl", hash = "sha256:e68cb05494eaa2dcb834d464ae09f5249d64fbb58574dffe397314c8b07be99c", size = 304395, upload-time = "2026-09-10T20:14:36.912Z" },
 ]
 
 [[package]]
