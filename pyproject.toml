@@ -12,7 +12,7 @@ dev = [
     "molecule==26.9.0",
     "molecule-plugins[docker]==26.9.28",
     "pre-commit==4.6.2",
-    "pylint==4.0.9",
+    "pylint==4.1.2",
     "pytest==9.1.1",
     "sphinx-ansible-theme==0.10.4",
 ]
