@@ -43,7 +43,7 @@ dependencies = [
     { name = "frozenlist" },
     { name = "multidict" },
     { name = "propcache" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'group-28-ansible-collection-smallstep-ansible-2-20' and extra == 'group-28-ansible-collection-smallstep-ansible-2-21')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
     { name = "yarl" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/58/d9/22ce5786ac0c1653ae8b6c23bded02c1686d11f0dbb45b31ce128e0df985/aiohttp-3.14.3.tar.gz", hash = "sha256:9491196535a88924a60afd5b5f434b5b203b6cc616250878dbdb223a8f7844bc", size = 7971213, upload-time = "2026-07-23T01:57:27.037Z" }
@@ -138,7 +138,7 @@ version = "1.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "frozenlist" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'group-28-ansible-collection-smallstep-ansible-2-20' and extra == 'group-28-ansible-collection-smallstep-ansible-2-21')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/61/62/06741b579156360248d1ec624842ad0edf697050bbaf7c3e46394e106ad1/aiosignal-1.4.0.tar.gz", hash = "sha256:f47eecd9468083c2029cc99945502cb7708b082c232f9aca65da147157b251c7", size = 25007, upload-time = "2025-07-03T22:54:43.528Z" }
 wheels = [
@@ -205,7 +205,7 @@ dev = [
     { name = "antsibull-docs", specifier = "==2.27.0" },
     { name = "molecule", specifier = "==26.10.0" },
     { name = "molecule-plugins", extras = ["docker"], specifier = "==26.10.12" },
-    { name = "pre-commit", specifier = "==4.6.2" },
+    { name = "pre-commit", specifier = "==4.7.0" },
     { name = "pylint", specifier = "==4.0.9" },
     { name = "pytest", specifier = "==9.1.1" },
     { name = "sphinx-ansible-theme", specifier = "==0.10.4" },
@@ -217,7 +217,7 @@ version = "26.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ansible-core", version = "2.20.10", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-20'" },
-    { name = "ansible-core", version = "2.21.5", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-21' or extra != 'group-28-ansible-collection-smallstep-ansible-2-20'" },
+    { name = "ansible-core", version = "2.21.5", source = { registry = "https://pypi.org/simple" }, marker = "extra != 'group-28-ansible-collection-smallstep-ansible-2-20' or extra == 'group-28-ansible-collection-smallstep-ansible-2-21'" },
     { name = "jsonschema" },
     { name = "packaging" },
     { name = "pyyaml" },
@@ -265,11 +265,11 @@ resolution-markers = [
     "python_full_version < '3.14' and sys_platform != 'linux' and sys_platform != 'linux2'",
 ]
 dependencies = [
-    { name = "cryptography", marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-21' or extra != 'group-28-ansible-collection-smallstep-ansible-2-20'" },
-    { name = "jinja2", marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-21' or extra != 'group-28-ansible-collection-smallstep-ansible-2-20'" },
-    { name = "packaging", marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-21' or extra != 'group-28-ansible-collection-smallstep-ansible-2-20'" },
-    { name = "pyyaml", marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-21' or extra != 'group-28-ansible-collection-smallstep-ansible-2-20'" },
-    { name = "resolvelib", marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-21' or extra != 'group-28-ansible-collection-smallstep-ansible-2-20'" },
+    { name = "cryptography", marker = "extra != 'group-28-ansible-collection-smallstep-ansible-2-20' or extra == 'group-28-ansible-collection-smallstep-ansible-2-21'" },
+    { name = "jinja2", marker = "extra != 'group-28-ansible-collection-smallstep-ansible-2-20' or extra == 'group-28-ansible-collection-smallstep-ansible-2-21'" },
+    { name = "packaging", marker = "extra != 'group-28-ansible-collection-smallstep-ansible-2-20' or extra == 'group-28-ansible-collection-smallstep-ansible-2-21'" },
+    { name = "pyyaml", marker = "extra != 'group-28-ansible-collection-smallstep-ansible-2-20' or extra == 'group-28-ansible-collection-smallstep-ansible-2-21'" },
+    { name = "resolvelib", marker = "extra != 'group-28-ansible-collection-smallstep-ansible-2-20' or extra == 'group-28-ansible-collection-smallstep-ansible-2-21'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0b/27/d02c3f75e9f1468b5efbe49667574f68331b17e8a9f2bb99e1d18be70052/ansible_core-2.21.5.tar.gz", hash = "sha256:65bb3148c58ebb843cd5074004c805f404f152114d98476dd823324616c9c6cb", size = 3395026, upload-time = "2026-10-05T15:11:00.15Z" }
 wheels = [
@@ -283,7 +283,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ansible-compat" },
     { name = "ansible-core", version = "2.20.10", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-20'" },
-    { name = "ansible-core", version = "2.21.5", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-21' or extra != 'group-28-ansible-collection-smallstep-ansible-2-20'" },
+    { name = "ansible-core", version = "2.21.5", source = { registry = "https://pypi.org/simple" }, marker = "extra != 'group-28-ansible-collection-smallstep-ansible-2-20' or extra == 'group-28-ansible-collection-smallstep-ansible-2-21'" },
     { name = "black" },
     { name = "cffi" },
     { name = "cryptography" },
@@ -508,7 +508,7 @@ name = "build"
 version = "1.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "(os_name == 'nt' and sys_platform != 'linux') or (os_name != 'nt' and extra == 'group-28-ansible-collection-smallstep-ansible-2-20' and extra == 'group-28-ansible-collection-smallstep-ansible-2-21') or (sys_platform == 'linux' and extra == 'group-28-ansible-collection-smallstep-ansible-2-20' and extra == 'group-28-ansible-collection-smallstep-ansible-2-21')" },
+    { name = "colorama", marker = "os_name == 'nt' and sys_platform != 'linux'" },
     { name = "packaging" },
     { name = "pyproject-hooks" },
 ]
@@ -531,7 +531,7 @@ name = "cffi"
 version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pycparser", marker = "implementation_name != 'PyPy' or (extra == 'group-28-ansible-collection-smallstep-ansible-2-20' and extra == 'group-28-ansible-collection-smallstep-ansible-2-21')" },
+    { name = "pycparser", marker = "implementation_name != 'PyPy'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/57/5f/ff100cae70ebe9d8df1c01a00e510e45d9adb5c1fdda84791b199141de97/cffi-2.1.0.tar.gz", hash = "sha256:efc1cdd798b1aaf39b4610bba7aad28c9bea9b910f25c784ccf9ec1fa719d1f9", size = 531036, upload-time = "2026-07-06T21:34:30.382Z" }
 wheels = [
@@ -686,7 +686,7 @@ name = "click"
 version = "8.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'group-28-ansible-collection-smallstep-ansible-2-20' and extra == 'group-28-ansible-collection-smallstep-ansible-2-21')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/76/d4/81420972a676e8ffea40450d8c8c92943e7218a78fe9b64359836cc9876b/click-8.4.2.tar.gz", hash = "sha256:9a6cea6e60b17ebe0a44c5cc636d94f09bd66142c1cd7d8b4cd731c4917a15f6", size = 338000, upload-time = "2026-06-24T17:45:15.148Z" }
 wheels = [
@@ -707,7 +707,7 @@ name = "cryptography"
 version = "50.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cffi", marker = "platform_python_implementation != 'PyPy' or (extra == 'group-28-ansible-collection-smallstep-ansible-2-20' and extra == 'group-28-ansible-collection-smallstep-ansible-2-21')" },
+    { name = "cffi", marker = "platform_python_implementation != 'PyPy'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/de/41/6cbdcf9142d00fe82836fbb51e503e58088575cf7a0fe1dbff6695bf0840/cryptography-50.0.0.tar.gz", hash = "sha256:eeac2acb5a20ed25e0ad6d1df9891a520b78b404266b6d11778f25d5d691a6c9", size = 880201, upload-time = "2026-07-31T14:25:10.11Z" }
 wheels = [
@@ -784,7 +784,7 @@ name = "docker"
 version = "7.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pywin32", marker = "sys_platform == 'win32' or (extra == 'group-28-ansible-collection-smallstep-ansible-2-20' and extra == 'group-28-ansible-collection-smallstep-ansible-2-21')" },
+    { name = "pywin32", marker = "sys_platform == 'win32'" },
     { name = "requests" },
     { name = "urllib3" },
 ]
@@ -1096,7 +1096,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "ansible-compat" },
     { name = "ansible-core", version = "2.20.10", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-20'" },
-    { name = "ansible-core", version = "2.21.5", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'group-28-ansible-collection-smallstep-ansible-2-21' or extra != 'group-28-ansible-collection-smallstep-ansible-2-20'" },
+    { name = "ansible-core", version = "2.21.5", source = { registry = "https://pypi.org/simple" }, marker = "extra != 'group-28-ansible-collection-smallstep-ansible-2-20' or extra == 'group-28-ansible-collection-smallstep-ansible-2-21'" },
     { name = "click" },
     { name = "enrich" },
     { name = "jinja2" },
@@ -1128,7 +1128,7 @@ wheels = [
 docker = [
     { name = "docker" },
     { name = "requests" },
-    { name = "selinux", marker = "sys_platform == 'linux' or sys_platform == 'linux2' or (extra == 'group-28-ansible-collection-smallstep-ansible-2-20' and extra == 'group-28-ansible-collection-smallstep-ansible-2-21')" },
+    { name = "selinux", marker = "sys_platform == 'linux' or sys_platform == 'linux2'" },
 ]
 
 [[package]]
@@ -1298,7 +1298,7 @@ wheels = [
 
 [[package]]
 name = "pre-commit"
-version = "4.6.2"
+version = "4.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cfgv" },
@@ -1307,9 +1307,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "virtualenv" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/74/89/1f3e8e1fc3e97de0fa963495832f581f025f29471602a309e48808244292/pre_commit-4.6.2.tar.gz", hash = "sha256:8f5d7bfb021ecdbcd9d49d89847082dd24172ccde534390081a679ad046e2441", size = 198670, upload-time = "2026-08-10T22:07:18.421Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3a/c3/6965c2690ddce885ec75121572d065a5b94c5a5d8d3e657927ecda9fd715/pre_commit-4.7.0.tar.gz", hash = "sha256:1f3deee12b914c8fa184bd2b5953391c2e4f36763e403d4a23dc9983fa7c6e86", size = 198120, upload-time = "2026-10-12T20:45:40.32Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/45/e2/bbb7129c9e7999a6b8ee9cca3b66486c25c423ab5a75f34071798b74ce94/pre_commit-4.6.2-py2.py3-none-any.whl", hash = "sha256:e2dde9a75d3bce11bd3831c26d134df00a2803c1d818be6a0383c3dcda25dc4e", size = 226202, upload-time = "2026-08-10T22:07:16.942Z" },
+    { url = "https://files.pythonhosted.org/packages/eb/83/ce0a196e4f7b20b11ce3aa1fc72fb973f64b7628d51c1b8aebad37fb7f81/pre_commit-4.7.0-py2.py3-none-any.whl", hash = "sha256:2e229038ad3656081b70c27913157e4b636ef306f643f024a8a8e3f0f7b2f877", size = 226261, upload-time = "2026-10-12T20:45:38.858Z" },
 ]
 
 [[package]]
@@ -1520,7 +1520,7 @@ version = "4.0.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "astroid" },
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'group-28-ansible-collection-smallstep-ansible-2-20' and extra == 'group-28-ansible-collection-smallstep-ansible-2-21')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "dill" },
     { name = "isort" },
     { name = "mccabe" },
@@ -1546,7 +1546,7 @@ name = "pytest"
 version = "9.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'group-28-ansible-collection-smallstep-ansible-2-20' and extra == 'group-28-ansible-collection-smallstep-ansible-2-21')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "iniconfig" },
     { name = "packaging" },
     { name = "pluggy" },
@@ -1670,7 +1670,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
     { name = "rpds-py" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'group-28-ansible-collection-smallstep-ansible-2-20' and extra == 'group-28-ansible-collection-smallstep-ansible-2-21')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/22/f5/df4e9027acead3ecc63e50fe1e36aca1523e1719559c499951bb4b53188f/referencing-0.37.0.tar.gz", hash = "sha256:44aefc3142c5b842538163acb373e24cce6632bd54bdb01b21ad5863489f50d8", size = 78036, upload-time = "2025-10-13T15:30:48.871Z" }
 wheels = [
@@ -1859,7 +1859,7 @@ name = "selinux"
 version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "distro", marker = "sys_platform == 'linux' or sys_platform == 'linux2' or (extra == 'group-28-ansible-collection-smallstep-ansible-2-20' and extra == 'group-28-ansible-collection-smallstep-ansible-2-21')" },
+    { name = "distro" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/25/07/51acd62e1e15e1172d46f7e32faf138725b147f8c08dbf2d512159d7a310/selinux-0.3.0.tar.gz", hash = "sha256:2a88b337ac46ad0f06f557b2806c3df62421972f766673dd8bf26732fb75a9ea", size = 13479, upload-time = "2022-12-24T16:42:13.163Z" }
 wheels = [
@@ -1909,7 +1909,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "alabaster" },
     { name = "babel" },
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'group-28-ansible-collection-smallstep-ansible-2-20' and extra == 'group-28-ansible-collection-smallstep-ansible-2-21')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "docutils" },
     { name = "imagesize" },
     { name = "jinja2" },
@@ -2060,7 +2060,7 @@ version = "0.27.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-doc" },
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'group-28-ansible-collection-smallstep-ansible-2-20' and extra == 'group-28-ansible-collection-smallstep-ansible-2-21')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "rich" },
     { name = "shellingham" },
 ]

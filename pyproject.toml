@@ -11,7 +11,7 @@ dev = [
     "antsibull-docs==2.27.0",
     "molecule==26.10.0",
     "molecule-plugins[docker]==26.10.12",
-    "pre-commit==4.6.2",
+    "pre-commit==4.7.0",
     "pylint==4.0.9",
     "pytest==9.1.1",
     "sphinx-ansible-theme==0.10.4",
