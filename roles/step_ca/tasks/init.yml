@@ -108,6 +108,7 @@
         name: "{{ step_ca_tmp_provisioner }}"
         type: JWK
         state: absent
+        step_cli_executable: "{{ step_cli_executable }}"
       environment:
         STEPPATH: "{{ step_ca_path }}"
       become: yes
