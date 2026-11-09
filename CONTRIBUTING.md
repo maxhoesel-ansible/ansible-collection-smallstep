@@ -31,7 +31,7 @@ Here are some general hints for plugin development:
 - All plugins should target Python 3.6 as the minimum supported version
 - Read the [Ansible module conventions](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_best_practices.html)
 - Use the pre-existing `doc_fragments` and `module_utils` python modules where applicable. Feel free to use an existing plugin/module as a base
-- Name your module according to the `step-li` command that it wraps around (Example: `step-cli ca provisioner` -> `step_ca_provisioner`).
+- Name your module according to the `step-cli` command that it wraps around (Example: `step-cli ca provisioner` -> `step_ca_provisioner`).
 - Use the `CLIWrapper` class in [step_cli_wrapper.py](/plugins/module_utils/step_cli_wrapper.py) to run step-cli commands
 - Try to make the calls idempotent where possible.
 - Modules should always support check mode
