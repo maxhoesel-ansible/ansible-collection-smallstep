@@ -7,7 +7,7 @@ dependencies = []
 
 [dependency-groups]
 dev = [
-    "ansible-lint==26.10.1",
+    "ansible-lint==26.11.0",
     "antsibull-docs==2.28.0",
     "molecule==26.10.0",
     "molecule-plugins[docker]==26.11.0",
