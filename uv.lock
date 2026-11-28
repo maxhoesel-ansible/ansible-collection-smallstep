@@ -202,7 +202,7 @@ ansible-2-20 = [{ name = "ansible-core", specifier = "==2.20.11" }]
 ansible-2-21 = [{ name = "ansible-core", specifier = "==2.21.6" }]
 dev = [
     { name = "ansible-lint", specifier = "==26.11.0" },
-    { name = "antsibull-docs", specifier = "==2.28.0" },
+    { name = "antsibull-docs", specifier = "==2.29.1" },
     { name = "molecule", specifier = "==26.10.0" },
     { name = "molecule-plugins", extras = ["docker"], specifier = "==26.11.0" },
     { name = "pre-commit", specifier = "==4.7.0" },
@@ -358,13 +358,14 @@ wheels = [
 
 [[package]]
 name = "antsibull-docs"
-version = "2.28.0"
+version = "2.29.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
     { name = "ansible-pygments" },
     { name = "antsibull-changelog" },
     { name = "antsibull-core" },
+    { name = "antsibull-docs-loader" },
     { name = "antsibull-docs-parser" },
     { name = "antsibull-docutils" },
     { name = "antsibull-fileutils" },
@@ -378,9 +379,21 @@ dependencies = [
     { name = "semantic-version" },
     { name = "sphinx" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/99/0f/98e6b0821023096226c4c988c72cf67ca579a18da97d1c8bea142da03984/antsibull_docs-2.28.0.tar.gz", hash = "sha256:6e1cde199ccbe172fbf47e53cbda448223501a7d8b4f06d1b633d3fc8a5949fc", size = 1601688, upload-time = "2026-10-16T09:34:06.569Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/34/33/783eec245daaa5625eae3b24be15af79c42c4d48e54df05961f9df070d92/antsibull_docs-2.29.1.tar.gz", hash = "sha256:4be2fa7a0e430e76a797b2bb2465b891f247d3e2a261242c7e03749237c65458", size = 1950489, upload-time = "2026-11-23T19:29:27.61Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/db/bb/1bc882bac5d01918debcb39aa12dbce090987f03c8864746eb2e5b6073e8/antsibull_docs-2.28.0-py3-none-any.whl", hash = "sha256:e71ef8c52f517eeec5c0f672b4952cd4f8df55461b9b842b4f2544932ab3ba58", size = 302724, upload-time = "2026-10-16T09:34:00.903Z" },
+    { url = "https://files.pythonhosted.org/packages/fc/35/bb991ba3331b760d091087d34a31909059addd0e0bb15d3738cf33139d07/antsibull_docs-2.29.1-py3-none-any.whl", hash = "sha256:c20d15edd1b297ec6bc9cedd1e14d80ab759281cb0b6dad679a3888edf3d52e3", size = 306288, upload-time = "2026-11-23T19:29:29.484Z" },
+]
+
+[[package]]
+name = "antsibull-docs-loader"
+version = "1.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyyaml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/0e/dd/24d279796273c898bdcc0205884ed4c2a3be7999a0696d32c8b77ff12a56/antsibull_docs_loader-1.0.0.tar.gz", hash = "sha256:c1c08623c14d3fc02add4b927678690174f8a082543ea0a48fd61e3647dcd053", size = 58184, upload-time = "2026-11-22T15:24:10.265Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ea/fd/9a6e0f1c87781babc28ef4f8d0088aa4f5b2b7ba490f10d8018d6eafdb9c/antsibull_docs_loader-1.0.0-py3-none-any.whl", hash = "sha256:92ec1647c24e9006efe7bb7525f3087b9ac70c878da2f2a1b105e7485fd7b240", size = 37362, upload-time = "2026-11-22T15:24:11.257Z" },
 ]
 
 [[package]]
